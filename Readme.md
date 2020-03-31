@@ -1,7 +1,7 @@
 # Личный проект «Большое путешествие» [![Build status][travis-image]][travis-url]
 
 * Студент: [Екатерина Мишинкина](https://up.htmlacademy.ru/ecmascript/11/user/1088907).
-* Наставник: `Неизвестно`.
+* Наставник: [Сергей Шершнев](https://up.htmlacademy.ru/ecmascript/11/user/587797).
 
 ---
 
