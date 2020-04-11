@@ -6,6 +6,7 @@ import {createSortingElement} from "./components/sorting.js";
 import {createTripCostElement} from "./components/trip-cost.js";
 import {createTripDayElement} from "./components/trip-day.js";
 import {createTripInfoElement} from "./components/trip-info.js";
+import {generateDayEvents} from "./mock/day-event.js";
 import {generateFilters} from "./mock/filter.js";
 
 const EVENT_COUNT = 3;
@@ -20,6 +21,7 @@ const tripMenuElement = tripControlsElement.querySelector(`h2:first-child`);
 const tripEventsElement = document.querySelector(`.trip-events`);
 
 const filters = generateFilters();
+const dayEvents = generateDayEvents(EVENT_COUNT);
 
 render(tripMainElement, createTripInfoElement(), `afterbegin`);
 
@@ -36,6 +38,6 @@ render(tripEventsElement, createTripDayElement(), `beforeend`);
 
 const tripEventsOfDayElement = tripEventsElement.querySelector(`.trip-events__list`);
 
-for (let i = 0; i < EVENT_COUNT; i++) {
-  render(tripEventsOfDayElement, createDayEventElement(), `beforeend`);
+for (let i = 0; i < dayEvents.length; i++) {
+  render(tripEventsOfDayElement, createDayEventElement(dayEvents[i]), `beforeend`);
 }
