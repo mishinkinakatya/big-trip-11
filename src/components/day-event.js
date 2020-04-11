@@ -1,7 +1,7 @@
-import {formatDate} from "../utils.js";
-import {generateOffers} from "../mock/day-event.js";
+import {formatDate, generateRandomArrayFromAnother} from "../utils.js";
+import {generateOffers} from "../mock/event.js";
 
-export const createDayEventElement = (dayEvent) => {
+export const createDayEventTemplate = (dayEvent) => {
   const {eventType, eventTitle, eventPrice, eventStartDay, eventEndDay, eventStartTime, eventEndTime} = dayEvent;
 
   const startDay = formatDate(eventStartDay);
@@ -19,7 +19,7 @@ export const createDayEventElement = (dayEvent) => {
     );
   };
 
-  const eventOffers = (generateOffers().length > 3 ? generateOffers().slice(0, 3) : generateOffers());
+  const eventOffers = generateRandomArrayFromAnother(generateOffers(), 0, 3);
 
   const offersMarkup = eventOffers.map((it) => createOfferMarkup(it[0], it[1])).join(`\n`);
 

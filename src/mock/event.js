@@ -1,4 +1,4 @@
-import {EVENT_POINT, EVENT_STATION, EVENT_MOTION, EVENT_DESTINATION, priceToOffer} from "../const.js";
+import {EVENT_POINT, EVENT_ACTIVITY, EVENT_TRANSPORT, EVENT_DESTINATION, priceToOffer} from "../const.js";
 import {castDateTimeFormat, generateRandomArrayItem, getRandomIntegeNumber} from "../utils.js";
 
 const generateDayEvent = () => {
@@ -23,10 +23,10 @@ const generateDayEvents = (count) => {
 };
 
 const eventTitle = (eventPoint) => {
-  if (EVENT_STATION.includes(eventPoint)) {
+  if (EVENT_ACTIVITY.includes(eventPoint)) {
     return `${eventPoint} in ${generateRandomArrayItem(EVENT_DESTINATION)}`;
   }
-  if (EVENT_MOTION.includes(eventPoint)) {
+  if (EVENT_TRANSPORT.includes(eventPoint)) {
     return `${eventPoint} to ${generateRandomArrayItem(EVENT_DESTINATION)}`;
   }
   return null;
