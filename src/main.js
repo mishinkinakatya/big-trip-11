@@ -4,7 +4,7 @@ import {createFilterTemplate} from "./components/filter.js";
 import {createSiteMenuTemplate} from "./components/site-menu.js";
 import {createSortingTemplate} from "./components/sorting.js";
 import {createTripCostTemplate} from "./components/trip-cost.js";
-import {createTripDayTemplate} from "./components/trip-day.js";
+import {createTripDaysTemplate} from "./components/trip-day.js";
 import {createTripInfoTemplate} from "./components/trip-info.js";
 import {generateDayEvents} from "./mock/event.js";
 import {generateFilters} from "./mock/filter.js";
@@ -34,7 +34,7 @@ render(tripControlsElement, createFilterTemplate(filters), `beforeend`);
 render(tripEventsElement, createSortingTemplate(), `beforeend`);
 render(tripEventsElement, createEventEditTemplate(), `beforeend`);
 
-render(tripEventsElement, createTripDayTemplate(), `beforeend`);
+render(tripEventsElement, createTripDaysTemplate(), `beforeend`);
 
 const tripEventsOfDayElement = tripEventsElement.querySelector(`.trip-events__list`);
 

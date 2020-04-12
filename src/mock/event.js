@@ -1,20 +1,19 @@
 import {EVENT_POINT, EVENT_ACTIVITY, EVENT_TRANSPORT, EVENT_DESTINATION, priceToOffer} from "../const.js";
-import {castDateTimeFormat, generateRandomArrayItem, getRandomIntegeNumber} from "../utils.js";
+import {generateRandomArrayItem, getRandomIntegeNumber, calculateEventDuration} from "../utils.js";
 
 const generateDayEvent = () => {
 
   const eventPoint = generateRandomArrayItem(EVENT_POINT);
-  const eventStartDay = getRandomStartDate();
-  const eventEndDay = getRandomEndDate(eventStartDay);
+  const eventStartDate = getRandomStartDate();
+  const eventEndDate = getRandomEndDate(eventStartDate);
 
   return {
     eventType: (eventPoint === `Check`) ? `check-in` : eventPoint,
     eventTitle: eventTitle(eventPoint),
     eventPrice: getRandomIntegeNumber(0, 100),
-    eventStartTime: `${castDateTimeFormat(getRandomIntegeNumber(0, 23))}:${castDateTimeFormat(getRandomIntegeNumber(0, 59))}`,
-    eventEndTime: `${castDateTimeFormat(getRandomIntegeNumber(0, 23))}:${castDateTimeFormat(getRandomIntegeNumber(0, 59))}`,
-    eventStartDay,
-    eventEndDay,
+    eventStartDate,
+    eventEndDate,
+    eventDuration: calculateEventDuration(Date.parse(eventEndDate) - Date.parse(eventStartDate)),
   };
 };
 
@@ -34,17 +33,29 @@ const eventTitle = (eventPoint) => {
 
 const getRandomStartDate = () => {
   const targetDate = new Date();
-  const diffValue = getRandomIntegeNumber(1, 28);
+  const diffDate = getRandomIntegeNumber(0, 10);
 
-  targetDate.setDate(targetDate.getDate() + diffValue);
+  const diffHours = getRandomIntegeNumber(0, 23);
+  const diffMinutes = getRandomIntegeNumber(0, 59);
+
+  targetDate.setDate(targetDate.getDate() + diffDate);
+  targetDate.setHours(targetDate.getHours() + diffHours);
+  targetDate.setMinutes(targetDate.getMinutes() + diffMinutes);
+
   return targetDate;
 };
 
-const getRandomEndDate = (day) => {
-  const targetDate = day;
-  const diffValue = getRandomIntegeNumber(1, 28);
+const getRandomEndDate = (startDate) => {
+  const targetDate = new Date(startDate);
+  const diffDate = getRandomIntegeNumber(0, 10);
 
-  targetDate.setDate(targetDate.getDate() + diffValue);
+  const diffHours = diffDate === 0 ? getRandomIntegeNumber(targetDate.getHours(), 23) : getRandomIntegeNumber(0, 23);
+  const diffMinutes = diffHours === 0 ? getRandomIntegeNumber(targetDate.getMinutes(), 59) : getRandomIntegeNumber(0, 59);
+
+  targetDate.setDate(targetDate.getDate() + diffDate);
+  targetDate.setHours(targetDate.getHours() + diffHours);
+  targetDate.setMinutes(targetDate.getMinutes() + diffMinutes);
+
   return targetDate;
 };
 
@@ -53,4 +64,8 @@ const generateOffers = () => {
   );
 };
 
-export {generateDayEvent, generateDayEvents, generateOffers};
+const tripDay = [
+  `2019-03-18`,
+];
+
+export {generateDayEvent, generateDayEvents, generateOffers, tripDay};

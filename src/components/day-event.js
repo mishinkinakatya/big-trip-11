@@ -1,13 +1,14 @@
-import {formatDate, generateRandomArrayFromAnother} from "../utils.js";
+import {formatDate, formatTime, generateRandomArrayFromAnother} from "../utils.js";
 import {generateOffers} from "../mock/event.js";
 
 export const createDayEventTemplate = (dayEvent) => {
-  const {eventType, eventTitle, eventPrice, eventStartDay, eventEndDay, eventStartTime, eventEndTime} = dayEvent;
+  const {eventType, eventTitle, eventPrice, eventStartDate, eventEndDate, eventDuration} = dayEvent;
 
-  const startDay = formatDate(eventStartDay);
-  const endDay = formatDate(eventEndDay);
+  const startDay = formatDate(eventStartDate);
+  const endDay = formatDate(eventEndDate);
 
-  const eventDuration = `30M`;
+  const startTime = formatTime(eventStartDate);
+  const endTime = formatTime(eventEndDate);
 
   const createOfferMarkup = (type, price) => {
     return (
@@ -33,9 +34,9 @@ export const createDayEventTemplate = (dayEvent) => {
 
         <div class="event__schedule">
             <p class="event__time">
-              <time class="event__start-time" datetime="${startDay}T${eventStartTime}">${eventStartTime}</time>
+              <time class="event__start-time" datetime="${startDay}T${startTime}">${startTime}</time>
               &mdash;
-              <time class="event__end-time" datetime="${endDay}T${eventEndTime}">${eventEndTime}</time>
+              <time class="event__end-time" datetime="${endDay}T${endTime}">${endTime}</time>
             </p>
             <p class="event__duration">${eventDuration}</p>
         </div>

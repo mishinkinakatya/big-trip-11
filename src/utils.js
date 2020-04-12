@@ -10,7 +10,7 @@ const formatTime = (date) => {
 };
 
 const formatDate = (date) => {
-  const day = castDateTimeFormat(date.getDay());
+  const day = castDateTimeFormat(date.getDate());
   const month = castDateTimeFormat(date.getMonth());
   const year = castDateTimeFormat(date.getFullYear());
 
@@ -35,4 +35,26 @@ const generateRandomArrayFromAnother = (initialArray, newArrayMinLength, newArra
   return initialArray.slice(indexStart, indexStart + countItems);
 };
 
-export {castDateTimeFormat, formatTime, formatDate, generateRandomArrayItem, getRandomIntegeNumber, generateRandomArrayFromAnother};
+const calculateEventDuration = (diff) => {
+  const MS_IN_DAY = 86400000;
+  const MS_IN_HOUR = 3600000;
+  const MS_IN_MINUTE = 60000;
+
+  const dayCount = castDateTimeFormat(Math.trunc(diff / MS_IN_DAY));
+
+  diff -= dayCount * MS_IN_DAY;
+  const hourCount = castDateTimeFormat(Math.trunc(diff / MS_IN_HOUR));
+  diff -= hourCount * MS_IN_HOUR;
+  const minutesCount = castDateTimeFormat(Math.trunc(diff / MS_IN_MINUTE));
+
+  if (dayCount > 0) {
+    return `${dayCount}D ${hourCount}H ${minutesCount}M`;
+  } else if (hourCount > 0) {
+    return `${hourCount}H ${minutesCount}M`;
+  } else {
+    return `${minutesCount}M`;
+  }
+};
+
+export {castDateTimeFormat, formatTime, formatDate, generateRandomArrayItem, getRandomIntegeNumber, generateRandomArrayFromAnother, calculateEventDuration};
+
