@@ -1,6 +1,6 @@
 import {EVENT_ACTIVITY, EVENT_TRANSPORT, EVENT_DESTINATION, EVENT_DESCRIPTION} from "../const.js";
 import {generateOffers} from "../mock/event.js";
-import {generateRandomArrayFromAnother} from "../utils.js";
+import {generateRandomArrayFromAnother, getRandomStartDate, getRandomEndDate, castDateTimeFormat} from "../utils.js";
 
 const createEventTypeMarkup = (eventType) => {
   const type = (eventType === `check`) ? `check-in` : eventType;
@@ -18,6 +18,19 @@ const createDestinationMarkup = (destination) => {
   );
 };
 
+const formatDateTime = (date) => {
+  const day = castDateTimeFormat(date.getDate());
+  const month = castDateTimeFormat(date.getMonth());
+  const year = String(date.getFullYear()).slice(2, 4);
+  const hours = castDateTimeFormat(date.getHours() % 12);
+  const minutes = castDateTimeFormat(date.getMinutes());
+
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
+};
+
+const startDate = getRandomStartDate();
+const endDate = getRandomEndDate(startDate);
+
 const createOfferMarkup = (offer, price, isChecked) => {
   return (
     `<div class="event__offer-selector">
@@ -31,17 +44,33 @@ const createOfferMarkup = (offer, price, isChecked) => {
   );
 };
 
+const createPhotosMarkup = () => {
+  return (
+    `<img class="event__photo" src="http://picsum.photos/248/152?r=${Math.random()}" alt="Event photo"></img>
+     <img class="event__photo" src="http://picsum.photos/248/152?r=${Math.random()}" alt="Event photo"></img>
+     <img class="event__photo" src="http://picsum.photos/248/152?r=${Math.random()}" alt="Event photo"></img>`
+  );
+};
+
 const eventOffers = generateRandomArrayFromAnother(generateOffers(), 0, 4);
 
-const eventTimeMarkup = `<input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="18/03/19 00:00" />`;
 
 export const createEventEditTemplate = () => {
 
   const eventTransportsMarkup = EVENT_TRANSPORT.map((it) => createEventTypeMarkup(it.toLowerCase())).join(`\n`);
   const eventActivitiesMarkup = EVENT_ACTIVITY.map((it) => createEventTypeMarkup(it.toLowerCase())).join(`\n`);
   const eventDestinationsMarkup = EVENT_DESTINATION.map((it) => createDestinationMarkup(it)).join(`\n`);
+
   const offersMarkup = eventOffers.map((it) => createOfferMarkup(it[0], it[1], Math.random() > 0.5)).join(`\n`);
+  const isOfferShowing = !!offersMarkup;
+
   const descriptionMarkup = generateRandomArrayFromAnother(EVENT_DESCRIPTION, 1, 5).join(`\n`);
+  const isDescriptionShowing = !!descriptionMarkup;
+
+  const photosMarkup = createPhotosMarkup();
+  const isPhotosShowing = !!photosMarkup;
+
+  const isEventDetailsShowing = isOfferShowing || isDescriptionShowing || isPhotosShowing;
 
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -80,12 +109,12 @@ export const createEventEditTemplate = () => {
           <label class="visually-hidden" for="event-start-time-1">
             From
           </label>
-          ${eventTimeMarkup}
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatDateTime(startDate)}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">
             To
           </label>
-          ${eventTimeMarkup}
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatDateTime(endDate)}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -99,28 +128,34 @@ export const createEventEditTemplate = () => {
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
         <button class="event__reset-btn" type="reset">Cancel</button>
       </header>
-      <section class="event__details">
-        <section class="event__section  event__section--offers">
+
+      ${isEventDetailsShowing ?
+      `<section class="event__details">
+      ${isOfferShowing ?
+      `<section class="event__section  event__section--offers">
           <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
           <div class="event__available-offers">
           ${offersMarkup}
           </div>
-        </section>
+        </section>`
+      : ``}
 
         <section class="event__section  event__section--destination">
-          <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-          <p class="event__destination-description">${descriptionMarkup}</p>
-
-          <div class="event__photos-container">
+        ${isDescriptionShowing ?
+      `<h3 class="event__section-title  event__section-title--destination">Destination</h3>
+          <p class="event__destination-description">${descriptionMarkup}</p>`
+      : ``}
+      ${isPhotosShowing ?
+      `<div class="event__photos-container">
             <div class="event__photos-tape">
-              <img class="event__photo" src="http://picsum.photos/248/152?r=${Math.random()}" alt="Event photo">
-              <img class="event__photo" src="http://picsum.photos/248/152?r=${Math.random()}" alt="Event photo">
-              <img class="event__photo" src="http://picsum.photos/248/152?r=${Math.random()}" alt="Event photo">
+            ${photosMarkup}
             </div>
-          </div>
+          </div>`
+      : ``}
         </section>
-      </section>
+      </section>`
+      : ``}
     </form>`
   );
 };

@@ -12,7 +12,7 @@ const formatTime = (date) => {
 const formatDate = (date) => {
   const day = castDateTimeFormat(date.getDate());
   const month = castDateTimeFormat(date.getMonth());
-  const year = castDateTimeFormat(date.getFullYear());
+  const year = date.getFullYear();
 
   return `${year}-${month}-${day}`;
 };
@@ -33,6 +33,34 @@ const generateRandomArrayFromAnother = (initialArray, newArrayMinLength, newArra
   const indexStart = getRandomIntegeNumber(0, arrayLength - 1);
 
   return initialArray.slice(indexStart, indexStart + countItems);
+};
+
+const getRandomStartDate = () => {
+  const targetDate = new Date();
+  const diffDate = getRandomIntegeNumber(0, 10);
+
+  const diffHours = getRandomIntegeNumber(0, 23);
+  const diffMinutes = getRandomIntegeNumber(0, 59);
+
+  targetDate.setDate(targetDate.getDate() + diffDate);
+  targetDate.setHours(targetDate.getHours() + diffHours);
+  targetDate.setMinutes(targetDate.getMinutes() + diffMinutes);
+
+  return targetDate;
+};
+
+const getRandomEndDate = (startDate) => {
+  const targetDate = new Date(startDate);
+  const diffDate = getRandomIntegeNumber(0, 10);
+
+  const diffHours = diffDate === 0 ? getRandomIntegeNumber(targetDate.getHours(), 23) : getRandomIntegeNumber(0, 23);
+  const diffMinutes = diffHours === 0 ? getRandomIntegeNumber(targetDate.getMinutes(), 59) : getRandomIntegeNumber(0, 59);
+
+  targetDate.setDate(targetDate.getDate() + diffDate);
+  targetDate.setHours(targetDate.getHours() + diffHours);
+  targetDate.setMinutes(targetDate.getMinutes() + diffMinutes);
+
+  return targetDate;
 };
 
 const calculateEventDuration = (diff) => {
@@ -56,5 +84,5 @@ const calculateEventDuration = (diff) => {
   }
 };
 
-export {castDateTimeFormat, formatTime, formatDate, generateRandomArrayItem, getRandomIntegeNumber, generateRandomArrayFromAnother, calculateEventDuration};
+export {castDateTimeFormat, formatTime, formatDate, generateRandomArrayItem, getRandomIntegeNumber, generateRandomArrayFromAnother, calculateEventDuration, getRandomStartDate, getRandomEndDate};
 
