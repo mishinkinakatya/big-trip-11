@@ -10,7 +10,7 @@ import {generateDayEvents} from "./mock/event.js";
 import {generateFilters} from "./mock/filter.js";
 import {castDateTimeFormat} from "./utils.js";
 
-const EVENT_COUNT = 5;
+const EVENT_COUNT = 23;
 
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
@@ -41,20 +41,20 @@ render(tripEventsElement, createTripDaysTemplate(eventDays), `beforeend`);
 
 const tripDaysElement = tripEventsElement.querySelectorAll(`.trip-days__item`);
 
-for (let i = 0; i < tripDaysElement.length; i++) {
-
-  const tripEventsOfDayElement = tripDaysElement.item(i).querySelector(`.trip-events__list`);
-  const tripDay = tripDaysElement.item(i).querySelector(`.day__date`).getAttribute(`dateTime`);
+tripDaysElement.forEach((day) => {
+  const tripEventsOfDayElement = day.querySelector(`.trip-events__list`);
+  const tripDay = day.querySelector(`.day__date`).getAttribute(`dateTime`);
 
   const tripDate = tripDay.slice(8, 10);
   const tripMonth = tripDay.slice(5, 7);
 
-  for (let j = 0; j < allEvents.length; j++) {
-    const eventDate = castDateTimeFormat(allEvents[j].eventStartDate.getDate());
-    const eventMonth = castDateTimeFormat(allEvents[j].eventStartDate.getMonth());
+  allEvents.forEach((eventItem) => {
+    const eventDate = castDateTimeFormat(eventItem.eventStartDate.getDate());
+    const eventMonth = castDateTimeFormat(eventItem.eventStartDate.getMonth());
 
     if (tripMonth === eventMonth && tripDate === eventDate) {
-      render(tripEventsOfDayElement, createDayEventTemplate(allEvents[j]), `beforeend`);
+      render(tripEventsOfDayElement, createDayEventTemplate(eventItem), `beforeend`);
     }
-  }
-}
+  });
+
+});

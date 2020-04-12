@@ -36,4 +36,4 @@ const generateOffers = () => {
   );
 };
 
-export {generateDayEvent, generateDayEvents, generateOffers};
+export {generateDayEvents, generateOffers};

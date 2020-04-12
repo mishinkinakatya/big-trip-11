@@ -12,7 +12,6 @@ const createTripDay = (number, date, descriptionDate) => {
   );
 };
 
-
 export const createTripDaysTemplate = (day) => {
   const createDescriptionDate = (item) => {
 
