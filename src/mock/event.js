@@ -64,8 +64,4 @@ const generateOffers = () => {
   );
 };
 
-const tripDay = [
-  `2019-03-18`,
-];
-
-export {generateDayEvent, generateDayEvents, generateOffers, tripDay};
+export {generateDayEvent, generateDayEvents, generateOffers};

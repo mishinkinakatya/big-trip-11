@@ -8,8 +8,9 @@ import {createTripDaysTemplate} from "./components/trip-day.js";
 import {createTripInfoTemplate} from "./components/trip-info.js";
 import {generateDayEvents} from "./mock/event.js";
 import {generateFilters} from "./mock/filter.js";
+import {castDateTimeFormat} from "./utils.js";
 
-const EVENT_COUNT = 3;
+const EVENT_COUNT = 5;
 
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
@@ -21,7 +22,8 @@ const tripMenuElement = tripControlsElement.querySelector(`h2:first-child`);
 const tripEventsElement = document.querySelector(`.trip-events`);
 
 const filters = generateFilters();
-const dayEvents = generateDayEvents(EVENT_COUNT);
+const allEvents = generateDayEvents(EVENT_COUNT);
+const eventDays = allEvents.map((it) => [`${it.eventStartDate.getFullYear()}-${castDateTimeFormat(it.eventStartDate.getMonth())}-${castDateTimeFormat(it.eventStartDate.getDate())}`].join(`, `));
 
 render(tripMainElement, createTripInfoTemplate(), `afterbegin`);
 
@@ -34,10 +36,25 @@ render(tripControlsElement, createFilterTemplate(filters), `beforeend`);
 render(tripEventsElement, createSortingTemplate(), `beforeend`);
 render(tripEventsElement, createEventEditTemplate(), `beforeend`);
 
-render(tripEventsElement, createTripDaysTemplate(), `beforeend`);
 
-const tripEventsOfDayElement = tripEventsElement.querySelector(`.trip-events__list`);
+render(tripEventsElement, createTripDaysTemplate(eventDays), `beforeend`);
 
-for (let i = 0; i < dayEvents.length; i++) {
-  render(tripEventsOfDayElement, createDayEventTemplate(dayEvents[i]), `beforeend`);
+const tripDaysElement = tripEventsElement.querySelectorAll(`.trip-days__item`);
+
+for (let i = 0; i < tripDaysElement.length; i++) {
+
+  const tripEventsOfDayElement = tripDaysElement.item(i).querySelector(`.trip-events__list`);
+  const tripDay = tripDaysElement.item(i).querySelector(`.day__date`).getAttribute(`dateTime`);
+
+  const tripDate = tripDay.slice(8, 10);
+  const tripMonth = tripDay.slice(5, 7);
+
+  for (let j = 0; j < allEvents.length; j++) {
+    const eventDate = castDateTimeFormat(allEvents[j].eventStartDate.getDate());
+    const eventMonth = castDateTimeFormat(allEvents[j].eventStartDate.getMonth());
+
+    if (tripMonth === eventMonth && tripDate === eventDate) {
+      render(tripEventsOfDayElement, createDayEventTemplate(allEvents[j]), `beforeend`);
+    }
+  }
 }
