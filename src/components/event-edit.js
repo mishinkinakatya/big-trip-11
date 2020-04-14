@@ -1,73 +1,70 @@
-import {EVENT_ACTIVITY, EVENT_TRANSPORT, EVENT_DESTINATION, EVENT_DESCRIPTION} from "../const.js";
-import {generateOffers} from "../mock/event.js";
-import {generateRandomArrayFromAnother, getRandomStartDate, getRandomEndDate, castDateTimeFormat} from "../utils.js";
+import {generateRandomArrayFromAnother, formatDateTime} from "../utils.js";
 
-const createEventTypeMarkup = (eventType) => {
-  const type = (eventType === `check`) ? `check-in` : eventType;
-  return (
-    `<div class="event__type-item">
-      <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
-      <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${type[0].toUpperCase() + type.slice(1)}</label>
-    </div>`
-  );
-};
+export const createEventEditTemplate = (eventOfTrip) => {
+  const {startDate, endDate, activity, transport, destination, description, offers, photos} = eventOfTrip;
 
-const createDestinationMarkup = (destination) => {
-  return (
-    `<option value="${destination}"></option>`
-  );
-};
+  const start = formatDateTime(startDate);
+  const end = formatDateTime(endDate);
 
-const formatDateTime = (date) => {
-  const day = castDateTimeFormat(date.getDate());
-  const month = castDateTimeFormat(date.getMonth());
-  const year = String(date.getFullYear()).slice(2, 4);
-  const hours = castDateTimeFormat(date.getHours() % 12);
-  const minutes = castDateTimeFormat(date.getMinutes());
+  const createEventTypeMarkup = (eventType) => {
+    const type = (eventType === `check`) ? `check-in` : eventType;
+    return (
+      `<div class="event__type-item">
+        <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
+        <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${type[0].toUpperCase() + type.slice(1)}</label>
+      </div>`
+    );
+  };
 
-  return `${day}/${month}/${year} ${hours}:${minutes}`;
-};
+  const eventTransportsMarkup = transport.map((it) => createEventTypeMarkup(it.toLowerCase())).join(`\n`);
+  const eventActivitiesMarkup = activity.map((it) => createEventTypeMarkup(it.toLowerCase())).join(`\n`);
 
-const startDate = getRandomStartDate();
-const endDate = getRandomEndDate(startDate);
+  const createDestinationMarkup = (eventDestination) => {
+    return (
+      `<option value="${eventDestination}"></option>`
+    );
+  };
 
-const createOfferMarkup = (offer, price, isChecked) => {
-  return (
-    `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer}-1" type="checkbox" name="event-offer-${offer}" ${isChecked ? `checked` : ``}>
-      <label class="event__offer-label" for="event-offer-${offer}-1">
-        <span class="event__offer-title">Add ${offer}</span>
-        &plus;
-        &euro;&nbsp;<span class="event__offer-price">${price}</span>
-      </label>
-    </div>`
-  );
-};
+  const eventDestinationsMarkup = destination.map((it) => createDestinationMarkup(it)).join(`\n`);
 
-const createPhotosMarkup = () => {
-  return (
-    `<img class="event__photo" src="http://picsum.photos/248/152?r=${Math.random()}" alt="Event photo"></img>
-     <img class="event__photo" src="http://picsum.photos/248/152?r=${Math.random()}" alt="Event photo"></img>
-     <img class="event__photo" src="http://picsum.photos/248/152?r=${Math.random()}" alt="Event photo"></img>`
-  );
-};
+  const offersCount = {
+    min: 0,
+    max: 4,
+  };
+  const offersForEdit = generateRandomArrayFromAnother(offers, offersCount.min, offersCount.max);
 
-const eventOffers = generateRandomArrayFromAnother(generateOffers(), 0, 4);
+  const descriptionLength = {
+    min: 1,
+    max: 5,
+  };
+  const descriptionForEdit = generateRandomArrayFromAnother(description, descriptionLength.min, descriptionLength.max);
 
+  const createOfferMarkup = (offer, price, isChecked) => {
+    return (
+      `<div class="event__offer-selector">
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer}-1" type="checkbox" name="event-offer-${offer}" ${isChecked ? `checked` : ``}>
+        <label class="event__offer-label" for="event-offer-${offer}-1">
+          <span class="event__offer-title">Add ${offer}</span>
+          &plus;
+          &euro;&nbsp;<span class="event__offer-price">${price}</span>
+        </label>
+      </div>`
+    );
+  };
 
-export const createEventEditTemplate = () => {
-
-  const eventTransportsMarkup = EVENT_TRANSPORT.map((it) => createEventTypeMarkup(it.toLowerCase())).join(`\n`);
-  const eventActivitiesMarkup = EVENT_ACTIVITY.map((it) => createEventTypeMarkup(it.toLowerCase())).join(`\n`);
-  const eventDestinationsMarkup = EVENT_DESTINATION.map((it) => createDestinationMarkup(it)).join(`\n`);
-
-  const offersMarkup = eventOffers.map((it) => createOfferMarkup(it[0], it[1], Math.random() > 0.5)).join(`\n`);
+  const offersMarkup = offersForEdit.map((it) => createOfferMarkup(it[0], it[1], Math.random() > 0.5)).join(`\n`);
   const isOfferShowing = !!offersMarkup;
 
-  const descriptionMarkup = generateRandomArrayFromAnother(EVENT_DESCRIPTION, 1, 5).join(`\n`);
+  const descriptionMarkup = descriptionForEdit.join(`\n`);
   const isDescriptionShowing = !!descriptionMarkup;
 
-  const photosMarkup = createPhotosMarkup();
+  const createPhotosMarkup = (photo) => {
+    return (
+      `<img class="event__photo" src="${photo}" alt="Event photo"></img>`
+    );
+  };
+
+  const photosMarkup = photos.map((it) => createPhotosMarkup(it)).join(`\n`);
   const isPhotosShowing = !!photosMarkup;
 
   const isEventDetailsShowing = isOfferShowing || isDescriptionShowing || isPhotosShowing;
@@ -109,12 +106,12 @@ export const createEventEditTemplate = () => {
           <label class="visually-hidden" for="event-start-time-1">
             From
           </label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatDateTime(startDate)}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${start}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">
             To
           </label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatDateTime(endDate)}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${end}">
         </div>
 
         <div class="event__field-group  event__field-group--price">

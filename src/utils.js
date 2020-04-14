@@ -17,6 +17,16 @@ const formatDate = (date) => {
   return `${year}-${month}-${day}`;
 };
 
+const formatDateTime = (date) => {
+  const day = castDateTimeFormat(date.getDate());
+  const month = castDateTimeFormat(date.getMonth());
+  const year = String(date.getFullYear()).slice(2, 4);
+  const hours = castDateTimeFormat(date.getHours() % 12);
+  const minutes = castDateTimeFormat(date.getMinutes());
+
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
+};
+
 const generateRandomArrayItem = (array) => {
   const randomIndex = getRandomIntegeNumber(0, array.length);
 
@@ -84,5 +94,5 @@ const calculateEventDuration = (diff) => {
   }
 };
 
-export {castDateTimeFormat, formatTime, formatDate, generateRandomArrayItem, getRandomIntegeNumber, generateRandomArrayFromAnother, calculateEventDuration, getRandomStartDate, getRandomEndDate};
+export {castDateTimeFormat, formatTime, formatDate, generateRandomArrayItem, getRandomIntegeNumber, generateRandomArrayFromAnother, calculateEventDuration, getRandomStartDate, getRandomEndDate, formatDateTime};
 

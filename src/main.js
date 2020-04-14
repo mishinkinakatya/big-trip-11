@@ -1,12 +1,12 @@
-import {createDayEventTemplate} from "./components/day-event.js";
+import {createDayEventTemplate} from "./components/events-of-day.js";
 import {createEventEditTemplate} from "./components/event-edit.js";
 import {createFilterTemplate} from "./components/filter.js";
 import {createSiteMenuTemplate} from "./components/site-menu.js";
-import {createSortingTemplate} from "./components/sorting.js";
+import {createSortTemplate} from "./components/sort.js";
 import {createTripCostTemplate} from "./components/trip-cost.js";
 import {createTripDaysTemplate} from "./components/trip-day.js";
 import {createTripInfoTemplate} from "./components/trip-info.js";
-import {generateDayEvents} from "./mock/event.js";
+import {generateDayEvents} from "./mock/event-of-trip.js";
 import {generateFilters} from "./mock/filter.js";
 import {castDateTimeFormat} from "./utils.js";
 
@@ -23,7 +23,7 @@ const tripEventsElement = document.querySelector(`.trip-events`);
 
 const filters = generateFilters();
 const allEvents = generateDayEvents(EVENT_COUNT);
-const eventDays = allEvents.map((it) => [`${it.eventStartDate.getFullYear()}-${castDateTimeFormat(it.eventStartDate.getMonth())}-${castDateTimeFormat(it.eventStartDate.getDate())}`].join(`, `));
+const eventDays = allEvents.map((it) => [`${it.startDate.getFullYear()}-${castDateTimeFormat(it.startDate.getMonth())}-${castDateTimeFormat(it.startDate.getDate())}`].join(`, `));
 
 render(tripMainElement, createTripInfoTemplate(), `afterbegin`);
 
@@ -33,8 +33,8 @@ render(tripInfoElement, createTripCostTemplate(), `beforeend`);
 render(tripMenuElement, createSiteMenuTemplate(), `afterend`);
 render(tripControlsElement, createFilterTemplate(filters), `beforeend`);
 
-render(tripEventsElement, createSortingTemplate(), `beforeend`);
-render(tripEventsElement, createEventEditTemplate(), `beforeend`);
+render(tripEventsElement, createSortTemplate(), `beforeend`);
+render(tripEventsElement, createEventEditTemplate(allEvents[0]), `beforeend`);
 
 
 render(tripEventsElement, createTripDaysTemplate(eventDays), `beforeend`);
@@ -49,8 +49,8 @@ tripDaysElement.forEach((day) => {
   const tripMonth = tripDay.slice(5, 7);
 
   allEvents.forEach((eventItem) => {
-    const eventDate = castDateTimeFormat(eventItem.eventStartDate.getDate());
-    const eventMonth = castDateTimeFormat(eventItem.eventStartDate.getMonth());
+    const eventDate = castDateTimeFormat(eventItem.startDate.getDate());
+    const eventMonth = castDateTimeFormat(eventItem.startDate.getMonth());
 
     if (tripMonth === eventMonth && tripDate === eventDate) {
       render(tripEventsOfDayElement, createDayEventTemplate(eventItem), `beforeend`);
