@@ -4,7 +4,7 @@ import {createFilterTemplate} from "./components/filter.js";
 import {createSiteMenuTemplate} from "./components/site-menu.js";
 import {createSortTemplate} from "./components/sort.js";
 import {createTripCostTemplate} from "./components/trip-cost.js";
-import {createTripDaysTemplate} from "./components/trip-day.js";
+import {createTripDaysTemplate} from "./components/trip-days.js";
 import {createTripInfoTemplate} from "./components/trip-info.js";
 import {generateDayEvents} from "./mock/event-of-trip.js";
 import {generateFilters} from "./mock/filter.js";

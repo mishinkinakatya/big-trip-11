@@ -94,5 +94,12 @@ const calculateEventDuration = (diff) => {
   }
 };
 
-export {castDateTimeFormat, formatTime, formatDate, generateRandomArrayItem, getRandomIntegeNumber, generateRandomArrayFromAnother, calculateEventDuration, getRandomStartDate, getRandomEndDate, formatDateTime};
+const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+
+  return newElement.firstChild;
+};
+
+export {castDateTimeFormat, formatTime, formatDate, generateRandomArrayItem, getRandomIntegeNumber, generateRandomArrayFromAnother, calculateEventDuration, getRandomStartDate, getRandomEndDate, formatDateTime, createElement};
 

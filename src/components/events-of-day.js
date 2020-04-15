@@ -1,6 +1,6 @@
-import {formatDate, formatTime} from "../utils.js";
+import {createElement, formatDate, formatTime} from "../utils.js";
 
-export const createDayEventTemplate = (eventOfDay) => {
+const createDayEventTemplate = (eventOfDay) => {
   const {type, title, price, startDate, endDate, duration, offers} = eventOfDay;
 
   const startDay = formatDate(startDate);
@@ -57,3 +57,27 @@ export const createDayEventTemplate = (eventOfDay) => {
     </li>`
   );
 };
+
+export default class EventsOfDay {
+  constructor(event) {
+    this._event = event;
+
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createDayEventTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

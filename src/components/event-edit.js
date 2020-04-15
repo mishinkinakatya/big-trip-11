@@ -1,6 +1,6 @@
-import {formatDateTime} from "../utils.js";
+import {createElement, formatDateTime} from "../utils.js";
 
-export const createEventEditTemplate = (eventOfTrip) => {
+const createEventEditTemplate = (eventOfTrip) => {
   const {startDate, endDate, activity, transport, destination, price, description, offers, photos} = eventOfTrip;
 
   const start = formatDateTime(startDate);
@@ -144,3 +144,27 @@ export const createEventEditTemplate = (eventOfTrip) => {
     </form>`
   );
 };
+
+export default class EventsEdit {
+  constructor(event) {
+    this._event = event;
+
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createEventEditTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
