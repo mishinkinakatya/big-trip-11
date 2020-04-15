@@ -1,11 +1,15 @@
 import {EVENT_POINT, EVENT_ACTIVITY, EVENT_TRANSPORT, EVENT_DESTINATION, EVENT_DESCRIPTION, priceToOffer} from "../const.js";
-import {generateRandomArrayItem, getRandomIntegeNumber, calculateEventDuration, getRandomStartDate, getRandomEndDate} from "../utils.js";
+import {generateRandomArrayItem, getRandomIntegeNumber, calculateEventDuration, getRandomStartDate, getRandomEndDate, generateRandomArrayFromAnother} from "../utils.js";
 
 const generateDayEvent = () => {
 
   const point = generateRandomArrayItem(EVENT_POINT);
   const startDate = getRandomStartDate();
   const endDate = getRandomEndDate(startDate);
+  const descriptionLength = {
+    min: 0,
+    max: 5,
+  };
 
   return {
     type: (point === `Check`) ? `check-in` : point,
@@ -14,11 +18,11 @@ const generateDayEvent = () => {
     startDate,
     endDate,
     duration: calculateEventDuration(Date.parse(endDate) - Date.parse(startDate)),
-    offers: generateOffers(),
+    offers: generateRandomArrayFromAnother(generateOffers(), 0, generateOffers().length),
     activity: EVENT_ACTIVITY,
     transport: EVENT_TRANSPORT,
     destination: EVENT_DESTINATION,
-    description: EVENT_DESCRIPTION,
+    description: generateRandomArrayFromAnother(EVENT_DESCRIPTION, descriptionLength.min, descriptionLength.max),
     photos: generatePhotoSrc(getRandomIntegeNumber(1, 5)),
   };
 };

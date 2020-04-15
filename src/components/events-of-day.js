@@ -1,4 +1,4 @@
-import {formatDate, formatTime, generateRandomArrayFromAnother} from "../utils.js";
+import {formatDate, formatTime} from "../utils.js";
 
 export const createDayEventTemplate = (eventOfDay) => {
   const {type, title, price, startDate, endDate, duration, offers} = eventOfDay;
@@ -19,11 +19,8 @@ export const createDayEventTemplate = (eventOfDay) => {
     );
   };
 
-  const offersCount = {
-    min: 0,
-    max: 3,
-  };
-  const offersOfDay = generateRandomArrayFromAnother(offers, offersCount.min, offersCount.max);
+  const offersMaxCount = 3;
+  const offersOfDay = offers.slice(0, offersMaxCount);
 
   const offersMarkup = offersOfDay.map((it) => createOfferMarkup(it[0], it[1])).join(`\n`);
 
