@@ -18,7 +18,7 @@ const generateDayEvent = () => {
     startDate,
     endDate,
     duration: calculateEventDuration(Date.parse(endDate) - Date.parse(startDate)),
-    offers: generateRandomArrayFromAnother(generateOffers(), 0, generateOffers().length),
+    offers: generateRandomArrayFromAnother(generateOffers(), 0, generateOffers().length).map((it)=> [it[0], it[1], Math.random() > 0.5]),
     activity: EVENT_ACTIVITY,
     transport: EVENT_TRANSPORT,
     destination: EVENT_DESTINATION,

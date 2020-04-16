@@ -20,7 +20,10 @@ const createDayEventTemplate = (eventOfDay) => {
   };
 
   const offersMaxCount = 3;
-  const offersOfDay = offers.slice(0, offersMaxCount);
+  const checkedOffers = offers.filter((offer) => {
+    return offer[2];
+  });
+  const offersOfDay = checkedOffers.slice(0, offersMaxCount);
 
   const offersMarkup = offersOfDay.map((it) => createOfferMarkup(it[0], it[1])).join(`\n`);
 
