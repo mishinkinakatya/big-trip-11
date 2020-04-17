@@ -40,7 +40,7 @@ const createEventEditTemplate = (eventOfTrip) => {
     );
   };
 
-  const offersMarkup = offers.map((it) => createOfferMarkup(it[0], it[1], it[2])).join(`\n`);
+  const offersMarkup = offers.map((it) => createOfferMarkup(it.type, it.price, it.check)).join(`\n`);
   const isOfferShowing = !!offersMarkup;
 
   const descriptionMarkup = description.join(`\n`);

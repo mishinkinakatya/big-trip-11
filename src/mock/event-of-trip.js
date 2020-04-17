@@ -6,7 +6,7 @@ const generateDayEvent = () => {
   const point = generateRandomArrayItem(EVENT_POINT);
   const startDate = getRandomStartDate();
   const endDate = getRandomEndDate(startDate);
-  const descriptionLength = {
+  const DescriptionLength = {
     min: 0,
     max: 5,
   };
@@ -18,11 +18,11 @@ const generateDayEvent = () => {
     startDate,
     endDate,
     duration: calculateEventDuration(Date.parse(endDate) - Date.parse(startDate)),
-    offers: generateRandomArrayFromAnother(generateOffers(), 0, generateOffers().length).map((it)=> [it[0], it[1], Math.random() > 0.5]),
+    offers: generateOffers(priceToOffer),
     activity: EVENT_ACTIVITY,
     transport: EVENT_TRANSPORT,
     destination: EVENT_DESTINATION,
-    description: generateRandomArrayFromAnother(EVENT_DESCRIPTION, descriptionLength.min, descriptionLength.max),
+    description: generateRandomArrayFromAnother(EVENT_DESCRIPTION, DescriptionLength.min, DescriptionLength.max),
     photos: generatePhotoSrc(getRandomIntegeNumber(1, 5)),
   };
 };
@@ -43,9 +43,18 @@ const generateTitle = (point) => {
   return `${point} ${direction} ${generateRandomArrayItem(EVENT_DESTINATION)}`;
 };
 
-const generateOffers = () => {
-  return (Object.entries(priceToOffer)
-  );
+const generateOffers = (offers) => {
+  const allOffers = Object.entries(offers);
+  const offersWithCheck = [];
+  allOffers.forEach((offer) => {
+    offersWithCheck.push(
+        {
+          type: offer[0],
+          price: offer[1],
+          check: Math.random() > 0.5,
+        });
+  });
+  return generateRandomArrayFromAnother(offersWithCheck, 0, offersWithCheck.length);
 };
 
 const generatePhotoSrc = (count) => {
@@ -56,4 +65,4 @@ const generatePhotoSrc = (count) => {
   return allPhotos;
 };
 
-export {generateDayEvents, generateOffers};
+export {generateDayEvents};

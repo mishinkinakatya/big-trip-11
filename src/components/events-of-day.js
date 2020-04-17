@@ -19,13 +19,12 @@ const createDayEventTemplate = (eventOfDay) => {
     );
   };
 
-  const offersMaxCount = 3;
+  const OFFERS_MAX_COUNT = 3;
   const checkedOffers = offers.filter((offer) => {
-    return offer[2];
+    return offer.check;
   });
-  const offersOfDay = checkedOffers.slice(0, offersMaxCount);
-
-  const offersMarkup = offersOfDay.map((it) => createOfferMarkup(it[0], it[1])).join(`\n`);
+  const offersOfDay = checkedOffers.slice(0, OFFERS_MAX_COUNT);
+  const offersMarkup = offersOfDay.map((it) => createOfferMarkup(it.type, it.price)).join(`\n`);
 
   return (
     `<li class="trip-events__item">
