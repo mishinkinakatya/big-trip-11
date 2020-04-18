@@ -1,7 +1,7 @@
-import {generateRandomArrayFromAnother, formatDateTime} from "../utils.js";
+import {createElement, formatDateTime} from "../utils.js";
 
-export const createEventEditTemplate = (eventOfTrip) => {
-  const {startDate, endDate, activity, transport, destination, description, offers, photos} = eventOfTrip;
+const createEventEditTemplate = (eventOfTrip) => {
+  const {startDate, endDate, activity, transport, destination, price, description, offers, photos} = eventOfTrip;
 
   const start = formatDateTime(startDate);
   const end = formatDateTime(endDate);
@@ -27,35 +27,23 @@ export const createEventEditTemplate = (eventOfTrip) => {
 
   const eventDestinationsMarkup = destination.map((it) => createDestinationMarkup(it)).join(`\n`);
 
-  const offersCount = {
-    min: 0,
-    max: 4,
-  };
-  const offersForEdit = generateRandomArrayFromAnother(offers, offersCount.min, offersCount.max);
-
-  const descriptionLength = {
-    min: 1,
-    max: 5,
-  };
-  const descriptionForEdit = generateRandomArrayFromAnother(description, descriptionLength.min, descriptionLength.max);
-
-  const createOfferMarkup = (offer, price, isChecked) => {
+  const createOfferMarkup = (offer, offerPrice, isChecked) => {
     return (
       `<div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer}-1" type="checkbox" name="event-offer-${offer}" ${isChecked ? `checked` : ``}>
         <label class="event__offer-label" for="event-offer-${offer}-1">
           <span class="event__offer-title">Add ${offer}</span>
           &plus;
-          &euro;&nbsp;<span class="event__offer-price">${price}</span>
+          &euro;&nbsp;<span class="event__offer-price">${offerPrice}</span>
         </label>
       </div>`
     );
   };
 
-  const offersMarkup = offersForEdit.map((it) => createOfferMarkup(it[0], it[1], Math.random() > 0.5)).join(`\n`);
+  const offersMarkup = offers.map((it) => createOfferMarkup(it.type, it.price, it.check)).join(`\n`);
   const isOfferShowing = !!offersMarkup;
 
-  const descriptionMarkup = descriptionForEdit.join(`\n`);
+  const descriptionMarkup = description.join(`\n`);
   const isDescriptionShowing = !!descriptionMarkup;
 
   const createPhotosMarkup = (photo) => {
@@ -119,7 +107,7 @@ export const createEventEditTemplate = (eventOfTrip) => {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="">
+          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -156,3 +144,27 @@ export const createEventEditTemplate = (eventOfTrip) => {
     </form>`
   );
 };
+
+export default class EventsEdit {
+  constructor(event) {
+    this._event = event;
+
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createEventEditTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

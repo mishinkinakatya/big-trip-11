@@ -1,11 +1,15 @@
 import {EVENT_POINT, EVENT_ACTIVITY, EVENT_TRANSPORT, EVENT_DESTINATION, EVENT_DESCRIPTION, priceToOffer} from "../const.js";
-import {generateRandomArrayItem, getRandomIntegeNumber, calculateEventDuration, getRandomStartDate, getRandomEndDate} from "../utils.js";
+import {generateRandomArrayItem, getRandomIntegeNumber, calculateEventDuration, getRandomStartDate, getRandomEndDate, generateRandomArrayFromAnother} from "../utils.js";
 
 const generateDayEvent = () => {
 
   const point = generateRandomArrayItem(EVENT_POINT);
   const startDate = getRandomStartDate();
   const endDate = getRandomEndDate(startDate);
+  const DescriptionLength = {
+    min: 0,
+    max: 5,
+  };
 
   return {
     type: (point === `Check`) ? `check-in` : point,
@@ -14,11 +18,11 @@ const generateDayEvent = () => {
     startDate,
     endDate,
     duration: calculateEventDuration(Date.parse(endDate) - Date.parse(startDate)),
-    offers: generateOffers(),
+    offers: generateOffers(priceToOffer),
     activity: EVENT_ACTIVITY,
     transport: EVENT_TRANSPORT,
     destination: EVENT_DESTINATION,
-    description: EVENT_DESCRIPTION,
+    description: generateRandomArrayFromAnother(EVENT_DESCRIPTION, DescriptionLength.min, DescriptionLength.max),
     photos: generatePhotoSrc(getRandomIntegeNumber(1, 5)),
   };
 };
@@ -39,9 +43,18 @@ const generateTitle = (point) => {
   return `${point} ${direction} ${generateRandomArrayItem(EVENT_DESTINATION)}`;
 };
 
-const generateOffers = () => {
-  return (Object.entries(priceToOffer)
-  );
+const generateOffers = (offers) => {
+  const allOffers = Object.entries(offers);
+  const offersWithCheck = [];
+  allOffers.forEach((offer) => {
+    offersWithCheck.push(
+        {
+          type: offer[0],
+          price: offer[1],
+          check: Math.random() > 0.5,
+        });
+  });
+  return generateRandomArrayFromAnother(offersWithCheck, 0, offersWithCheck.length);
 };
 
 const generatePhotoSrc = (count) => {
@@ -52,4 +65,4 @@ const generatePhotoSrc = (count) => {
   return allPhotos;
 };
 
-export {generateDayEvents, generateOffers};
+export {generateDayEvents};

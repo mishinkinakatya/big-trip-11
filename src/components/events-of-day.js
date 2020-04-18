@@ -1,6 +1,6 @@
-import {formatDate, formatTime, generateRandomArrayFromAnother} from "../utils.js";
+import {createElement, formatDate, formatTime} from "../utils.js";
 
-export const createDayEventTemplate = (eventOfDay) => {
+const createDayEventTemplate = (eventOfDay) => {
   const {type, title, price, startDate, endDate, duration, offers} = eventOfDay;
 
   const startDay = formatDate(startDate);
@@ -19,13 +19,12 @@ export const createDayEventTemplate = (eventOfDay) => {
     );
   };
 
-  const offersCount = {
-    min: 0,
-    max: 3,
-  };
-  const offersOfDay = generateRandomArrayFromAnother(offers, offersCount.min, offersCount.max);
-
-  const offersMarkup = offersOfDay.map((it) => createOfferMarkup(it[0], it[1])).join(`\n`);
+  const OFFERS_MAX_COUNT = 3;
+  const checkedOffers = offers.filter((offer) => {
+    return offer.check;
+  });
+  const offersOfDay = checkedOffers.slice(0, OFFERS_MAX_COUNT);
+  const offersMarkup = offersOfDay.map((it) => createOfferMarkup(it.type, it.price)).join(`\n`);
 
   return (
     `<li class="trip-events__item">
@@ -60,3 +59,27 @@ export const createDayEventTemplate = (eventOfDay) => {
     </li>`
   );
 };
+
+export default class EventsOfDay {
+  constructor(event) {
+    this._event = event;
+
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createDayEventTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
