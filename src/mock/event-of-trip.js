@@ -1,5 +1,5 @@
 import {EVENT_POINT, EVENT_ACTIVITY, EVENT_TRANSPORT, EVENT_DESTINATION, EVENT_DESCRIPTION, priceToOffer} from "../const.js";
-import {generateRandomArrayItem, getRandomIntegeNumber, calculateEventDuration, getRandomStartDate, getRandomEndDate, generateRandomArrayFromAnother} from "../utils.js";
+import {generateRandomArrayItem, getRandomIntegeNumber, calculateEventDuration, getRandomStartDate, getRandomEndDate, generateRandomArrayFromAnother} from "../utils/common.js";
 
 const generateDayEvent = () => {
 
@@ -51,7 +51,7 @@ const generateOffers = (offers) => {
         {
           type: offer[0],
           price: offer[1],
-          check: Math.random() > 0.5,
+          isChecked: Math.random() > 0.5,
         });
   });
   return generateRandomArrayFromAnother(offersWithCheck, 0, offersWithCheck.length);
