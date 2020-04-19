@@ -1,4 +1,5 @@
-import {createElement, formatDate, formatTime} from "../utils.js";
+import AbstractComponent from "./abstract-component.js";
+import {formatDate, formatTime} from "../utils/common.js";
 
 const createDayEventTemplate = (eventOfDay) => {
   const {type, title, price, startDate, endDate, duration, offers} = eventOfDay;
@@ -21,7 +22,7 @@ const createDayEventTemplate = (eventOfDay) => {
 
   const OFFERS_MAX_COUNT = 3;
   const checkedOffers = offers.filter((offer) => {
-    return offer.check;
+    return offer.isChecked;
   });
   const offersOfDay = checkedOffers.slice(0, OFFERS_MAX_COUNT);
   const offersMarkup = offersOfDay.map((it) => createOfferMarkup(it.type, it.price)).join(`\n`);
@@ -60,26 +61,17 @@ const createDayEventTemplate = (eventOfDay) => {
   );
 };
 
-export default class EventsOfDay {
+export default class EventOfDay extends AbstractComponent {
   constructor(event) {
+    super();
     this._event = event;
-
-    this._element = null;
   }
 
   getTemplate() {
     return createDayEventTemplate(this._event);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setEditButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
   }
 }

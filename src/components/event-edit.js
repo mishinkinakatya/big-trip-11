@@ -1,4 +1,5 @@
-import {createElement, formatDateTime} from "../utils.js";
+import AbstractComponent from "./abstract-component.js";
+import {formatDateTime} from "../utils/common.js";
 
 const createEventEditTemplate = (eventOfTrip) => {
   const {startDate, endDate, activity, transport, destination, price, description, offers, photos} = eventOfTrip;
@@ -40,7 +41,7 @@ const createEventEditTemplate = (eventOfTrip) => {
     );
   };
 
-  const offersMarkup = offers.map((it) => createOfferMarkup(it.type, it.price, it.check)).join(`\n`);
+  const offersMarkup = offers.map((it) => createOfferMarkup(it.type, it.price, it.isChecked)).join(`\n`);
   const isOfferShowing = !!offersMarkup;
 
   const descriptionMarkup = description.join(`\n`);
@@ -145,26 +146,17 @@ const createEventEditTemplate = (eventOfTrip) => {
   );
 };
 
-export default class EventsEdit {
+export default class EventsEdit extends AbstractComponent {
   constructor(event) {
+    super();
     this._event = event;
-
-    this._element = null;
   }
 
   getTemplate() {
     return createEventEditTemplate(this._event);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setSubmitHandler(handler) {
+    this.getElement().querySelector(`.event__save-btn`).addEventListener(`click`, handler);
   }
 }
