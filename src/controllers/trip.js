@@ -49,9 +49,9 @@ export default class TripController {
   }
 
   render(events) {
-    const isEvents = events.every((event) => event.type && event.destination && event.startDate && event.endDate && event.price);
+    const isEvents = events.length === 0;
 
-    if (!isEvents) {
+    if (isEvents) {
       render(this._container, this._noEventsComponent, RenderPosition.BEFOREEND);
       return;
     }
