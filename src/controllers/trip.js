@@ -1,7 +1,7 @@
 import EventOfDayComponent from "../components/event-of-day.js";
 import EventEditComponent from "../components/event-edit.js";
 import NoEventsComponent from "../components/no-events.js";
-import SortComponent from "../components/sort.js";
+import SortComponent, {SortType} from "../components/sort.js";
 import TripDaysComponent from "../components/trip-days.js";
 import {castDateTimeFormat} from "../utils/common.js";
 import {render, replace, RenderPosition} from "../utils/render.js";
@@ -38,6 +38,25 @@ const renderEvent = (eventListElement, event) => {
   });
 
   render(eventListElement, eventOfDayComponent, RenderPosition.BEFOREEND);
+};
+
+const getSortedEvents = (events, sortType) => {
+  let sortedEvents = [];
+  const showingEvents = events.slice();
+
+  switch (sortType) {
+    case SortType.TIME:
+      sortedEvents = showingEvents.sort((a, b) => b.duration - a.duration);
+      break;
+    case SortType.PRICE:
+      sortedEvents = showingEvents.sort((a, b) => b.price - a.price);
+      break;
+    case SortType.EVENT:
+      sortedEvents = showingEvents;
+      break;
+  }
+
+  return sortedEvents;
 };
 
 export default class TripController {
@@ -78,6 +97,13 @@ export default class TripController {
         if (tripMonth === eventMonth && tripDate === eventDate) {
           renderEvent(tripEventsOfDayElement, eventItem);
         }
+      });
+    });
+
+    this._sortComponent.setSortTypeChangeHandler((sortType) => {
+      const sortedEvents = getSortedEvents(events, sortType);
+      sortedEvents.forEach((eventItem) => {
+        renderEvent(this._container, eventItem);
       });
 
     });
