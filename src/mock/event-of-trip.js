@@ -6,6 +6,7 @@ const generateDayEvent = () => {
   const point = generateRandomArrayItem(EVENT_POINT);
   const startDate = getRandomStartDate();
   const endDate = getRandomEndDate(startDate);
+  const durationInMs = Date.parse(endDate) - Date.parse(startDate);
   const DescriptionLength = {
     min: 0,
     max: 5,
@@ -17,7 +18,8 @@ const generateDayEvent = () => {
     price: getRandomIntegeNumber(0, 100),
     startDate,
     endDate,
-    duration: calculateEventDuration(Date.parse(endDate) - Date.parse(startDate)),
+    durationInMs,
+    duration: calculateEventDuration(durationInMs),
     offers: generateOffers(priceToOffer),
     activity: EVENT_ACTIVITY,
     transport: EVENT_TRANSPORT,
