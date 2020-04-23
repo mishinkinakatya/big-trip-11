@@ -6,6 +6,13 @@ const createTripDaysTemplate = () => {
   );
 };
 
+export const clearContent = (container) => {
+  const containerContent = container.getElement();
+  containerContent.innerHTML = ``;
+
+  return containerContent;
+};
+
 export default class TripDays extends AbstractComponent {
   getTemplate() {
     return createTripDaysTemplate();

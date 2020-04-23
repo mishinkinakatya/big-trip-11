@@ -55,6 +55,10 @@ export default class Sort extends AbstractComponent {
   setSortTypeChangeHandler(handler) {
     this.getElement().addEventListener(`click`, (evt) => {
 
+      if (evt.target.tagName !== `INPUT`) {
+        return;
+      }
+
       const sortType = evt.target.dataset.sortType;
 
       if (this._currentSortType === sortType) {
