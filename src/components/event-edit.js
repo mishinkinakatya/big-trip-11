@@ -1,61 +1,89 @@
 import AbstractComponent from "./abstract-component.js";
 import {formatDateTime} from "../utils/common.js";
 
+/**
+* @return {*} Функция, которая возвращает разметку блока "Тип точки маршрута"
+* @param {*} eventType Тип точки маршрута
+*/
+const createEventTypeMarkup = (eventType) => {
+  const type = (eventType === `check`) ? `check-in` : eventType;
+  return (
+    `<div class="event__type-item">
+      <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
+      <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${type[0].toUpperCase() + type.slice(1)}</label>
+    </div>`
+  );
+};
+
+/**
+* @return {*} Функция, которая возвращает разметку блока "Пункт назначения для точки маршрута"
+* @param {*} eventDestination Пункт назначения
+*/
+const createDestinationMarkup = (eventDestination) => {
+  return (
+    `<option value="${eventDestination}"></option>`
+  );
+};
+
+/**
+  * @return {*} Функция, которая возвращает разметку блока "Дополнительные опции для точки маршрута"
+  * @param {string} offer Дополнительные опция
+  * @param {number} offerPrice Цена дополнительной опции
+  * @param {boolean} isChecked Флаг: Опция выбрана?
+  */
+const createOfferMarkup = (offer, offerPrice, isChecked) => {
+  return (
+    `<div class="event__offer-selector">
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer}-1" type="checkbox" name="event-offer-${offer}" ${isChecked ? `checked` : ``}>
+      <label class="event__offer-label" for="event-offer-${offer}-1">
+        <span class="event__offer-title">Add ${offer}</span>
+        &plus;
+        &euro;&nbsp;<span class="event__offer-price">${offerPrice}</span>
+      </label>
+    </div>`
+  );
+};
+
+/**
+* @return {*} Функция, которая возвращает разметку блока "Фотография точки маршрута"
+* @param {string} photo Src фотографии
+*/
+const createPhotosMarkup = (photo) => {
+  return (
+    `<img class="event__photo" src="${photo}" alt="Event photo"></img>`
+  );
+};
+
+/**
+ * @return {*} Функция, которая возвращает разметку компонента "Точка маршрута в режиме Edit"
+ * @param {*} eventOfTrip Объект, содержащий свойства компонента "Точка маршрута в режиме Edit"
+ */
 const createEventEditTemplate = (eventOfTrip) => {
   const {startDate, endDate, activity, transport, destination, price, description, offers, photos} = eventOfTrip;
 
   const start = formatDateTime(startDate);
   const end = formatDateTime(endDate);
 
-  const createEventTypeMarkup = (eventType) => {
-    const type = (eventType === `check`) ? `check-in` : eventType;
-    return (
-      `<div class="event__type-item">
-        <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
-        <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${type[0].toUpperCase() + type.slice(1)}</label>
-      </div>`
-    );
-  };
-
+  /** Разметка для точек с типом Transport */
   const eventTransportsMarkup = transport.map((it) => createEventTypeMarkup(it.toLowerCase())).join(`\n`);
+  /** Разметка для точек с типом Activities */
   const eventActivitiesMarkup = activity.map((it) => createEventTypeMarkup(it.toLowerCase())).join(`\n`);
-
-  const createDestinationMarkup = (eventDestination) => {
-    return (
-      `<option value="${eventDestination}"></option>`
-    );
-  };
-
+  /** Разметка для "Пунктов назначения для точек маршрута" */
   const eventDestinationsMarkup = destination.map((it) => createDestinationMarkup(it)).join(`\n`);
-
-  const createOfferMarkup = (offer, offerPrice, isChecked) => {
-    return (
-      `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer}-1" type="checkbox" name="event-offer-${offer}" ${isChecked ? `checked` : ``}>
-        <label class="event__offer-label" for="event-offer-${offer}-1">
-          <span class="event__offer-title">Add ${offer}</span>
-          &plus;
-          &euro;&nbsp;<span class="event__offer-price">${offerPrice}</span>
-        </label>
-      </div>`
-    );
-  };
-
+  /** Разметка для "Дополнительных опций для точки маршрута" */
   const offersMarkup = offers.map((it) => createOfferMarkup(it.type, it.price, it.isChecked)).join(`\n`);
-  const isOfferShowing = !!offersMarkup;
-
+  /** Разметка для "Описания точки маршрута" */
   const descriptionMarkup = description.join(`\n`);
-  const isDescriptionShowing = !!descriptionMarkup;
-
-  const createPhotosMarkup = (photo) => {
-    return (
-      `<img class="event__photo" src="${photo}" alt="Event photo"></img>`
-    );
-  };
-
+  /** Разметка для "Фотографий точки маршрута" */
   const photosMarkup = photos.map((it) => createPhotosMarkup(it)).join(`\n`);
-  const isPhotosShowing = !!photosMarkup;
 
+  /** Флаг: Показывать блок "Дополнительные опции для точки маршрута"? */
+  const isOfferShowing = !!offersMarkup;
+  /** Флаг: Показывать блок "Описание точки маршрута"? */
+  const isDescriptionShowing = !!descriptionMarkup;
+  /** Флаг: Показывать блок "Фотографии точки маршрута"? */
+  const isPhotosShowing = !!photosMarkup;
+  /** Флаг: Показывать блок с Дополнительными опциями, Описанием и Фотографиями точки маршрута? */
   const isEventDetailsShowing = isOfferShowing || isDescriptionShowing || isPhotosShowing;
 
   return (
@@ -146,16 +174,27 @@ const createEventEditTemplate = (eventOfTrip) => {
   );
 };
 
+/** Компонент: "Точка маршрута в режиме Edit" */
 export default class EventsEdit extends AbstractComponent {
+  /**
+   * Свойства компонента "Точка маршрута в режиме Edit"
+   * @property {*} this._event - Компонент "Точка маршрута в режиме DEFAULT"
+   * @param {*} event Компонент "Точка маршрута в режиме DEFAULT"
+   */
   constructor(event) {
     super();
     this._event = event;
   }
 
+  /** @return {*} Метод, который возвращает разметку компонента "Точка маршрута в режиме Edit" */
   getTemplate() {
     return createEventEditTemplate(this._event);
   }
 
+  /**
+   * Метод, который устанавливает колбэк на клик по кнопке Save
+   * @param {*} handler Колбэк для клика по кнопке Save
+   */
   setSubmitHandler(handler) {
     this.getElement().querySelector(`.event__save-btn`).addEventListener(`click`, handler);
   }

@@ -1,7 +1,26 @@
 import AbstractComponent from "./abstract-component.js";
 import {formatDate, formatTime} from "../utils/common.js";
 
-const createDayEventTemplate = (eventOfDay) => {
+/**
+* @return {*} Функция, которая возвращает разметку блока с дополнительными опциями компонента "Один день маршрута"
+* @param {*} offerType Тип опции
+* @param {*} offerPrice Цена опции
+*/
+const createOfferMarkup = (offerType, offerPrice) => {
+  return (
+    `<li class="event__offer">
+      <span class="event__offer-title">${offerType}</span>
+            &plus;
+            &euro;&nbsp;<span class="event__offer-price">${offerPrice}</span>
+    </li>`
+  );
+};
+
+/**
+ * @return {*} Функция, которая возвращает разметку компонента "Одна точка маршрута"
+ * @param {*} eventOfDay Объект, содержащий свойства компонента "Точка маршрута в режиме Default"
+ */
+const createEventOfDayTemplate = (eventOfDay) => {
   const {type, title, price, startDate, endDate, duration, offers} = eventOfDay;
 
   const startDay = formatDate(startDate);
@@ -10,22 +29,17 @@ const createDayEventTemplate = (eventOfDay) => {
   const startTime = formatTime(startDate);
   const endTime = formatTime(endDate);
 
-  const createOfferMarkup = (offerType, offerPrice) => {
-    return (
-      `<li class="event__offer">
-        <span class="event__offer-title">${offerType}</span>
-              &plus;
-              &euro;&nbsp;<span class="event__offer-price">${offerPrice}</span>
-      </li>`
-    );
-  };
-
   const OFFERS_MAX_COUNT = 3;
+
+  /** Массив, содержащий выбранные опции */
   const checkedOffers = offers.filter((offer) => {
     return offer.isChecked;
   });
-  const offersOfDay = checkedOffers.slice(0, OFFERS_MAX_COUNT);
-  const offersMarkup = offersOfDay.map((it) => createOfferMarkup(it.type, it.price)).join(`\n`);
+
+  /** Массив, содержащий опции, которые будут отображаться в компонента "Точка маршрута в режиме Default" */
+  const showingOffersOfDay = checkedOffers.slice(0, OFFERS_MAX_COUNT);
+  /** Разметка для блока с дополнительными опциями */
+  const offersMarkup = showingOffersOfDay.map((it) => createOfferMarkup(it.type, it.price)).join(`\n`);
 
   return (
     `<li class="trip-events__item">
@@ -61,16 +75,27 @@ const createDayEventTemplate = (eventOfDay) => {
   );
 };
 
+/** Компонент: "Одна точка маршрута" */
 export default class EventOfDay extends AbstractComponent {
-  constructor(event) {
+  /**
+   * Свойства компонента "Одна точка маршрута"
+   * @property {*} this._eventOfDay - Компонент "Точка маршрута в режиме Default"
+   * @param {*} eventOfDay Компонент "Точка маршрута в режиме Default"
+   */
+  constructor(eventOfDay) {
     super();
-    this._event = event;
+    this._eventOfDay = eventOfDay;
   }
 
+  /** @return {*} Метод, который возвращает разметку компонента "Одна точка маршрута" */
   getTemplate() {
-    return createDayEventTemplate(this._event);
+    return createEventOfDayTemplate(this._eventOfDay);
   }
 
+  /**
+   * Метод, который устанавливает колбэк на клик по стрелке Edit
+   * @param {*} handler Колбэк для клика по стрелке Edit
+   */
   setEditButtonClickHandler(handler) {
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
   }
