@@ -34,10 +34,11 @@ const getSortedPoints = (points, sortType) => {
  * @return {*} Функция для отрисовки точек маршрута без группировки по дням
  * @param {*} tripList Элемент, внутри которого будут рендериться точки маршрута
  * @param {*} points Массив всех точек маршрута
+ * @param {*} dataChangeHandler Метод, который измененяет данные и перерисовывает компонент
  */
-const renderPoints = (tripList, points) => {
+const renderPoints = (tripList, points, dataChangeHandler) => {
   return points.map((point) => {
-    const pointController = new PointController(tripList);
+    const pointController = new PointController(tripList, dataChangeHandler);
 
     pointController.render(point);
 
@@ -50,8 +51,9 @@ const renderPoints = (tripList, points) => {
  * @param {*} daysOfPoints Массив с о всеми днями точек маршрута
  * @param {*} tripDays Элемент, внутри которого будет рендериться блок с днями точек маршрута
  * @param {*} points Массив всех точек маршрута
+ * @param {*} dataChangeHandler Метод, который измененяет данные и перерисовывает компонент
  */
-const renderPointsToDays = (daysOfPoints, tripDays, points) => {
+const renderPointsToDays = (daysOfPoints, tripDays, points, dataChangeHandler) => {
   const uniqueSortDays = Array.from(new Set(daysOfPoints)).sort();
 
   uniqueSortDays.map((it, i) => {
@@ -68,7 +70,7 @@ const renderPointsToDays = (daysOfPoints, tripDays, points) => {
     const tripMonth = tripDay.slice(5, 7);
 
     return points.map((point) => {
-      const pointController = new PointController(tripPointsOfDayElement);
+      const pointController = new PointController(tripPointsOfDayElement, dataChangeHandler);
 
       const pointDate = castDateTimeFormat(point.startDate.getDate());
       const pointMonth = castDateTimeFormat(point.startDate.getMonth());
@@ -92,6 +94,7 @@ export default class TripController {
    * @property {*} this._noPointsComponent - Компонент, который будет рендериться, если нет ни одной точки маршрута
    * @property {*} this._sortComponent - Компонент "Сортировка"
    * @property {*} this._tripDays - Компонент "Блок с днями путешествия"
+   * @property {*} this._dataChangeHandler - Метод, который измененяет данные и перерисовывает компонент
    * @property {*} this._sortTypeChangeHandler - Приватный метод - колбэк для клика по типу сортировки (перерисовывает точки маршрута при изменении типа сортировки)
    * @property {*} this._getPointsDays - Приватный метод, который возвращает все даты путешествия
    * @param {*} container Компонент, внутри которого будет рендериться маршрут путешествия
@@ -105,6 +108,7 @@ export default class TripController {
     this._sortComponent = new SortComponent();
     this._tripDays = new TripDaysComponent();
 
+    this._dataChangeHandler = this._dataChangeHandler.bind(this);
     this._sortTypeChangeHandler = this._sortTypeChangeHandler.bind(this);
     this._sortComponent.setSortTypeChangeHandler(this._sortTypeChangeHandler);
 
@@ -128,7 +132,7 @@ export default class TripController {
     render(this._container, this._sortComponent, RenderPosition.BEFOREEND);
     render(this._container, this._tripDays, RenderPosition.BEFOREEND);
 
-    const newPoints = renderPointsToDays(pointsDays, this._tripDays.getElement(), this._points);
+    const newPoints = renderPointsToDays(pointsDays, this._tripDays.getElement(), this._points, this._dataChangeHandler);
     this._showedPointControllers = this._showedPointControllers.concat(newPoints);
   }
 
@@ -152,13 +156,30 @@ export default class TripController {
       render(this._tripDays.getElement(), tripDayComponent, RenderPosition.BEFOREEND);
 
       const tripList = tripDayComponent.getElement().querySelector(`.trip-events__list`);
-      newPoints = renderPoints(tripList, sortedEvents);
+      newPoints = renderPoints(tripList, sortedEvents, this._dataChangeHandler);
     }
 
     if (sortType === SortType.EVENT) {
-      newPoints = renderPointsToDays(pointsDays, this._tripDays.getElement(), sortedEvents);
+      newPoints = renderPointsToDays(pointsDays, this._tripDays.getElement(), sortedEvents, this._dataChangeHandler);
     }
 
     this._showedPointControllers = this._showedPointControllers.concat(newPoints);
+  }
+
+  /**
+   * Приватный метод - колбэк для клика по звёздочке (Favorite)
+   * @param {*} pointController Контроллер точки маршрута
+   * @param {*} oldData Старые данные
+   * @param {*} newData Новые данные
+   */
+  _dataChangeHandler(pointController, oldData, newData) {
+    const index = this._points.findIndex((it) => it === oldData);
+    if (index === -1) {
+      return;
+    }
+
+    this._points = [].concat(this._points.slice(0, index), newData, this._points.slice(index + 1));
+
+    pointController.render(this._points[index]);
   }
 }

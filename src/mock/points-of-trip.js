@@ -26,6 +26,7 @@ const generatePointOfTrip = () => {
     destination: POINT_DESTINATION,
     description: generateRandomArrayFromAnother(POINT_DESCRIPTION, DescriptionLength.min, DescriptionLength.max),
     photos: generatePhotoSrc(getRandomIntegeNumber(1, 5)),
+    isFavorite: Math.random() > 0.5,
   };
 };
 

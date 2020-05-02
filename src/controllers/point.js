@@ -11,9 +11,11 @@ export default class PointController {
    * @property {*} this._pointEditComponent - Компонент "Точка маршрута в режиме Edit"
    * @property {*} this._escKeyDownHandler - Метод, который устанавливает колбэк на нажатие кнопки Esc
    * @param {*} container Компонент, внутри которого будет рендериться точка маршрута
+   * @param {*} dataChangeHandler Метод, который измененяет данные и перерисовывает компонент
    */
-  constructor(container) {
+  constructor(container, dataChangeHandler) {
     this._container = container;
+    this._dataChangeHandler = dataChangeHandler;
 
     this._pointOfDayComponent = null;
     this._pointEditComponent = null;
@@ -38,6 +40,12 @@ export default class PointController {
       evt.preventDefault();
       this._replaceEditToPoint();
       document.removeEventListener(`keydown`, this._escKeyDownHandler);
+    });
+
+    this._pointEditComponent.setFavoriteChangeHandler(() => {
+      this._dataChangeHandler(this, point, Object.assign({}, point, {
+        isFavorite: !point.isFavorite,
+      }));
     });
 
     render(this._container, this._pointOfDayComponent, RenderPosition.BEFOREEND);
