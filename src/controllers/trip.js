@@ -1,57 +1,10 @@
-import PointOfDayComponent from "../components/point-of-day.js";
-import PointEditComponent from "../components/point-edit.js";
-import NoPointsComponent from "../components/no-points.js";
-import SortComponent, {SortType} from "../components/sort.js";
-import DayOfTripComponent from "../components/day-of-trip.js";
-import TripDaysComponent from "../components/trip-days.js";
 import {castDateTimeFormat} from "../utils/common.js";
-import {render, replace, RenderPosition} from "../utils/render.js";
-
-/**
- * Функция для рендеринга одной точки маршрута
- * @param {*} pointListElement Элемент, внутри которого нужно отрисовать точку маршрута
- * @param {*} point Объект с описанием свойств точки маршрута
- */
-const renderPoint = (pointListElement, point) => {
-  /** Функция, которая заменяет Точку маршрута в режиме Default, на Точку маршрута в режиме Edit */
-  const replacePointToEdit = () => {
-    replace(pointEditComponent, pointOfDayComponent);
-  };
-
-  /** Функция, которая заменяет Точку маршрута в режиме Edit, на Точку маршрута в режиме Default */
-  const replaceEditToPoint = () => {
-    replace(pointOfDayComponent, pointEditComponent);
-  };
-
-  /** Метод, который устанавливает колбэк на нажатие кнопки Esc
-   * @param {*} evt Событие, которое произошло
-   */
-  const escKeyDownHandler = (evt) => {
-    const isEscKey = evt.key === `Esc` || evt.key === `Escape`;
-
-    if (isEscKey) {
-      replaceEditToPoint();
-      document.removeEventListener(`keydown`, escKeyDownHandler);
-    }
-  };
-
-  /** Инстанс компонента "Одна точка маршрута" */
-  const pointOfDayComponent = new PointOfDayComponent(point);
-  pointOfDayComponent.setEditButtonClickHandler(() => {
-    replacePointToEdit();
-    document.addEventListener(`keydown`, escKeyDownHandler);
-  });
-
-  /** Инстанс компонента "Точка маршрута в режиме Edit" */
-  const pointEditComponent = new PointEditComponent(point);
-  pointEditComponent.setSubmitHandler((evt) => {
-    evt.preventDefault();
-    replaceEditToPoint();
-    document.removeEventListener(`keydown`, escKeyDownHandler);
-  });
-
-  render(pointListElement, pointOfDayComponent, RenderPosition.BEFOREEND);
-};
+import DayOfTripComponent from "../components/day-of-trip.js";
+import NoPointsComponent from "../components/no-points.js";
+import PointController from "../controllers/point.js";
+import SortComponent, {SortType} from "../components/sort.js";
+import TripDaysComponent from "../components/trip-days.js";
+import {render, RenderPosition} from "../utils/render.js";
 
 /**
  * @return {*} Функция, котороя возвращает отсортированный массив событий
@@ -117,6 +70,7 @@ export default class TripController {
    * @property {*} this._container - Компонент, внутри которого будет рендериться маршрут путешествия
    * @property {*} this._noPointsComponent - Компонент, который будет рендериться, если нет ни одной точки маршрута
    * @property {*} this._sortComponent - Компонент "Сортировка"
+   * @property {*} this._tripDays - Компонент "Блок с днями путешествия"
    * @param {*} container Компонент, внутри которого будет рендериться маршрут путешествия
    */
   constructor(container) {
@@ -124,6 +78,7 @@ export default class TripController {
 
     this._noPointsComponent = new NoPointsComponent();
     this._sortComponent = new SortComponent();
+    this._tripDays = new TripDaysComponent();
   }
 
   /**
@@ -142,19 +97,18 @@ export default class TripController {
 
     const pointsDays = points.map((it) => [`${it.startDate.getFullYear()}-${castDateTimeFormat(it.startDate.getMonth())}-${castDateTimeFormat(it.startDate.getDate())}`].join(`, `));
 
-    const tripDays = new TripDaysComponent();
-    render(this._container, tripDays, RenderPosition.BEFOREEND);
+    render(this._container, this._tripDays, RenderPosition.BEFOREEND);
 
-    renderPointsToDays(pointsDays, tripDays.getElement(), points);
+    renderPointsToDays(pointsDays, this._tripDays.getElement(), points);
 
     this._sortComponent.setSortTypeChangeHandler((sortType) => {
       const sortedEvents = getSortedPoints(points, sortType);
 
-      tripDays.clearContent();
+      this._tripDays.clearContent();
 
       if (sortType !== SortType.EVENT) {
         const tripDayComponent = new DayOfTripComponent(``, ``);
-        render(tripDays.getElement(), tripDayComponent, RenderPosition.BEFOREEND);
+        render(this._tripDays.getElement(), tripDayComponent, RenderPosition.BEFOREEND);
 
         const tripList = tripDayComponent.getElement().querySelector(`.trip-events__list`);
         sortedEvents.forEach((eventItem) => {
@@ -163,7 +117,7 @@ export default class TripController {
       }
 
       if (sortType === SortType.EVENT) {
-        renderPointsToDays(pointsDays, tripDays.getElement(), sortedEvents);
+        renderPointsToDays(pointsDays, this._tripDays.getElement(), sortedEvents);
       }
     });
   }
