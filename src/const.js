@@ -1,10 +1,10 @@
-const EVENT_ACTIVITY = [
+const POINT_ACTIVITY = [
   `Check`,
   `Sightseeing`,
   `Restaurant`,
 ];
 
-const EVENT_TRANSPORT = [
+const POINT_TRANSPORT = [
   `Taxi`,
   `Bus`,
   `Train`,
@@ -14,9 +14,9 @@ const EVENT_TRANSPORT = [
   `Flight`,
 ];
 
-const EVENT_POINT = EVENT_TRANSPORT.concat(EVENT_ACTIVITY);
+const POINT = POINT_TRANSPORT.concat(POINT_ACTIVITY);
 
-const EVENT_DESTINATION = [
+const POINT_DESTINATION = [
   `Amsterdam`,
   `Chamonix`,
   `Geneva`,
@@ -36,7 +36,7 @@ const priceToOffer = {
   'Lunch in city': `30`,
 };
 
-const EVENT_DESCRIPTION = [
+const POINT_DESCRIPTION = [
   `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
   `Cras aliquet varius magna, non porta ligula feugiat eget.`,
   `Fusce tristique felis at fermentum pharetra.`,
@@ -52,4 +52,4 @@ const EVENT_DESCRIPTION = [
 
 const MONTH = [`JAN`, `FEB`, `MAR`, `APR`, `MAY`, `JUNE`, `JULY`, `AUG`, `SEPT`, `OCT`, `NOV`, `DEC`];
 
-export {EVENT_ACTIVITY, EVENT_TRANSPORT, EVENT_POINT, EVENT_DESTINATION, priceToOffer, EVENT_DESCRIPTION, MONTH};
+export {POINT_ACTIVITY, POINT_TRANSPORT, POINT, POINT_DESTINATION, priceToOffer, POINT_DESCRIPTION, MONTH};

@@ -1,9 +1,9 @@
-import {EVENT_POINT, EVENT_ACTIVITY, EVENT_TRANSPORT, EVENT_DESTINATION, EVENT_DESCRIPTION, priceToOffer} from "../const.js";
-import {generateRandomArrayItem, getRandomIntegeNumber, calculateEventDuration, getRandomStartDate, getRandomEndDate, generateRandomArrayFromAnother} from "../utils/common.js";
+import {POINT, POINT_ACTIVITY, POINT_TRANSPORT, POINT_DESTINATION, POINT_DESCRIPTION, priceToOffer} from "../const.js";
+import {generateRandomArrayItem, getRandomIntegeNumber, calculatePointDuration, getRandomStartDate, getRandomEndDate, generateRandomArrayFromAnother} from "../utils/common.js";
 
-const generateDayEvent = () => {
+const generatePointOfTrip = () => {
 
-  const point = generateRandomArrayItem(EVENT_POINT);
+  const point = generateRandomArrayItem(POINT);
   const startDate = getRandomStartDate();
   const endDate = getRandomEndDate(startDate);
   const durationInMs = Date.parse(endDate) - Date.parse(startDate);
@@ -19,30 +19,30 @@ const generateDayEvent = () => {
     startDate,
     endDate,
     durationInMs,
-    duration: calculateEventDuration(durationInMs),
+    duration: calculatePointDuration(durationInMs),
     offers: generateOffers(priceToOffer),
-    activity: EVENT_ACTIVITY,
-    transport: EVENT_TRANSPORT,
-    destination: EVENT_DESTINATION,
-    description: generateRandomArrayFromAnother(EVENT_DESCRIPTION, DescriptionLength.min, DescriptionLength.max),
+    activity: POINT_ACTIVITY,
+    transport: POINT_TRANSPORT,
+    destination: POINT_DESTINATION,
+    description: generateRandomArrayFromAnother(POINT_DESCRIPTION, DescriptionLength.min, DescriptionLength.max),
     photos: generatePhotoSrc(getRandomIntegeNumber(1, 5)),
   };
 };
 
-const generateDayEvents = (count) => {
-  return new Array(count).fill(``).map(generateDayEvent);
+const generatePointsOfTrip = (count) => {
+  return new Array(count).fill(``).map(generatePointOfTrip);
 };
 
 const generateTitle = (point) => {
   let direction = ``;
 
-  if (EVENT_ACTIVITY.includes(point)) {
+  if (POINT_ACTIVITY.includes(point)) {
     direction = `in`;
   }
-  if (EVENT_TRANSPORT.includes(point)) {
+  if (POINT_TRANSPORT.includes(point)) {
     direction = `to`;
   }
-  return `${point} ${direction} ${generateRandomArrayItem(EVENT_DESTINATION)}`;
+  return `${point} ${direction} ${generateRandomArrayItem(POINT_DESTINATION)}`;
 };
 
 const generateOffers = (offers) => {
@@ -67,4 +67,4 @@ const generatePhotoSrc = (count) => {
   return allPhotos;
 };
 
-export {generateDayEvents};
+export {generatePointsOfTrip};

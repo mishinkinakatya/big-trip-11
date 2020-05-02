@@ -18,10 +18,10 @@ const createOfferMarkup = (offerType, offerPrice) => {
 
 /**
  * @return {*} Функция, которая возвращает разметку компонента "Одна точка маршрута"
- * @param {*} eventOfDay Объект, содержащий свойства компонента "Точка маршрута в режиме Default"
+ * @param {*} pointOfDay Объект, содержащий свойства компонента "Точка маршрута в режиме Default"
  */
-const createEventOfDayTemplate = (eventOfDay) => {
-  const {type, title, price, startDate, endDate, duration, offers} = eventOfDay;
+const createPointOfDayTemplate = (pointOfDay) => {
+  const {type, title, price, startDate, endDate, duration, offers} = pointOfDay;
 
   const startDay = formatDate(startDate);
   const endDay = formatDate(endDate);
@@ -76,20 +76,20 @@ const createEventOfDayTemplate = (eventOfDay) => {
 };
 
 /** Компонент: "Одна точка маршрута" */
-export default class EventOfDay extends AbstractComponent {
+export default class PointOfDay extends AbstractComponent {
   /**
    * Свойства компонента "Одна точка маршрута"
-   * @property {*} this._eventOfDay - Компонент "Точка маршрута в режиме Default"
-   * @param {*} eventOfDay Компонент "Точка маршрута в режиме Default"
+   * @property {*} this._pointOfDay - Компонент "Точка маршрута в режиме Default"
+   * @param {*} pointOfDay Компонент "Точка маршрута в режиме Default"
    */
-  constructor(eventOfDay) {
+  constructor(pointOfDay) {
     super();
-    this._eventOfDay = eventOfDay;
+    this._pointOfDay = pointOfDay;
   }
 
   /** @return {*} Метод, который возвращает разметку компонента "Одна точка маршрута" */
   getTemplate() {
-    return createEventOfDayTemplate(this._eventOfDay);
+    return createPointOfDayTemplate(this._pointOfDay);
   }
 
   /**

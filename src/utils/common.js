@@ -73,7 +73,7 @@ const getRandomEndDate = (startDate) => {
   return targetDate;
 };
 
-const calculateEventDuration = (diff) => {
+const calculatePointDuration = (diff) => {
   const MS_IN_DAY = 86400000;
   const MS_IN_HOUR = 3600000;
   const MS_IN_MINUTE = 60000;
@@ -94,5 +94,5 @@ const calculateEventDuration = (diff) => {
   }
 };
 
-export {castDateTimeFormat, formatTime, formatDate, generateRandomArrayItem, getRandomIntegeNumber, generateRandomArrayFromAnother, calculateEventDuration, getRandomStartDate, getRandomEndDate, formatDateTime};
+export {castDateTimeFormat, formatTime, formatDate, generateRandomArrayItem, getRandomIntegeNumber, generateRandomArrayFromAnother, calculatePointDuration, getRandomStartDate, getRandomEndDate, formatDateTime};
 

@@ -1,10 +1,10 @@
 import AbstractComponent from "./abstract-component.js";
 
-const createNoEventsTemplate = () =>
+const createNoPointsTemplate = () =>
   `<p class="trip-events__msg">Click New Event to create your first point</p>`;
 
-export default class NoEvents extends AbstractComponent {
+export default class NoPoints extends AbstractComponent {
   getTemplate() {
-    return createNoEventsTemplate();
+    return createNoPointsTemplate();
   }
 }

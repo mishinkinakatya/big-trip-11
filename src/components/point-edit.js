@@ -3,10 +3,10 @@ import {formatDateTime} from "../utils/common.js";
 
 /**
 * @return {*} Функция, которая возвращает разметку блока "Тип точки маршрута"
-* @param {*} eventType Тип точки маршрута
+* @param {*} pointType Тип точки маршрута
 */
-const createEventTypeMarkup = (eventType) => {
-  const type = (eventType === `check`) ? `check-in` : eventType;
+const createPointTypeMarkup = (pointType) => {
+  const type = (pointType === `check`) ? `check-in` : pointType;
   return (
     `<div class="event__type-item">
       <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
@@ -17,11 +17,11 @@ const createEventTypeMarkup = (eventType) => {
 
 /**
 * @return {*} Функция, которая возвращает разметку блока "Пункт назначения для точки маршрута"
-* @param {*} eventDestination Пункт назначения
+* @param {*} pointDestination Пункт назначения
 */
-const createDestinationMarkup = (eventDestination) => {
+const createDestinationMarkup = (pointDestination) => {
   return (
-    `<option value="${eventDestination}"></option>`
+    `<option value="${pointDestination}"></option>`
   );
 };
 
@@ -56,20 +56,20 @@ const createPhotosMarkup = (photo) => {
 
 /**
  * @return {*} Функция, которая возвращает разметку компонента "Точка маршрута в режиме Edit"
- * @param {*} eventOfTrip Объект, содержащий свойства компонента "Точка маршрута в режиме Edit"
+ * @param {*} pointOfTrip Объект, содержащий свойства компонента "Точка маршрута в режиме Edit"
  */
-const createEventEditTemplate = (eventOfTrip) => {
-  const {startDate, endDate, activity, transport, destination, price, description, offers, photos} = eventOfTrip;
+const createEventEditTemplate = (pointOfTrip) => {
+  const {startDate, endDate, activity, transport, destination, price, description, offers, photos} = pointOfTrip;
 
   const start = formatDateTime(startDate);
   const end = formatDateTime(endDate);
 
   /** Разметка для точек с типом Transport */
-  const eventTransportsMarkup = transport.map((it) => createEventTypeMarkup(it.toLowerCase())).join(`\n`);
+  const pointTransportsMarkup = transport.map((it) => createPointTypeMarkup(it.toLowerCase())).join(`\n`);
   /** Разметка для точек с типом Activities */
-  const eventActivitiesMarkup = activity.map((it) => createEventTypeMarkup(it.toLowerCase())).join(`\n`);
+  const pointActivitiesMarkup = activity.map((it) => createPointTypeMarkup(it.toLowerCase())).join(`\n`);
   /** Разметка для "Пунктов назначения для точек маршрута" */
-  const eventDestinationsMarkup = destination.map((it) => createDestinationMarkup(it)).join(`\n`);
+  const pointDestinationsMarkup = destination.map((it) => createDestinationMarkup(it)).join(`\n`);
   /** Разметка для "Дополнительных опций для точки маршрута" */
   const offersMarkup = offers.map((it) => createOfferMarkup(it.type, it.price, it.isChecked)).join(`\n`);
   /** Разметка для "Описания точки маршрута" */
@@ -84,7 +84,7 @@ const createEventEditTemplate = (eventOfTrip) => {
   /** Флаг: Показывать блок "Фотографии точки маршрута"? */
   const isPhotosShowing = !!photosMarkup;
   /** Флаг: Показывать блок с Дополнительными опциями, Описанием и Фотографиями точки маршрута? */
-  const isEventDetailsShowing = isOfferShowing || isDescriptionShowing || isPhotosShowing;
+  const isPointDetailsShowing = isOfferShowing || isDescriptionShowing || isPhotosShowing;
 
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -99,12 +99,12 @@ const createEventEditTemplate = (eventOfTrip) => {
           <div class="event__type-list">
             <fieldset class="event__type-group">
               <legend class="visually-hidden">Transfer</legend>
-              ${eventTransportsMarkup}
+              ${pointTransportsMarkup}
             </fieldset>
 
             <fieldset class="event__type-group">
               <legend class="visually-hidden">Activity</legend>
-              ${eventActivitiesMarkup}
+              ${pointActivitiesMarkup}
             </fieldset>
           </div>
         </div>
@@ -115,7 +115,7 @@ const createEventEditTemplate = (eventOfTrip) => {
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Geneva" list="destination-list-1">
           <datalist id="destination-list-1">
-            ${eventDestinationsMarkup}
+            ${pointDestinationsMarkup}
           </datalist>
         </div>
 
@@ -143,7 +143,7 @@ const createEventEditTemplate = (eventOfTrip) => {
         <button class="event__reset-btn" type="reset">Cancel</button>
       </header>
 
-      ${isEventDetailsShowing ?
+      ${isPointDetailsShowing ?
       `<section class="event__details">
       ${isOfferShowing ?
       `<section class="event__section  event__section--offers">
@@ -175,20 +175,20 @@ const createEventEditTemplate = (eventOfTrip) => {
 };
 
 /** Компонент: "Точка маршрута в режиме Edit" */
-export default class EventsEdit extends AbstractComponent {
+export default class PointEdit extends AbstractComponent {
   /**
    * Свойства компонента "Точка маршрута в режиме Edit"
-   * @property {*} this._event - Компонент "Точка маршрута в режиме DEFAULT"
-   * @param {*} event Компонент "Точка маршрута в режиме DEFAULT"
+   * @property {*} this._point - Компонент "Точка маршрута в режиме DEFAULT"
+   * @param {*} point Компонент "Точка маршрута в режиме DEFAULT"
    */
-  constructor(event) {
+  constructor(point) {
     super();
-    this._event = event;
+    this._point = point;
   }
 
   /** @return {*} Метод, который возвращает разметку компонента "Точка маршрута в режиме Edit" */
   getTemplate() {
-    return createEventEditTemplate(this._event);
+    return createEventEditTemplate(this._point);
   }
 
   /**
