@@ -31,10 +31,25 @@ const getSortedPoints = (points, sortType) => {
 };
 
 /**
- * Функция для отрисовки событий, сгруппированным по дням
- * @param {*} daysOfPoints Массив с о всеми днями событий
- * @param {*} tripDays Элемент, внутри которого будет рендериться блок с днями событий
- * @param {*} points Массив всех событий
+ * @return {*} Функция для отрисовки точек маршрута без группировки по дням
+ * @param {*} tripList Элемент, внутри которого будут рендериться точки маршрута
+ * @param {*} points Массив всех точек маршрута
+ */
+const renderPoints = (tripList, points) => {
+  return points.map((point) => {
+    const pointController = new PointController(tripList);
+
+    pointController.render(point);
+
+    return pointController;
+  });
+};
+
+/**
+ * Функция для отрисовки точек маршрута, сгруппированным по дням
+ * @param {*} daysOfPoints Массив с о всеми днями точек маршрута
+ * @param {*} tripDays Элемент, внутри которого будет рендериться блок с днями точек маршрута
+ * @param {*} points Массив всех точек маршрута
  */
 const renderPointsToDays = (daysOfPoints, tripDays, points) => {
   const uniqueSortDays = Array.from(new Set(daysOfPoints)).sort();
@@ -52,13 +67,17 @@ const renderPointsToDays = (daysOfPoints, tripDays, points) => {
     const tripDate = tripDay.slice(8, 10);
     const tripMonth = tripDay.slice(5, 7);
 
-    points.forEach((pointItem) => {
-      const pointDate = castDateTimeFormat(pointItem.startDate.getDate());
-      const pointMonth = castDateTimeFormat(pointItem.startDate.getMonth());
+    return points.map((point) => {
+      const pointController = new PointController(tripPointsOfDayElement);
+
+      const pointDate = castDateTimeFormat(point.startDate.getDate());
+      const pointMonth = castDateTimeFormat(point.startDate.getMonth());
 
       if (tripMonth === pointMonth && tripDate === pointDate) {
-        renderPoint(tripPointsOfDayElement, pointItem);
+        pointController.render(point);
       }
+
+      return pointController;
     });
   });
 };
@@ -68,17 +87,28 @@ export default class TripController {
   /**
    * Свойства контроллера "Маршрут путешествия"
    * @property {*} this._container - Компонент, внутри которого будет рендериться маршрут путешествия
+   * @property {*} this._points - Массив со всеми точками маршрута
+   * @property {*} this._showedPointControllers - Массив со всеми показанынми контроллерами "Точка маршрута"
    * @property {*} this._noPointsComponent - Компонент, который будет рендериться, если нет ни одной точки маршрута
    * @property {*} this._sortComponent - Компонент "Сортировка"
    * @property {*} this._tripDays - Компонент "Блок с днями путешествия"
+   * @property {*} this._sortTypeChangeHandler - Приватный метод - колбэк для клика по типу сортировки (перерисовывает точки маршрута при изменении типа сортировки)
+   * @property {*} this._getPointsDays - Приватный метод, который возвращает все даты путешествия
    * @param {*} container Компонент, внутри которого будет рендериться маршрут путешествия
    */
   constructor(container) {
     this._container = container;
 
+    this._points = [];
+    this._showedPointControllers = [];
     this._noPointsComponent = new NoPointsComponent();
     this._sortComponent = new SortComponent();
     this._tripDays = new TripDaysComponent();
+
+    this._sortTypeChangeHandler = this._sortTypeChangeHandler.bind(this);
+    this._sortComponent.setSortTypeChangeHandler(this._sortTypeChangeHandler);
+
+    this._getPointsDays = this._getPointsDays.bind(this);
   }
 
   /**
@@ -86,7 +116,9 @@ export default class TripController {
    * @param {array} points Массив со всеми точками маршрута
    */
   render(points) {
-    const isPoints = points.length === 0;
+    this._points = points;
+    const pointsDays = this._getPointsDays(this._points);
+    const isPoints = this._points.length === 0;
 
     if (isPoints) {
       render(this._container, this._noPointsComponent, RenderPosition.BEFOREEND);
@@ -94,31 +126,39 @@ export default class TripController {
     }
 
     render(this._container, this._sortComponent, RenderPosition.BEFOREEND);
-
-    const pointsDays = points.map((it) => [`${it.startDate.getFullYear()}-${castDateTimeFormat(it.startDate.getMonth())}-${castDateTimeFormat(it.startDate.getDate())}`].join(`, `));
-
     render(this._container, this._tripDays, RenderPosition.BEFOREEND);
 
-    renderPointsToDays(pointsDays, this._tripDays.getElement(), points);
+    const newPoints = renderPointsToDays(pointsDays, this._tripDays.getElement(), this._points);
+    this._showedPointControllers = this._showedPointControllers.concat(newPoints);
+  }
 
-    this._sortComponent.setSortTypeChangeHandler((sortType) => {
-      const sortedEvents = getSortedPoints(points, sortType);
+  /** @return {*} Приватный метод, который возвращает все даты путешествия */
+  _getPointsDays() {
+    return this._points.map((it) => [`${it.startDate.getFullYear()}-${castDateTimeFormat(it.startDate.getMonth())}-${castDateTimeFormat(it.startDate.getDate())}`].join(`, `));
+  }
 
-      this._tripDays.clearContent();
+  /**
+   * Приватный метод - колбэк для клика по типу сортировки (перерисовывает точки маршрута при изменении типа сортировки)
+   * @param {*} sortType Тип сортировки
+   */
+  _sortTypeChangeHandler(sortType) {
+    const sortedEvents = getSortedPoints(this._points, sortType);
+    const pointsDays = this._getPointsDays(this._points);
+    this._tripDays.clearContent();
+    let newPoints = [];
 
-      if (sortType !== SortType.EVENT) {
-        const tripDayComponent = new DayOfTripComponent(``, ``);
-        render(this._tripDays.getElement(), tripDayComponent, RenderPosition.BEFOREEND);
+    if (sortType !== SortType.EVENT) {
+      const tripDayComponent = new DayOfTripComponent(``, ``);
+      render(this._tripDays.getElement(), tripDayComponent, RenderPosition.BEFOREEND);
 
-        const tripList = tripDayComponent.getElement().querySelector(`.trip-events__list`);
-        sortedEvents.forEach((eventItem) => {
-          renderPoint(tripList, eventItem);
-        });
-      }
+      const tripList = tripDayComponent.getElement().querySelector(`.trip-events__list`);
+      newPoints = renderPoints(tripList, sortedEvents);
+    }
 
-      if (sortType === SortType.EVENT) {
-        renderPointsToDays(pointsDays, this._tripDays.getElement(), sortedEvents);
-      }
-    });
+    if (sortType === SortType.EVENT) {
+      newPoints = renderPointsToDays(pointsDays, this._tripDays.getElement(), sortedEvents);
+    }
+
+    this._showedPointControllers = this._showedPointControllers.concat(newPoints);
   }
 }
