@@ -1,4 +1,4 @@
-import AbstractComponent from "./abstract-component.js";
+import AbstractSmartComponent from "./abstract-smart-component.js";
 import {formatDateTime} from "../utils/common.js";
 
 /**
@@ -59,17 +59,17 @@ const createPhotosMarkup = (photo) => {
  * @param {*} pointOfTrip Объект, содержащий свойства компонента "Точка маршрута в режиме Edit"
  */
 const createEventEditTemplate = (pointOfTrip) => {
-  const {startDate, endDate, activity, transport, destination, price, description, offers, photos, isFavorite} = pointOfTrip;
+  const {type, startDate, endDate, allActivities, allTransports, allDestinations, typeWithPreposition, price, destination, description, offers, photos, isFavorite} = pointOfTrip;
 
   const start = formatDateTime(startDate);
   const end = formatDateTime(endDate);
 
   /** Разметка для точек с типом Transport */
-  const pointTransportsMarkup = transport.map((it) => createPointTypeMarkup(it.toLowerCase())).join(`\n`);
+  const pointTransportsMarkup = allTransports.map((it) => createPointTypeMarkup(it.toLowerCase())).join(`\n`);
   /** Разметка для точек с типом Activities */
-  const pointActivitiesMarkup = activity.map((it) => createPointTypeMarkup(it.toLowerCase())).join(`\n`);
+  const pointActivitiesMarkup = allActivities.map((it) => createPointTypeMarkup(it.toLowerCase())).join(`\n`);
   /** Разметка для "Пунктов назначения для точек маршрута" */
-  const pointDestinationsMarkup = destination.map((it) => createDestinationMarkup(it)).join(`\n`);
+  const pointDestinationsMarkup = allDestinations.map((it) => createDestinationMarkup(it)).join(`\n`);
   /** Разметка для "Дополнительных опций для точки маршрута" */
   const offersMarkup = offers.map((it) => createOfferMarkup(it.type, it.price, it.isChecked)).join(`\n`);
   /** Разметка для "Описания точки маршрута" */
@@ -92,7 +92,7 @@ const createEventEditTemplate = (pointOfTrip) => {
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="img/icons/flight.png" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -111,9 +111,9 @@ const createEventEditTemplate = (pointOfTrip) => {
 
         <div class="event__field-group  event__field-group--destination">
           <label class="event__label  event__type-output" for="event-destination-1">
-            Flight to
+            ${typeWithPreposition}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Geneva" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1">
           <datalist id="destination-list-1">
             ${pointDestinationsMarkup}
           </datalist>
@@ -187,7 +187,7 @@ const createEventEditTemplate = (pointOfTrip) => {
 };
 
 /** Компонент: "Точка маршрута в режиме Edit" */
-export default class PointEdit extends AbstractComponent {
+export default class PointEdit extends AbstractSmartComponent {
   /**
    * Свойства компонента "Точка маршрута в режиме Edit"
    * @property {*} this._point - Компонент "Точка маршрута в режиме DEFAULT"
@@ -196,11 +196,17 @@ export default class PointEdit extends AbstractComponent {
   constructor(point) {
     super();
     this._point = point;
+
+    this._submitHandler = null;
   }
 
   /** @return {*} Метод, который возвращает разметку компонента "Точка маршрута в режиме Edit" */
   getTemplate() {
     return createEventEditTemplate(this._point);
+  }
+
+  recoveryListeners() {
+    this.setSubmitHandler(this._submitHandler);
   }
 
   /**
@@ -209,6 +215,7 @@ export default class PointEdit extends AbstractComponent {
    */
   setSubmitHandler(handler) {
     this.getElement().querySelector(`.event__save-btn`).addEventListener(`click`, handler);
+    this._submitHandler = handler;
   }
 
   /**
