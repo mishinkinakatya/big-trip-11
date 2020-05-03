@@ -198,6 +198,7 @@ export default class PointEdit extends AbstractSmartComponent {
     this._point = point;
 
     this._submitHandler = null;
+    this._subscribeOnEvents();
   }
 
   /** @return {*} Метод, который возвращает разметку компонента "Точка маршрута в режиме Edit" */
@@ -207,6 +208,11 @@ export default class PointEdit extends AbstractSmartComponent {
 
   recoveryListeners() {
     this.setSubmitHandler(this._submitHandler);
+    this._subscribeOnEvents();
+  }
+
+  reset() {
+    this.rerender();
   }
 
   /**
@@ -224,5 +230,26 @@ export default class PointEdit extends AbstractSmartComponent {
    */
   setFavoriteChangeHandler(handler) {
     this.getElement().querySelector(`.event__favorite-checkbox`).addEventListener(`change`, handler);
+  }
+
+  _subscribeOnEvents() {
+    const element = this.getElement();
+
+    element.querySelector(`.event__type-list`).addEventListener(`click`, (evt) => {
+
+      if (evt.target.tagName !== `INPUT`) {
+        return;
+      }
+
+      const pointType = evt.target.value;
+      if (this._point.type === pointType) {
+        return;
+      }
+
+      this._point.type = pointType;
+
+      this.rerender();
+    });
+
   }
 }

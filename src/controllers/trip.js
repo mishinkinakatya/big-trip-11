@@ -35,10 +35,11 @@ const getSortedPoints = (points, sortType) => {
  * @param {*} tripList Элемент, внутри которого будут рендериться точки маршрута
  * @param {*} points Массив всех точек маршрута
  * @param {*} dataChangeHandler Метод, который измененяет данные и перерисовывает компонент
+ * @param {*} viewChangeHandler
  */
-const renderPoints = (tripList, points, dataChangeHandler) => {
+const renderPoints = (tripList, points, dataChangeHandler, viewChangeHandler) => {
   return points.map((point) => {
-    const pointController = new PointController(tripList, dataChangeHandler);
+    const pointController = new PointController(tripList, dataChangeHandler, viewChangeHandler);
 
     pointController.render(point);
 
@@ -47,13 +48,14 @@ const renderPoints = (tripList, points, dataChangeHandler) => {
 };
 
 /**
- * Функция для отрисовки точек маршрута, сгруппированным по дням
+ * @return {*} Функция для отрисовки точек маршрута, сгруппированным по дням
  * @param {*} daysOfPoints Массив с о всеми днями точек маршрута
  * @param {*} tripDays Элемент, внутри которого будет рендериться блок с днями точек маршрута
  * @param {*} points Массив всех точек маршрута
  * @param {*} dataChangeHandler Метод, который измененяет данные и перерисовывает компонент
+ * @param {*} viewChangeHandler
  */
-const renderPointsToDays = (daysOfPoints, tripDays, points, dataChangeHandler) => {
+const renderPointsToDays = (daysOfPoints, tripDays, points, dataChangeHandler, viewChangeHandler) => {
   const uniqueSortDays = Array.from(new Set(daysOfPoints)).sort();
 
   uniqueSortDays.map((it, i) => {
@@ -62,7 +64,7 @@ const renderPointsToDays = (daysOfPoints, tripDays, points, dataChangeHandler) =
 
   const tripDaysElement = tripDays.querySelectorAll(`.trip-days__item`);
 
-  tripDaysElement.forEach((day) => {
+  return tripDaysElement.forEach((day) => {
     const tripPointsOfDayElement = day.querySelector(`.trip-events__list`);
     const tripDay = day.querySelector(`.day__date`).getAttribute(`dateTime`);
 
@@ -70,7 +72,7 @@ const renderPointsToDays = (daysOfPoints, tripDays, points, dataChangeHandler) =
     const tripMonth = tripDay.slice(5, 7);
 
     return points.map((point) => {
-      const pointController = new PointController(tripPointsOfDayElement, dataChangeHandler);
+      const pointController = new PointController(tripPointsOfDayElement, dataChangeHandler, viewChangeHandler);
 
       const pointDate = castDateTimeFormat(point.startDate.getDate());
       const pointMonth = castDateTimeFormat(point.startDate.getMonth());
@@ -78,7 +80,6 @@ const renderPointsToDays = (daysOfPoints, tripDays, points, dataChangeHandler) =
       if (tripMonth === pointMonth && tripDate === pointDate) {
         pointController.render(point);
       }
-
       return pointController;
     });
   });
@@ -95,6 +96,7 @@ export default class TripController {
    * @property {*} this._sortComponent - Компонент "Сортировка"
    * @property {*} this._tripDays - Компонент "Блок с днями путешествия"
    * @property {*} this._dataChangeHandler - Метод, который измененяет данные и перерисовывает компонент
+   * @property {*} this._viewChangeHandler
    * @property {*} this._sortTypeChangeHandler - Приватный метод - колбэк для клика по типу сортировки (перерисовывает точки маршрута при изменении типа сортировки)
    * @property {*} this._getPointsDays - Приватный метод, который возвращает все даты путешествия
    * @param {*} container Компонент, внутри которого будет рендериться маршрут путешествия
@@ -109,6 +111,7 @@ export default class TripController {
     this._tripDays = new TripDaysComponent();
 
     this._dataChangeHandler = this._dataChangeHandler.bind(this);
+    this._viewChangeHandler = this._viewChangeHandler.bind(this);
     this._sortTypeChangeHandler = this._sortTypeChangeHandler.bind(this);
     this._sortComponent.setSortTypeChangeHandler(this._sortTypeChangeHandler);
 
@@ -130,9 +133,9 @@ export default class TripController {
     }
 
     render(this._container, this._sortComponent, RenderPosition.BEFOREEND);
-    render(this._container, this._tripDays, RenderPosition.BEFOREEND);
 
-    const newPoints = renderPointsToDays(pointsDays, this._tripDays.getElement(), this._points, this._dataChangeHandler);
+    render(this._container, this._tripDays, RenderPosition.BEFOREEND);
+    const newPoints = renderPointsToDays(pointsDays, this._tripDays.getElement(), this._points, this._dataChangeHandler, this._viewChangeHandler);
     this._showedPointControllers = this._showedPointControllers.concat(newPoints);
   }
 
@@ -146,7 +149,7 @@ export default class TripController {
    * @param {*} sortType Тип сортировки
    */
   _sortTypeChangeHandler(sortType) {
-    const sortedEvents = getSortedPoints(this._points, sortType);
+    const sortedPoints = getSortedPoints(this._points, sortType);
     const pointsDays = this._getPointsDays(this._points);
     this._tripDays.clearContent();
     let newPoints = [];
@@ -156,14 +159,15 @@ export default class TripController {
       render(this._tripDays.getElement(), tripDayComponent, RenderPosition.BEFOREEND);
 
       const tripList = tripDayComponent.getElement().querySelector(`.trip-events__list`);
-      newPoints = renderPoints(tripList, sortedEvents, this._dataChangeHandler);
+      newPoints = renderPoints(tripList, sortedPoints, this._dataChangeHandler, this._viewChangeHandler);
+
     }
 
     if (sortType === SortType.EVENT) {
-      newPoints = renderPointsToDays(pointsDays, this._tripDays.getElement(), sortedEvents, this._dataChangeHandler);
+      newPoints = renderPointsToDays(pointsDays, this._tripDays.getElement(), sortedPoints, this._dataChangeHandler, this._viewChangeHandler);
     }
 
-    this._showedPointControllers = this._showedPointControllers.concat(newPoints);
+    this._showedPointControllers = newPoints;
   }
 
   /**
@@ -181,5 +185,9 @@ export default class TripController {
     this._points = [].concat(this._points.slice(0, index), newData, this._points.slice(index + 1));
 
     // pointController.render(this._points[index]);
+  }
+
+  _viewChangeHandler() {
+    this._showedPointControllers.forEach((it) => it.setDefaultView());
   }
 }
