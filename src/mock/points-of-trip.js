@@ -1,5 +1,7 @@
-import {POINT_ACTION, POINT_ACTIVITY, POINT_TRANSPORT, priceToOffer} from "../const.js";
-import {generateRandomArrayItem, getRandomIntegerNumber, calculatePointDuration, getRandomStartDate, getRandomEndDate, generateRandomArrayFromAnother, getPointDestination, getPointDescription} from "../utils/common.js";
+import {POINT_ACTIVITY, POINT_TRANSPORT, POINT_ACTION_WITH_OFFERS} from "../const.js";
+import {generateRandomArrayItem, getRandomIntegerNumber, calculatePointDuration, getRandomStartDate, getRandomEndDate, getPointDestination, getPointDescription, getPointAction} from "../utils/common.js";
+
+const POINT_ACTION = getPointAction();
 
 const generatePointOfTrip = () => {
 
@@ -13,6 +15,7 @@ const generatePointOfTrip = () => {
   const startDate = getRandomStartDate();
   const endDate = getRandomEndDate(startDate);
   const durationInMs = Date.parse(endDate) - Date.parse(startDate);
+  const offers = generateOffers(pointAction, POINT_ACTION_WITH_OFFERS);
 
   return {
     type: (pointAction === `Check`) ? `check-in` : pointAction,
@@ -24,7 +27,7 @@ const generatePointOfTrip = () => {
     endDate,
     durationInMs,
     duration: calculatePointDuration(durationInMs),
-    offers: generateOffers(priceToOffer),
+    offers,
     allActivities: POINT_ACTIVITY,
     allTransports: POINT_TRANSPORT,
     allDestinations,
@@ -52,18 +55,20 @@ const addPreposition = (point) => {
   return direction;
 };
 
-const generateOffers = (offers) => {
-  const allOffers = Object.entries(offers);
+const generateOffers = (pointType, points) => {
   const offersWithCheck = [];
-  allOffers.forEach((offer) => {
+  const offersForPointType = points.filter((point) => {
+    return point.pointType === pointType;
+  });
+  offersForPointType.forEach((point) => {
     offersWithCheck.push(
         {
-          type: offer[0],
-          price: offer[1],
+          type: point.offerType,
+          price: point.offerPrice,
           isChecked: Math.random() > 0.5,
         });
   });
-  return generateRandomArrayFromAnother(offersWithCheck, 0, offersWithCheck.length);
+  return offersWithCheck;
 };
 
 const generatePhotoSrc = (count) => {

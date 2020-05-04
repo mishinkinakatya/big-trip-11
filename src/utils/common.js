@@ -1,4 +1,4 @@
-import {ALL_DESTINATION, ALL_DESCRIPTION} from "../const.js";
+import {ALL_DESTINATION, ALL_DESCRIPTION, POINT_ACTION_WITH_OFFERS} from "../const.js";
 
 const castDateTimeFormat = (value) => {
   return value < 10 ? `0${value}` : String(value);
@@ -128,5 +128,13 @@ const getPointDescription = () => {
   return POINT_DESCRIPTION;
 };
 
-export {castDateTimeFormat, formatTime, formatDate, generateRandomArrayItem, getRandomIntegerNumber, generateRandomArrayFromAnother, calculatePointDuration, getRandomStartDate, getRandomEndDate, formatDateTime, getPointDestination, getPointDescription};
+const getPointAction = () => {
+  let POINT_ACTION = [];
+  for (let value of POINT_ACTION_WITH_OFFERS) {
+    POINT_ACTION.push(value.pointType);
+  }
+  return Array.from(new Set(POINT_ACTION));
+};
+
+export {castDateTimeFormat, formatTime, formatDate, generateRandomArrayItem, getRandomIntegerNumber, generateRandomArrayFromAnother, calculatePointDuration, getRandomStartDate, getRandomEndDate, formatDateTime, getPointDestination, getPointDescription, getPointAction};
 
