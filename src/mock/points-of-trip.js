@@ -1,11 +1,11 @@
-import {POINT_ACTIVITY, POINT_TRANSPORT, POINT_ACTION_WITH_OFFERS} from "../const.js";
-import {generateRandomArrayItem, getRandomIntegerNumber, calculatePointDuration, getRandomStartDate, getRandomEndDate, getPointDestination, getPointDescription, getPointAction} from "../utils/common.js";
+import {POINT_ACTIVITY, POINT_TRANSPORT} from "../const.js";
+import {generateRandomArrayItem, getRandomIntegerNumber, calculatePointDuration, getRandomStartDate, getRandomEndDate, getPointDestination, getPointDescription, POINT_WITH_OFFERS, addPreposition} from "../utils/common.js";
 
-const POINT_ACTION = getPointAction();
+console.log(POINT_WITH_OFFERS);
 
 const generatePointOfTrip = () => {
 
-  const pointAction = generateRandomArrayItem(POINT_ACTION);
+  const pointAction = generateRandomArrayItem(Object.keys(POINT_WITH_OFFERS));
   const allDestinations = getPointDestination();
   const allDescriptions = getPointDescription();
   const destination = generateRandomArrayItem(allDestinations);
@@ -15,7 +15,7 @@ const generatePointOfTrip = () => {
   const startDate = getRandomStartDate();
   const endDate = getRandomEndDate(startDate);
   const durationInMs = Date.parse(endDate) - Date.parse(startDate);
-  const offers = generateOffers(pointAction, POINT_ACTION_WITH_OFFERS);
+  const offers = POINT_WITH_OFFERS[pointAction];
 
   return {
     type: (pointAction === `Check`) ? `check-in` : pointAction,
@@ -42,34 +42,9 @@ const generatePointsOfTrip = (count) => {
   return new Array(count).fill(``).map(generatePointOfTrip);
 };
 
-const addPreposition = (point) => {
-  let direction = ``;
 
-  if (POINT_ACTIVITY.includes(point)) {
-    direction = `in`;
-  }
-  if (POINT_TRANSPORT.includes(point)) {
-    direction = `to`;
-  }
 
-  return direction;
-};
 
-const generateOffers = (pointType, points) => {
-  const offersWithCheck = [];
-  const offersForPointType = points.filter((point) => {
-    return point.pointType === pointType;
-  });
-  offersForPointType.forEach((point) => {
-    offersWithCheck.push(
-        {
-          type: point.offerType,
-          price: point.offerPrice,
-          isChecked: Math.random() > 0.5,
-        });
-  });
-  return offersWithCheck;
-};
 
 const generatePhotoSrc = (count) => {
   const allPhotos = [];

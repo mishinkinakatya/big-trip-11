@@ -1,5 +1,5 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {formatDateTime} from "../utils/common.js";
+import {formatDateTime, POINT_WITH_OFFERS, addPreposition} from "../utils/common.js";
 
 /**
 * @return {*} Функция, которая возвращает разметку блока "Тип точки маршрута"
@@ -60,9 +60,9 @@ const createPhotosMarkup = (photo) => {
  * @param {*} options Объект, содержащий интерактивные свойства компонента "Точка маршрута в режиме Edit"
  */
 const createEventEditTemplate = (pointOfTrip, options = {}) => {
-  const {type, startDate, endDate, allActivities, allTransports, allDestinations, typeWithPreposition, price, destination, offers, photos, isFavorite} = pointOfTrip;
-  const {description} = options;
-
+  const {startDate, endDate, allActivities, allTransports, allDestinations, price, photos, isFavorite, offers} = pointOfTrip;
+  const {type, typeWithPreposition, destination, description} = options;
+console.log(typeWithPreposition);
   const start = formatDateTime(startDate);
   const end = formatDateTime(endDate);
 
@@ -198,7 +198,11 @@ export default class PointEdit extends AbstractSmartComponent {
   constructor(point) {
     super();
     this._point = point;
+    this._type = point.type;
+    this._typeWithPreposition = point.typeWithPreposition;
+    this._destination = point.destination;
     this._description = point.description;
+    // this._offers = point.offers;
 
     this._submitHandler = null;
     this._subscribeOnEvents();
@@ -207,7 +211,11 @@ export default class PointEdit extends AbstractSmartComponent {
   /** @return {*} Метод, который возвращает разметку компонента "Точка маршрута в режиме Edit" */
   getTemplate() {
     return createEventEditTemplate(this._point, {
+      type: this._type,
+      typeWithPreposition: this._typeWithPreposition,
+      destination: this._destination,
       description: this._description,
+      // offers: this._offers,
     });
   }
 
@@ -240,34 +248,37 @@ export default class PointEdit extends AbstractSmartComponent {
   _subscribeOnEvents() {
     const element = this.getElement();
 
-    element.querySelector(`.event__type-list`).addEventListener(`click`, (evt) => {
+    element.querySelector(`.event__type-list`).addEventListener(`change`, (evt) => {
 
       if (evt.target.tagName !== `INPUT`) {
         return;
       }
 
       const pointType = evt.target.value;
-      if (this._point.type === pointType) {
+      if (this._type === pointType) {
         return;
       }
 
-      this._point.type = pointType;
+      this._type = pointType;
+      console.log(pointType);
+      this._typeWithPreposition = `${this._type} ${addPreposition(this._type)}`;
+      // this._offers = POINT_WITH_OFFERS[this._point.type];
 
       this.rerender();
     });
 
     element.querySelector(`.event__input--destination`).addEventListener(`change`, (evt) => {
       const pointDestination = evt.target.value;
-      if (this._point.destination === pointDestination) {
+      if (this._destination === pointDestination) {
         return;
       }
 
-      this._point.destination = pointDestination;
+      this._destination = pointDestination;
 
-      if (!this._point.allDestinations.includes(this._point.destination)) {
+      if (!this._point.allDestinations.includes(this._destination)) {
         this._description = [];
       } else {
-        this._description = this._point.allDescriptions[this._point.allDestinations.findIndex((it) => it === this._point.destination)];
+        this._description = this._point.allDescriptions[this._point.allDestinations.findIndex((it) => it === this._destination)];
       }
 
       this.rerender();

@@ -1,4 +1,4 @@
-import {ALL_DESTINATION, ALL_DESCRIPTION, POINT_ACTION_WITH_OFFERS} from "../const.js";
+import {ALL_DESTINATION, ALL_DESCRIPTION, POINT_ACTION_WITH_OFFERS, POINT_ACTIVITY, POINT_TRANSPORT} from "../const.js";
 
 const castDateTimeFormat = (value) => {
   return value < 10 ? `0${value}` : String(value);
@@ -136,5 +136,50 @@ const getPointAction = () => {
   return Array.from(new Set(POINT_ACTION));
 };
 
-export {castDateTimeFormat, formatTime, formatDate, generateRandomArrayItem, getRandomIntegerNumber, generateRandomArrayFromAnother, calculatePointDuration, getRandomStartDate, getRandomEndDate, formatDateTime, getPointDestination, getPointDescription, getPointAction};
+const POINT_ACTION = getPointAction();
+
+const generateOffers = (pointType, points) => {
+  const offersWithCheck = [];
+  const offersForPointType = points.filter((point) => {
+    return point.pointType === pointType;
+  });
+  offersForPointType.forEach((point) => {
+    offersWithCheck.push(
+        {
+          type: point.offerType,
+          price: point.offerPrice,
+          isChecked: Math.random() > 0.5,
+        });
+  });
+  return offersWithCheck;
+};
+
+const generatePointsWithOffers = (points) => {
+  const pointsWithOffers = {};
+
+  POINT_ACTION.forEach((point) => {
+    Object.assign(pointsWithOffers, {
+      [point]: generateOffers(point, points)
+    });
+  });
+
+  return pointsWithOffers;
+};
+
+const addPreposition = (point) => {
+  let direction = ``;
+
+  if (POINT_ACTIVITY.includes(point)) {
+    direction = `in`;
+  }
+  if (POINT_TRANSPORT.includes(point)) {
+    direction = `to`;
+  }
+
+  return direction;
+};
+
+const POINT_WITH_OFFERS = generatePointsWithOffers(POINT_ACTION_WITH_OFFERS);
+
+export {castDateTimeFormat, formatTime, formatDate, generateRandomArrayItem, getRandomIntegerNumber, generateRandomArrayFromAnother, calculatePointDuration, getRandomStartDate, getRandomEndDate, formatDateTime, getPointDestination, getPointDescription, getPointAction, POINT_WITH_OFFERS, addPreposition};
 
