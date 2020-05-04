@@ -1,4 +1,4 @@
-import {ALL_DESTINATION, ALL_DESCRIPTION, POINT_ACTION_WITH_OFFERS, POINT_ACTIVITY, POINT_TRANSPORT} from "../const.js";
+import {ALL_DESTINATION, ALL_DESCRIPTION, POINT_ACTION_WITH_OFFERS, POINT_ACTIVITY, POINT_TRANSPORT, ALL_POINT_ACTION} from "../const.js";
 
 const castDateTimeFormat = (value) => {
   return value < 10 ? `0${value}` : String(value);
@@ -137,6 +137,7 @@ const getPointAction = () => {
 };
 
 const POINT_ACTION = getPointAction();
+const POINT_ACTION_FOR_TITLE = POINT_ACTION.map((it) => ALL_POINT_ACTION[it]);
 
 const generateOffers = (pointType, points) => {
   const offersWithCheck = [];
@@ -169,10 +170,10 @@ const generatePointsWithOffers = (points) => {
 const addPreposition = (point) => {
   let direction = ``;
 
-  if (POINT_ACTIVITY.includes(point)) {
+  if (Object.values(POINT_ACTIVITY).includes(point)) {
     direction = `in`;
   }
-  if (POINT_TRANSPORT.includes(point)) {
+  if (Object.values(POINT_TRANSPORT).includes(point)) {
     direction = `to`;
   }
 
@@ -181,5 +182,5 @@ const addPreposition = (point) => {
 
 const POINT_WITH_OFFERS = generatePointsWithOffers(POINT_ACTION_WITH_OFFERS);
 
-export {castDateTimeFormat, formatTime, formatDate, generateRandomArrayItem, getRandomIntegerNumber, generateRandomArrayFromAnother, calculatePointDuration, getRandomStartDate, getRandomEndDate, formatDateTime, getPointDestination, getPointDescription, getPointAction, POINT_WITH_OFFERS, addPreposition};
+export {castDateTimeFormat, formatTime, formatDate, generateRandomArrayItem, getRandomIntegerNumber, generateRandomArrayFromAnother, calculatePointDuration, getRandomStartDate, getRandomEndDate, formatDateTime, getPointDestination, getPointDescription, getPointAction, POINT_WITH_OFFERS, addPreposition, POINT_ACTION_FOR_TITLE};
 

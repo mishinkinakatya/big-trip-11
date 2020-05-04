@@ -1,5 +1,6 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import {formatDateTime, POINT_WITH_OFFERS, addPreposition} from "../utils/common.js";
+import {ALL_POINT_ACTION} from "../const.js";
 
 /**
 * @return {*} Функция, которая возвращает разметку блока "Тип точки маршрута"
@@ -60,16 +61,15 @@ const createPhotosMarkup = (photo) => {
  * @param {*} options Объект, содержащий интерактивные свойства компонента "Точка маршрута в режиме Edit"
  */
 const createEventEditTemplate = (pointOfTrip, options = {}) => {
-  const {startDate, endDate, allActivities, allTransports, allDestinations, price, photos, isFavorite, offers} = pointOfTrip;
-  const {type, typeWithPreposition, destination, description} = options;
-console.log(typeWithPreposition);
+  const {startDate, endDate, allActivities, allTransports, allDestinations, price, photos, isFavorite} = pointOfTrip;
+  const {type, typeWithPreposition, destination, description, offers} = options;
   const start = formatDateTime(startDate);
   const end = formatDateTime(endDate);
 
   /** Разметка для точек с типом Transport */
-  const pointTransportsMarkup = allTransports.map((it) => createPointTypeMarkup(it.toLowerCase())).join(`\n`);
+  const pointTransportsMarkup = allTransports.map((it) => createPointTypeMarkup(it)).join(`\n`);
   /** Разметка для точек с типом Activities */
-  const pointActivitiesMarkup = allActivities.map((it) => createPointTypeMarkup(it.toLowerCase())).join(`\n`);
+  const pointActivitiesMarkup = allActivities.map((it) => createPointTypeMarkup(it)).join(`\n`);
   /** Разметка для "Пунктов назначения для точек маршрута" */
   const pointDestinationsMarkup = allDestinations.map((it) => createDestinationMarkup(it)).join(`\n`);
   /** Разметка для "Дополнительных опций для точки маршрута" */
@@ -202,7 +202,7 @@ export default class PointEdit extends AbstractSmartComponent {
     this._typeWithPreposition = point.typeWithPreposition;
     this._destination = point.destination;
     this._description = point.description;
-    // this._offers = point.offers;
+    this._offers = point.offers;
 
     this._submitHandler = null;
     this._subscribeOnEvents();
@@ -215,7 +215,7 @@ export default class PointEdit extends AbstractSmartComponent {
       typeWithPreposition: this._typeWithPreposition,
       destination: this._destination,
       description: this._description,
-      // offers: this._offers,
+      offers: this._offers,
     });
   }
 
@@ -260,9 +260,8 @@ export default class PointEdit extends AbstractSmartComponent {
       }
 
       this._type = pointType;
-      console.log(pointType);
-      this._typeWithPreposition = `${this._type} ${addPreposition(this._type)}`;
-      // this._offers = POINT_WITH_OFFERS[this._point.type];
+      this._typeWithPreposition = `${ALL_POINT_ACTION[this._type]} ${addPreposition(ALL_POINT_ACTION[this._type])}`;
+      this._offers = POINT_WITH_OFFERS[this._type];
 
       this.rerender();
     });

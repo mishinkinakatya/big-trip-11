@@ -19,125 +19,129 @@ const ALL_DESCRIPTION = [
   `In rutrum ac purus sit amet tempus.`,
 ];
 
-const POINT_ACTIVITY = [
-  `Check`,
-  `Sightseeing`,
-  `Restaurant`,
-];
+const POINT_ACTIVITY = {
+  'check-in': `Check-in`,
+  'sightseeing': `Sightseeing`,
+  'restaurant': `Restaurant`,
+};
 
-const POINT_TRANSPORT = [
-  `Taxi`,
-  `Bus`,
-  `Train`,
-  `Ship`,
-  `Transport`,
-  `Drive`,
-  `Flight`,
-];
+const POINT_TRANSPORT = {
+  'taxi': `Taxi`,
+  'bus': `Bus`,
+  'train': `Train`,
+  'ship': `Ship`,
+  'transport': `Transport`,
+  'drive': `Drive`,
+  'flight': `Flight`,
+};
 
+const ALL_POINT_ACTION = Object.assign(POINT_TRANSPORT, POINT_ACTIVITY);
+
+
+// TODO!!! Научиться генерировать массив из имеющихся данных
 const POINT_ACTION_WITH_OFFERS = [
   {
-    pointType: `Taxi`,
+    pointType: `taxi`,
     offerType: `Order Uber`,
     offerPrice: `20`,
   },
   {
-    pointType: `Bus`,
+    pointType: `bus`,
     offerType: `Add luggage`,
     offerPrice: `30`,
   },
   {
-    pointType: `Bus`,
+    pointType: `bus`,
     offerType: `Add meal`,
     offerPrice: `15`,
   },
   {
-    pointType: `Bus`,
+    pointType: `bus`,
     offerType: `Choose seats`,
     offerPrice: `5`,
   },
   {
-    pointType: `Train`,
+    pointType: `train`,
     offerType: `Travel by train`,
     offerPrice: `40`,
   },
   {
-    pointType: `Train`,
+    pointType: `train`,
     offerType: `Add luggage`,
     offerPrice: `30`,
   },
   {
-    pointType: `Train`,
+    pointType: `train`,
     offerType: `Add meal`,
     offerPrice: `15`,
   },
   {
-    pointType: `Train`,
+    pointType: `train`,
     offerType: `Choose seats`,
     offerPrice: `5`,
   },
   {
-    pointType: `Ship`,
+    pointType: `ship`,
     offerType: `Add luggage`,
     offerPrice: `30`,
   },
   {
-    pointType: `Ship`,
+    pointType: `ship`,
     offerType: `Add meal`,
     offerPrice: `15`,
   },
   {
-    pointType: `Ship`,
+    pointType: `ship`,
     offerType: `Choose seats`,
     offerPrice: `5`,
   },
   {
-    pointType: `Transport`,
+    pointType: `transport`,
     offerType: `Rent a car`,
     offerPrice: `200`,
   },
   {
-    pointType: `Drive`,
+    pointType: `drive`,
     offerType: `Rent a car`,
     offerPrice: `200`,
   },
   {
-    pointType: `Flight`,
+    pointType: `flight`,
     offerType: `Switch to comfort class`,
     offerPrice: `100`,
   },
   {
-    pointType: `Flight`,
+    pointType: `flight`,
     offerType: `Add luggage`,
     offerPrice: `30`,
   },
   {
-    pointType: `Flight`,
+    pointType: `flight`,
     offerType: `Add meal`,
     offerPrice: `15`,
   },
   {
-    pointType: `Flight`,
+    pointType: `flight`,
     offerType: `Choose seats`,
     offerPrice: `5`,
   },
   {
-    pointType: `Check`,
+    pointType: `check-in`,
     offerType: `Add breakfast`,
     offerPrice: `50`,
   },
   {
-    pointType: `Sightseeing`,
+    pointType: `sightseeing`,
     offerType: `Book tickets`,
     offerPrice: `40`,
   },
   {
-    pointType: `Sightseeing`,
+    pointType: `sightseeing`,
     offerType: `Lunch in city`,
     offerPrice: `30`,
   },
   {
-    pointType: `Restaurant`,
+    pointType: `restaurant`,
     offerType: `Choose seats`,
     offerPrice: `5`,
   },
@@ -145,5 +149,5 @@ const POINT_ACTION_WITH_OFFERS = [
 
 const MONTH = [`JAN`, `FEB`, `MAR`, `APR`, `MAY`, `JUNE`, `JULY`, `AUG`, `SEPT`, `OCT`, `NOV`, `DEC`];
 
-export {POINT_ACTIVITY, POINT_TRANSPORT, ALL_DESCRIPTION, ALL_DESTINATION, POINT_ACTION_WITH_OFFERS, MONTH};
+export {POINT_ACTIVITY, POINT_TRANSPORT, ALL_DESCRIPTION, ALL_DESTINATION, POINT_ACTION_WITH_OFFERS, MONTH, ALL_POINT_ACTION};
 
