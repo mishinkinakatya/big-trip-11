@@ -1,3 +1,5 @@
+
+
 const POINT_ACTIVITY = [
   `Check`,
   `Sightseeing`,
@@ -16,11 +18,25 @@ const POINT_TRANSPORT = [
 
 const POINT_ACTION = POINT_TRANSPORT.concat(POINT_ACTIVITY);
 
-const POINT_DESTINATION = [
+const ALL_DESTINATION = [
   `Amsterdam`,
   `Chamonix`,
   `Geneva`,
   `Saint Petersburg`,
+];
+
+const ALL_DESCRIPTION = [
+  `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
+  `Cras aliquet varius magna, non porta ligula feugiat eget.`,
+  `Fusce tristique felis at fermentum pharetra.`,
+  `Aliquam id orci ut lectus varius viverra.`,
+  `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.`,
+  `Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.`,
+  `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.`,
+  `Sed sed nisi sed augue convallis suscipit in sed felis.`,
+  `Aliquam erat volutpat.`,
+  `Nunc fermentum tortor ac porta dapibus.`,
+  `In rutrum ac purus sit amet tempus.`,
 ];
 
 const priceToOffer = {
@@ -36,20 +52,6 @@ const priceToOffer = {
   'Lunch in city': `30`,
 };
 
-const POINT_DESCRIPTION = [
-  `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
-  `Cras aliquet varius magna, non porta ligula feugiat eget.`,
-  `Fusce tristique felis at fermentum pharetra.`,
-  `Aliquam id orci ut lectus varius viverra.`,
-  `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.`,
-  `Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.`,
-  `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.`,
-  `Sed sed nisi sed augue convallis suscipit in sed felis.`,
-  `Aliquam erat volutpat.`,
-  `Nunc fermentum tortor ac porta dapibus.`,
-  `In rutrum ac purus sit amet tempus.`,
-];
-
 const MONTH = [`JAN`, `FEB`, `MAR`, `APR`, `MAY`, `JUNE`, `JULY`, `AUG`, `SEPT`, `OCT`, `NOV`, `DEC`];
 
-export {POINT_ACTIVITY, POINT_TRANSPORT, POINT_ACTION, POINT_DESTINATION, priceToOffer, POINT_DESCRIPTION, MONTH};
+export {POINT_ACTIVITY, POINT_TRANSPORT, POINT_ACTION, ALL_DESCRIPTION, ALL_DESTINATION, priceToOffer, MONTH};

@@ -1,26 +1,25 @@
-import {POINT_ACTION, POINT_ACTIVITY, POINT_TRANSPORT, POINT_DESTINATION, POINT_DESCRIPTION, priceToOffer} from "../const.js";
-import {generateRandomArrayItem, getRandomIntegeNumber, calculatePointDuration, getRandomStartDate, getRandomEndDate, generateRandomArrayFromAnother} from "../utils/common.js";
+import {POINT_ACTION, POINT_ACTIVITY, POINT_TRANSPORT, priceToOffer} from "../const.js";
+import {generateRandomArrayItem, getRandomIntegerNumber, calculatePointDuration, getRandomStartDate, getRandomEndDate, generateRandomArrayFromAnother, getPointDestination, getPointDescription} from "../utils/common.js";
 
 const generatePointOfTrip = () => {
 
   const pointAction = generateRandomArrayItem(POINT_ACTION);
-  const destination = generateRandomArrayItem(POINT_DESTINATION);
+  const allDestinations = getPointDestination();
+  const allDescriptions = getPointDescription();
+  const destination = generateRandomArrayItem(allDestinations);
+  const description = allDescriptions[allDestinations.findIndex((it) => it === destination)];
   const typeWithPreposition = `${pointAction} ${addPreposition(pointAction)}`;
   const title = `${typeWithPreposition} ${destination}`;
   const startDate = getRandomStartDate();
   const endDate = getRandomEndDate(startDate);
   const durationInMs = Date.parse(endDate) - Date.parse(startDate);
-  const DescriptionLength = {
-    min: 0,
-    max: 5,
-  };
 
   return {
     type: (pointAction === `Check`) ? `check-in` : pointAction,
     typeWithPreposition,
     destination,
     title,
-    price: getRandomIntegeNumber(0, 100),
+    price: getRandomIntegerNumber(0, 100),
     startDate,
     endDate,
     durationInMs,
@@ -28,9 +27,10 @@ const generatePointOfTrip = () => {
     offers: generateOffers(priceToOffer),
     allActivities: POINT_ACTIVITY,
     allTransports: POINT_TRANSPORT,
-    allDestinations: POINT_DESTINATION,
-    description: generateRandomArrayFromAnother(POINT_DESCRIPTION, DescriptionLength.min, DescriptionLength.max),
-    photos: generatePhotoSrc(getRandomIntegeNumber(1, 5)),
+    allDestinations,
+    allDescriptions,
+    description,
+    photos: generatePhotoSrc(getRandomIntegerNumber(1, 5)),
     isFavorite: Math.random() > 0.5,
   };
 };

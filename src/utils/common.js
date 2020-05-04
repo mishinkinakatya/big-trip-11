@@ -1,3 +1,5 @@
+import {ALL_DESTINATION, ALL_DESCRIPTION} from "../const.js";
+
 const castDateTimeFormat = (value) => {
   return value < 10 ? `0${value}` : String(value);
 };
@@ -28,29 +30,29 @@ const formatDateTime = (date) => {
 };
 
 const generateRandomArrayItem = (array) => {
-  const randomIndex = getRandomIntegeNumber(0, array.length);
+  const randomIndex = getRandomIntegerNumber(0, array.length);
 
   return array[randomIndex];
 };
 
-const getRandomIntegeNumber = (min, max) => {
+const getRandomIntegerNumber = (min, max) => {
   return min + Math.floor(Math.random() * (max - min));
 };
 
 const generateRandomArrayFromAnother = (initialArray, newArrayMinLength, newArrayMaxLength) => {
   const arrayLength = initialArray.length;
-  const countItems = getRandomIntegeNumber(newArrayMinLength, newArrayMaxLength);
-  const indexStart = getRandomIntegeNumber(0, arrayLength - 1);
+  const countItems = getRandomIntegerNumber(newArrayMinLength, newArrayMaxLength);
+  const indexStart = getRandomIntegerNumber(0, arrayLength - 1);
 
   return initialArray.slice(indexStart, indexStart + countItems);
 };
 
 const getRandomStartDate = () => {
   const targetDate = new Date();
-  const diffDate = getRandomIntegeNumber(0, 10);
+  const diffDate = getRandomIntegerNumber(0, 10);
 
-  const diffHours = getRandomIntegeNumber(0, 23);
-  const diffMinutes = getRandomIntegeNumber(0, 59);
+  const diffHours = getRandomIntegerNumber(0, 23);
+  const diffMinutes = getRandomIntegerNumber(0, 59);
 
   targetDate.setDate(targetDate.getDate() + diffDate);
   targetDate.setHours(targetDate.getHours() + diffHours);
@@ -61,10 +63,10 @@ const getRandomStartDate = () => {
 
 const getRandomEndDate = (startDate) => {
   const targetDate = new Date(startDate);
-  const diffDate = getRandomIntegeNumber(0, 10);
+  const diffDate = getRandomIntegerNumber(0, 10);
 
-  const diffHours = diffDate === 0 ? getRandomIntegeNumber(targetDate.getHours(), 23) : getRandomIntegeNumber(0, 23);
-  const diffMinutes = diffHours === 0 ? getRandomIntegeNumber(targetDate.getMinutes(), 59) : getRandomIntegeNumber(0, 59);
+  const diffHours = diffDate === 0 ? getRandomIntegerNumber(targetDate.getHours(), 23) : getRandomIntegerNumber(0, 23);
+  const diffMinutes = diffHours === 0 ? getRandomIntegerNumber(targetDate.getMinutes(), 59) : getRandomIntegerNumber(0, 59);
 
   targetDate.setDate(targetDate.getDate() + diffDate);
   targetDate.setHours(targetDate.getHours() + diffHours);
@@ -94,5 +96,37 @@ const calculatePointDuration = (diff) => {
   }
 };
 
-export {castDateTimeFormat, formatTime, formatDate, generateRandomArrayItem, getRandomIntegeNumber, generateRandomArrayFromAnother, calculatePointDuration, getRandomStartDate, getRandomEndDate, formatDateTime};
+const DescriptionLength = {
+  min: 0,
+  max: 5,
+};
+
+const getPointDestinationWithDescription = () => {
+  return ALL_DESTINATION.map((it) => {
+    return {
+      destination: it,
+      description: generateRandomArrayFromAnother(ALL_DESCRIPTION, DescriptionLength.min, DescriptionLength.max),
+    };
+  });
+};
+
+const POINT_DESTINATION_WITH_DESCRIPTION = getPointDestinationWithDescription();
+
+const getPointDestination = () => {
+  let POINT_DESTINATION = [];
+  for (let value of POINT_DESTINATION_WITH_DESCRIPTION) {
+    POINT_DESTINATION.push(value.destination);
+  }
+  return POINT_DESTINATION;
+};
+
+const getPointDescription = () => {
+  let POINT_DESCRIPTION = [];
+  for (let value of POINT_DESTINATION_WITH_DESCRIPTION) {
+    POINT_DESCRIPTION.push(value.description);
+  }
+  return POINT_DESCRIPTION;
+};
+
+export {castDateTimeFormat, formatTime, formatDate, generateRandomArrayItem, getRandomIntegerNumber, generateRandomArrayFromAnother, calculatePointDuration, getRandomStartDate, getRandomEndDate, formatDateTime, getPointDestination, getPointDescription};
 

@@ -57,9 +57,11 @@ const createPhotosMarkup = (photo) => {
 /**
  * @return {*} Функция, которая возвращает разметку компонента "Точка маршрута в режиме Edit"
  * @param {*} pointOfTrip Объект, содержащий свойства компонента "Точка маршрута в режиме Edit"
+ * @param {*} options Объект, содержащий интерактивные свойства компонента "Точка маршрута в режиме Edit"
  */
-const createEventEditTemplate = (pointOfTrip) => {
-  const {type, startDate, endDate, allActivities, allTransports, allDestinations, typeWithPreposition, price, destination, description, offers, photos, isFavorite} = pointOfTrip;
+const createEventEditTemplate = (pointOfTrip, options = {}) => {
+  const {type, startDate, endDate, allActivities, allTransports, allDestinations, typeWithPreposition, price, destination, offers, photos, isFavorite} = pointOfTrip;
+  const {description} = options;
 
   const start = formatDateTime(startDate);
   const end = formatDateTime(endDate);
@@ -196,6 +198,7 @@ export default class PointEdit extends AbstractSmartComponent {
   constructor(point) {
     super();
     this._point = point;
+    this._description = point.description;
 
     this._submitHandler = null;
     this._subscribeOnEvents();
@@ -203,7 +206,9 @@ export default class PointEdit extends AbstractSmartComponent {
 
   /** @return {*} Метод, который возвращает разметку компонента "Точка маршрута в режиме Edit" */
   getTemplate() {
-    return createEventEditTemplate(this._point);
+    return createEventEditTemplate(this._point, {
+      description: this._description,
+    });
   }
 
   recoveryListeners() {
@@ -247,6 +252,23 @@ export default class PointEdit extends AbstractSmartComponent {
       }
 
       this._point.type = pointType;
+
+      this.rerender();
+    });
+
+    element.querySelector(`.event__input--destination`).addEventListener(`change`, (evt) => {
+      const pointDestination = evt.target.value;
+      if (this._point.destination === pointDestination) {
+        return;
+      }
+
+      this._point.destination = pointDestination;
+
+      if (!this._point.allDestinations.includes(this._point.destination)) {
+        this._description = [];
+      } else {
+        this._description = this._point.allDescriptions[this._point.allDestinations.findIndex((it) => it === this._point.destination)];
+      }
 
       this.rerender();
     });
