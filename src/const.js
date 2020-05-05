@@ -20,26 +20,25 @@ const ALL_DESCRIPTION = [
 ];
 
 const POINT_ACTIVITY = {
-  'check-in': `Check-in`,
-  'sightseeing': `Sightseeing`,
-  'restaurant': `Restaurant`,
+  'check-in': `Check-in in`,
+  'sightseeing': `Sightseeing in`,
+  'restaurant': `Restaurant in`,
 };
 
 const POINT_TRANSPORT = {
-  'taxi': `Taxi`,
-  'bus': `Bus`,
-  'train': `Train`,
-  'ship': `Ship`,
-  'transport': `Transport`,
-  'drive': `Drive`,
-  'flight': `Flight`,
+  'taxi': `Taxi to`,
+  'bus': `Bus to`,
+  'train': `Train to`,
+  'ship': `Ship to`,
+  'transport': `Transport to`,
+  'drive': `Drive to`,
+  'flight': `Flight to`,
 };
 
-const ALL_POINT_ACTION = Object.assign(POINT_TRANSPORT, POINT_ACTIVITY);
-
+const ALL_POINT_ACTION = Object.assign({}, POINT_TRANSPORT, POINT_ACTIVITY);
 
 // TODO!!! Научиться генерировать массив из имеющихся данных
-const POINT_ACTION_WITH_OFFERS = [
+const ACTIONS_WITH_OFFERS = [
   {
     pointType: `taxi`,
     offerType: `Order Uber`,
@@ -149,5 +148,5 @@ const POINT_ACTION_WITH_OFFERS = [
 
 const MONTH = [`JAN`, `FEB`, `MAR`, `APR`, `MAY`, `JUNE`, `JULY`, `AUG`, `SEPT`, `OCT`, `NOV`, `DEC`];
 
-export {POINT_ACTIVITY, POINT_TRANSPORT, ALL_DESCRIPTION, ALL_DESTINATION, POINT_ACTION_WITH_OFFERS, MONTH, ALL_POINT_ACTION};
+export {ALL_DESCRIPTION, ALL_DESTINATION, ALL_POINT_ACTION, ACTIONS_WITH_OFFERS, MONTH, POINT_ACTIVITY, POINT_TRANSPORT};
 

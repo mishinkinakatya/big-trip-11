@@ -1,5 +1,5 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {formatDateTime, POINT_WITH_OFFERS, addPreposition} from "../utils/common.js";
+import {formatDateTime, POINTS_ACTION_WITH_OFFERS, POINTS_DESTINATION_WITH_DESCRIPTION} from "../utils/common.js";
 import {ALL_POINT_ACTION} from "../const.js";
 
 /**
@@ -65,7 +65,6 @@ const createEventEditTemplate = (pointOfTrip, options = {}) => {
   const {type, typeWithPreposition, destination, description, offers} = options;
   const start = formatDateTime(startDate);
   const end = formatDateTime(endDate);
-
   /** Разметка для точек с типом Transport */
   const pointTransportsMarkup = allTransports.map((it) => createPointTypeMarkup(it)).join(`\n`);
   /** Разметка для точек с типом Activities */
@@ -219,12 +218,22 @@ export default class PointEdit extends AbstractSmartComponent {
     });
   }
 
+  /** Метод, который перенавешивает слушателей */
   recoveryListeners() {
     this.setSubmitHandler(this._submitHandler);
     this._subscribeOnEvents();
   }
 
+  /** Метод, котоырй сбрасывает все изменения в контроллере */
   reset() {
+    const point = this._point;
+
+    this._type = point.type;
+    this._typeWithPreposition = point.typeWithPreposition;
+    this._destination = point.destination;
+    this._description = point.description;
+    this._offers = point.offers;
+
     this.rerender();
   }
 
@@ -245,6 +254,7 @@ export default class PointEdit extends AbstractSmartComponent {
     this.getElement().querySelector(`.event__favorite-checkbox`).addEventListener(`change`, handler);
   }
 
+  /** Приватный метод, который подписывается на события: Изменение типа точки маршрута и пункта назначения */
   _subscribeOnEvents() {
     const element = this.getElement();
 
@@ -260,8 +270,8 @@ export default class PointEdit extends AbstractSmartComponent {
       }
 
       this._type = pointType;
-      this._typeWithPreposition = `${ALL_POINT_ACTION[this._type]} ${addPreposition(ALL_POINT_ACTION[this._type])}`;
-      this._offers = POINT_WITH_OFFERS[this._type];
+      this._typeWithPreposition = `${ALL_POINT_ACTION[this._type]}`;
+      this._offers = POINTS_ACTION_WITH_OFFERS[this._type];
 
       this.rerender();
     });
@@ -273,11 +283,10 @@ export default class PointEdit extends AbstractSmartComponent {
       }
 
       this._destination = pointDestination;
-
       if (!this._point.allDestinations.includes(this._destination)) {
         this._description = [];
       } else {
-        this._description = this._point.allDescriptions[this._point.allDestinations.findIndex((it) => it === this._destination)];
+        this._description = POINTS_DESTINATION_WITH_DESCRIPTION[POINTS_DESTINATION_WITH_DESCRIPTION.findIndex((it) => it.destination === this._destination)].description;
       }
 
       this.rerender();

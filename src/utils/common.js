@@ -1,4 +1,4 @@
-import {ALL_DESTINATION, ALL_DESCRIPTION, POINT_ACTION_WITH_OFFERS, POINT_ACTIVITY, POINT_TRANSPORT, ALL_POINT_ACTION} from "../const.js";
+import {ALL_DESTINATION, ALL_DESCRIPTION, ALL_POINT_ACTION, ACTIONS_WITH_OFFERS} from "../const.js";
 
 const castDateTimeFormat = (value) => {
   return value < 10 ? `0${value}` : String(value);
@@ -101,45 +101,19 @@ const DescriptionLength = {
   max: 5,
 };
 
-const getPointDestinationWithDescription = () => {
-  return ALL_DESTINATION.map((it) => {
+// Пока генерирую сама - реализовала функцию.
+const generateDescriptionsForDestinations = (destinations, descriptions) => {
+  return destinations.map((it) => {
     return {
       destination: it,
-      description: generateRandomArrayFromAnother(ALL_DESCRIPTION, DescriptionLength.min, DescriptionLength.max),
+      description: generateRandomArrayFromAnother(descriptions, DescriptionLength.min, DescriptionLength.max),
     };
   });
 };
+// Когда данные будут приходить с сервера - эта константа переедет в point-edit
+const POINTS_DESTINATION_WITH_DESCRIPTION = generateDescriptionsForDestinations(ALL_DESTINATION, ALL_DESCRIPTION);
 
-const POINT_DESTINATION_WITH_DESCRIPTION = getPointDestinationWithDescription();
-
-const getPointDestination = () => {
-  let POINT_DESTINATION = [];
-  for (let value of POINT_DESTINATION_WITH_DESCRIPTION) {
-    POINT_DESTINATION.push(value.destination);
-  }
-  return POINT_DESTINATION;
-};
-
-const getPointDescription = () => {
-  let POINT_DESCRIPTION = [];
-  for (let value of POINT_DESTINATION_WITH_DESCRIPTION) {
-    POINT_DESCRIPTION.push(value.description);
-  }
-  return POINT_DESCRIPTION;
-};
-
-const getPointAction = () => {
-  let POINT_ACTION = [];
-  for (let value of POINT_ACTION_WITH_OFFERS) {
-    POINT_ACTION.push(value.pointType);
-  }
-  return Array.from(new Set(POINT_ACTION));
-};
-
-const POINT_ACTION = getPointAction();
-const POINT_ACTION_FOR_TITLE = POINT_ACTION.map((it) => ALL_POINT_ACTION[it]);
-
-const generateOffers = (pointType, points) => {
+const getOffers = (pointType, points) => {
   const offersWithCheck = [];
   const offersForPointType = points.filter((point) => {
     return point.pointType === pointType;
@@ -158,29 +132,17 @@ const generateOffers = (pointType, points) => {
 const generatePointsWithOffers = (points) => {
   const pointsWithOffers = {};
 
-  POINT_ACTION.forEach((point) => {
+  Object.keys(ALL_POINT_ACTION).forEach((point) => {
     Object.assign(pointsWithOffers, {
-      [point]: generateOffers(point, points)
+      [point]: getOffers(point, points)
     });
   });
 
   return pointsWithOffers;
 };
 
-const addPreposition = (point) => {
-  let direction = ``;
+// Когда данные будут приходить с сервера - эта константа переедет в point-edit
+const POINTS_ACTION_WITH_OFFERS = generatePointsWithOffers(ACTIONS_WITH_OFFERS);
 
-  if (Object.values(POINT_ACTIVITY).includes(point)) {
-    direction = `in`;
-  }
-  if (Object.values(POINT_TRANSPORT).includes(point)) {
-    direction = `to`;
-  }
-
-  return direction;
-};
-
-const POINT_WITH_OFFERS = generatePointsWithOffers(POINT_ACTION_WITH_OFFERS);
-
-export {castDateTimeFormat, formatTime, formatDate, generateRandomArrayItem, getRandomIntegerNumber, generateRandomArrayFromAnother, calculatePointDuration, getRandomStartDate, getRandomEndDate, formatDateTime, getPointDestination, getPointDescription, getPointAction, POINT_WITH_OFFERS, addPreposition, POINT_ACTION_FOR_TITLE};
+export {calculatePointDuration, castDateTimeFormat, formatDate, formatDateTime, formatTime, generateRandomArrayFromAnother, generateRandomArrayItem, getRandomEndDate, getRandomIntegerNumber, getRandomStartDate, POINTS_ACTION_WITH_OFFERS, POINTS_DESTINATION_WITH_DESCRIPTION};
 

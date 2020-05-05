@@ -68,6 +68,7 @@ export default class PointController {
     }
   }
 
+  /** Метод, который возвращает Точку маршрута в дефолтное состояние */
   setDefaultView() {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceEditToPoint();

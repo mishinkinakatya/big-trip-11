@@ -41,7 +41,7 @@ export default class TripController {
    * @property {*} this._sortComponent - Компонент "Сортировка"
    * @property {*} this._tripDays - Компонент "Блок с днями путешествия"
    * @property {*} this._dataChangeHandler - Метод, который измененяет данные и перерисовывает компонент
-   * @property {*} this._viewChangeHandler
+   * @property {*} this._viewChangeHandler - Приватный метод - колбэк, который уведомляет все подписанные на него контроллеры, что они должны изменить вид (переключает в дефолтный режим все контроллеры "Точка маршрута")
    * @property {*} this._sortTypeChangeHandler - Приватный метод - колбэк для клика по типу сортировки (перерисовывает точки маршрута при изменении типа сортировки)
    * @property {*} this._getPointsDays - Приватный метод, который возвращает все даты путешествия
    * @param {*} container Компонент, внутри которого будет рендериться маршрут путешествия
@@ -89,11 +89,9 @@ export default class TripController {
   }
 
   /**
- * @return {*} Функция для отрисовки точек маршрута без группировки по дням
+ * @return {*} Приватный метод для отрисовки точек маршрута без группировки по дням
  * @param {*} tripList Элемент, внутри которого будут рендериться точки маршрута
  * @param {*} point Массив всех точек маршрута
- * @param {*} dataChangeHandler Метод, который измененяет данные и перерисовывает компонент
- * @param {*} viewChangeHandler
  */
   _renderPoint(tripList, point) {
     const pointController = new PointController(tripList, this._dataChangeHandler, this._viewChangeHandler);
@@ -103,9 +101,8 @@ export default class TripController {
   }
 
   /**
-   * @return {*} Функция, которая возвращает все дни маршрута и отрисовывает их
+   * @return {*} Приватный метод, который возвращает все дни маршрута и отрисовывает их
    * @param {*} daysOfPoints Массив с о всеми днями точек маршрута
-   * @param {*} tripDaysElement Элемент, внутри которого будет рендериться блок с днями точек маршрута
    */
   _renderDaysOfTrip(daysOfPoints) {
     const uniqueSortDays = Array.from(new Set(daysOfPoints)).sort();
@@ -125,11 +122,9 @@ export default class TripController {
   }
 
   /**
-   * @return {*} Функция для отрисовки точек маршрута, сгруппированным по дням
+   * @return {*} Приватный метод для отрисовки точек маршрута, сгруппированных по дням
    * @param {*} daysOfPoints Массив с о всеми днями точек маршрута
    * @param {*} points Массив всех точек маршрута
-   * @param {*} dataChangeHandler Метод, который измененяет данные и перерисовывает компонент
-   * @param {*} viewChangeHandler
    */
   _renderPointsToDays(daysOfPoints, points) {
     let newPoints = [];
@@ -188,7 +183,7 @@ export default class TripController {
   }
 
   /**
-   * Приватный метод - колбэк для клика по звёздочке (Favorite)
+   * Приватный метод - колбэк, который изменяет данные (клик по звёздочке (Favorite))
    * @param {*} pointController Контроллер точки маршрута
    * @param {*} oldData Старые данные
    * @param {*} newData Новые данные
@@ -204,6 +199,7 @@ export default class TripController {
     pointController.render(this._points[index]);
   }
 
+  /** Приватный метод - колбэк, который уведомляет все подписанные на него контроллеры, что они должны изменить вид (переключает в дефолтный режим все контроллеры "Точка маршрута") */
   _viewChangeHandler() {
     this._showedPointControllers.forEach((it) => it.setDefaultView());
   }
