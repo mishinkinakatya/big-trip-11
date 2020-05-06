@@ -1,32 +1,25 @@
 import {ALL_DESTINATION, ALL_DESCRIPTION, ALL_POINT_ACTION, ACTIONS_WITH_OFFERS} from "../const.js";
+import moment from "moment";
+
+const DescriptionLength = {
+  min: 0,
+  max: 5,
+};
 
 const castDateTimeFormat = (value) => {
   return value < 10 ? `0${value}` : String(value);
 };
 
 const formatTime = (date) => {
-  const hours = castDateTimeFormat(date.getHours() % 12);
-  const minutes = castDateTimeFormat(date.getMinutes());
-
-  return `${hours}:${minutes}`;
+  return moment(date).format(`hh:mm`);
 };
 
 const formatDate = (date) => {
-  const day = castDateTimeFormat(date.getDate());
-  const month = castDateTimeFormat(date.getMonth());
-  const year = date.getFullYear();
-
-  return `${year}-${month}-${day}`;
+  return moment(date).format(`YYYY-MM-DD`);
 };
 
 const formatDateTime = (date) => {
-  const day = castDateTimeFormat(date.getDate());
-  const month = castDateTimeFormat(date.getMonth());
-  const year = String(date.getFullYear()).slice(2, 4);
-  const hours = castDateTimeFormat(date.getHours() % 12);
-  const minutes = castDateTimeFormat(date.getMinutes());
-
-  return `${day}/${month}/${year} ${hours}:${minutes}`;
+  return `${moment(date).format(`DD/MM/YY`)} ${moment(date).format(`hh:mm`)}`;
 };
 
 const generateRandomArrayItem = (array) => {
@@ -75,17 +68,20 @@ const getRandomEndDate = (startDate) => {
   return targetDate;
 };
 
-const calculatePointDuration = (diff) => {
-  const MS_IN_DAY = 86400000;
-  const MS_IN_HOUR = 3600000;
-  const MS_IN_MINUTE = 60000;
+const calculatePointDuration = (start, end) => {
+  return moment.duration(moment(end).diff(moment(start)));
+};
 
-  const dayCount = castDateTimeFormat(Math.trunc(diff / MS_IN_DAY));
+const getPointDurationInMs = (start, end) => {
+  return calculatePointDuration(start, end).asMilliseconds();
+};
 
-  diff -= dayCount * MS_IN_DAY;
-  const hourCount = castDateTimeFormat(Math.trunc(diff / MS_IN_HOUR));
-  diff -= hourCount * MS_IN_HOUR;
-  const minutesCount = castDateTimeFormat(Math.trunc(diff / MS_IN_MINUTE));
+const getPointDurationInDHM = (start, end) => {
+  const duration = calculatePointDuration(start, end);
+
+  const dayCount = castDateTimeFormat(duration.days());
+  const hourCount = castDateTimeFormat(duration.hours());
+  const minutesCount = castDateTimeFormat(duration.minutes());
 
   if (dayCount > 0) {
     return `${dayCount}D ${hourCount}H ${minutesCount}M`;
@@ -94,11 +90,6 @@ const calculatePointDuration = (diff) => {
   } else {
     return `${minutesCount}M`;
   }
-};
-
-const DescriptionLength = {
-  min: 0,
-  max: 5,
 };
 
 // Пока генерирую сама - реализовала функцию.
@@ -120,11 +111,11 @@ const getOffers = (pointType, points) => {
   });
   offersForPointType.forEach((point) => {
     offersWithCheck.push(
-        {
-          type: point.offerType,
-          price: point.offerPrice,
-          isChecked: Math.random() > 0.5,
-        });
+      {
+        type: point.offerType,
+        price: point.offerPrice,
+        isChecked: Math.random() > 0.5,
+      });
   });
   return offersWithCheck;
 };
@@ -144,5 +135,5 @@ const generatePointsWithOffers = (points) => {
 // Когда данные будут приходить с сервера - эта константа переедет в point-edit
 const POINTS_ACTION_WITH_OFFERS = generatePointsWithOffers(ACTIONS_WITH_OFFERS);
 
-export {calculatePointDuration, castDateTimeFormat, formatDate, formatDateTime, formatTime, generateRandomArrayFromAnother, generateRandomArrayItem, getRandomEndDate, getRandomIntegerNumber, getRandomStartDate, POINTS_ACTION_WITH_OFFERS, POINTS_DESTINATION_WITH_DESCRIPTION};
+export {getPointDurationInDHM, getPointDurationInMs, castDateTimeFormat, formatDate, formatDateTime, formatTime, generateRandomArrayFromAnother, generateRandomArrayItem, getRandomEndDate, getRandomIntegerNumber, getRandomStartDate, POINTS_ACTION_WITH_OFFERS, POINTS_DESTINATION_WITH_DESCRIPTION};
 
