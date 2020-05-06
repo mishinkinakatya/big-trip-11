@@ -1,7 +1,9 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import {formatDateTime, POINTS_ACTION_WITH_OFFERS, POINTS_DESTINATION_WITH_DESCRIPTION} from "../utils/common.js";
 import {ALL_POINT_ACTION} from "../const.js";
+import flatpickr from "flatpickr";
 
+import "flatpickr/dist/flatpickr.min.css";
 /**
 * @return {*} Функция, которая возвращает разметку блока "Тип точки маршрута"
 * @param {*} pointType Тип точки маршрута
