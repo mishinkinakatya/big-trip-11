@@ -131,5 +131,13 @@ const generatePointsWithOffers = (points) => {
 // Когда данные будут приходить с сервера - эта константа переедет в point-edit
 const POINTS_ACTION_WITH_OFFERS = generatePointsWithOffers(ACTIONS_WITH_OFFERS);
 
-export {getPointDurationInDHM, getPointDurationInMs, castDateTimeFormat, formatDate, formatTime, generateRandomArrayFromAnother, generateRandomArrayItem, getRandomEndDate, getRandomIntegerNumber, getRandomStartDate, POINTS_ACTION_WITH_OFFERS, POINTS_DESTINATION_WITH_DESCRIPTION};
+const isFutureDate = (nowDate, startDate) => {
+  return startDate > nowDate;
+};
+
+const isPastDate = (nowDate, endDate) => {
+  return endDate < nowDate;
+};
+
+export {getPointDurationInDHM, getPointDurationInMs, castDateTimeFormat, formatDate, formatTime, generateRandomArrayFromAnother, generateRandomArrayItem, getRandomEndDate, getRandomIntegerNumber, getRandomStartDate, isFutureDate, isPastDate, POINTS_ACTION_WITH_OFFERS, POINTS_DESTINATION_WITH_DESCRIPTION};
 

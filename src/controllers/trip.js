@@ -43,6 +43,7 @@ export default class TripController {
    * @property {*} this._dataChangeHandler - Метод, который измененяет данные и перерисовывает компонент
    * @property {*} this._viewChangeHandler - Приватный метод - колбэк, который уведомляет все подписанные на него контроллеры, что они должны изменить вид (переключает в дефолтный режим все контроллеры "Точка маршрута")
    * @property {*} this._sortTypeChangeHandler - Приватный метод - колбэк для клика по типу сортировки (перерисовывает точки маршрута при изменении типа сортировки)
+   * @property {*} this._filterChangeHandler - Приватный метод - колбэк для клика по типу сортировки (перерисовывает точки маршрута при изменении типа сортировки)
    * @property {*} this._getPointsDays - Приватный метод, который возвращает все даты путешествия
    * @param {*} container Компонент, внутри которого будет рендериться маршрут путешествия
    * @param {*} pointsModel Модель задач "Точки маршрута"
@@ -59,7 +60,10 @@ export default class TripController {
     this._dataChangeHandler = this._dataChangeHandler.bind(this);
     this._viewChangeHandler = this._viewChangeHandler.bind(this);
     this._sortTypeChangeHandler = this._sortTypeChangeHandler.bind(this);
+    this._filterChangeHandler = this._filterChangeHandler.bind(this);
+
     this._sortComponent.setSortTypeChangeHandler(this._sortTypeChangeHandler);
+    this._pointsModel.setFilterChangeHandler(this._filterChangeHandler);
 
     this._getPointsDays = this._getPointsDays.bind(this);
   }
@@ -202,5 +206,19 @@ export default class TripController {
   /** Приватный метод - колбэк, который уведомляет все подписанные на него контроллеры, что они должны изменить вид (переключает в дефолтный режим все контроллеры "Точка маршрута") */
   _viewChangeHandler() {
     this._showedPointControllers.forEach((it) => it.setDefaultView());
+  }
+
+  _removePoints() {
+    this._showedPointControllers.forEach((pointController) => pointController.destroy());
+    this._showedPointControllers = [];
+  }
+
+  _updatePoints() {
+    this._removePoints();
+    this._renderPointsToDays(this._getPointsDays(), this._pointsModel.getPoints());
+  }
+
+  _filterChangeHandler() {
+    this._updatePoints();
   }
 }

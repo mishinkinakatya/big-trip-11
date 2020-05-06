@@ -1,6 +1,6 @@
 import PointOfDayComponent from "../components/point-of-day.js";
 import PointEditComponent from "../components/point-edit.js";
-import {render, replace, RenderPosition} from "../utils/render.js";
+import {render, replace, remove, RenderPosition} from "../utils/render.js";
 
 
 const Mode = {
@@ -66,6 +66,13 @@ export default class PointController {
     } else {
       render(this._container, this._pointOfDayComponent, RenderPosition.BEFOREEND);
     }
+  }
+
+  /** Метод, который удаялет компоненты "Одна точка маршрута" и "Точка маршрута в режиме Edit" */
+  destroy() {
+    remove(this._pointOfDayComponent);
+    remove(this._pointEditComponent);
+    document.removeEventListener(`keydown`, this._escKeyDownHandler);
   }
 
   /** Метод, который возвращает Точку маршрута в дефолтное состояние */

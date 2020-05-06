@@ -46,6 +46,15 @@ const replace = (newComponent, oldComponent) => {
   }
 };
 
+/**
+ * Функция для удаления одного компонента
+ * @param {*} component Компонент
+ */
+const remove = (component) => {
+  component.getElement().remove();
+  component.removeElement();
+};
+
 /** Позиция относительно элемента, в который мы отрисовываем данные */
 export const RenderPosition = {
   AFTERBEGIN: `afterbegin`,
@@ -53,4 +62,4 @@ export const RenderPosition = {
   BEFOREEND: `beforeend`,
 };
 
-export {createElement, render, replace};
+export {createElement, render, replace, remove};
