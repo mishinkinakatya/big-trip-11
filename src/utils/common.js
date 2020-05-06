@@ -18,10 +18,6 @@ const formatDate = (date) => {
   return moment(date).format(`YYYY-MM-DD`);
 };
 
-const formatDateTime = (date) => {
-  return `${moment(date).format(`DD/MM/YY`)} ${moment(date).format(`hh:mm`)}`;
-};
-
 const generateRandomArrayItem = (array) => {
   const randomIndex = getRandomIntegerNumber(0, array.length);
 
@@ -111,11 +107,11 @@ const getOffers = (pointType, points) => {
   });
   offersForPointType.forEach((point) => {
     offersWithCheck.push(
-      {
-        type: point.offerType,
-        price: point.offerPrice,
-        isChecked: Math.random() > 0.5,
-      });
+        {
+          type: point.offerType,
+          price: point.offerPrice,
+          isChecked: Math.random() > 0.5,
+        });
   });
   return offersWithCheck;
 };
@@ -135,5 +131,5 @@ const generatePointsWithOffers = (points) => {
 // Когда данные будут приходить с сервера - эта константа переедет в point-edit
 const POINTS_ACTION_WITH_OFFERS = generatePointsWithOffers(ACTIONS_WITH_OFFERS);
 
-export {getPointDurationInDHM, getPointDurationInMs, castDateTimeFormat, formatDate, formatDateTime, formatTime, generateRandomArrayFromAnother, generateRandomArrayItem, getRandomEndDate, getRandomIntegerNumber, getRandomStartDate, POINTS_ACTION_WITH_OFFERS, POINTS_DESTINATION_WITH_DESCRIPTION};
+export {getPointDurationInDHM, getPointDurationInMs, castDateTimeFormat, formatDate, formatTime, generateRandomArrayFromAnother, generateRandomArrayItem, getRandomEndDate, getRandomIntegerNumber, getRandomStartDate, POINTS_ACTION_WITH_OFFERS, POINTS_DESTINATION_WITH_DESCRIPTION};
 

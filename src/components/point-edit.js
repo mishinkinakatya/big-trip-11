@@ -1,5 +1,5 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {formatDateTime, POINTS_ACTION_WITH_OFFERS, POINTS_DESTINATION_WITH_DESCRIPTION} from "../utils/common.js";
+import {POINTS_ACTION_WITH_OFFERS, POINTS_DESTINATION_WITH_DESCRIPTION} from "../utils/common.js";
 import {ALL_POINT_ACTION} from "../const.js";
 import flatpickr from "flatpickr";
 
@@ -63,10 +63,8 @@ const createPhotosMarkup = (photo) => {
  * @param {*} options Объект, содержащий интерактивные свойства компонента "Точка маршрута в режиме Edit"
  */
 const createEventEditTemplate = (pointOfTrip, options = {}) => {
-  const {startDate, endDate, allActivities, allTransports, allDestinations, price, photos, isFavorite} = pointOfTrip;
-  const {type, typeWithPreposition, destination, description, offers} = options;
-  const start = formatDateTime(startDate);
-  const end = formatDateTime(endDate);
+  const {allActivities, allTransports, allDestinations, photos, isFavorite, price} = pointOfTrip;
+  const {type, typeWithPreposition, destination, description, offers, startDate, endDate} = options;
   /** Разметка для точек с типом Transport */
   const pointTransportsMarkup = allTransports.map((it) => createPointTypeMarkup(it)).join(`\n`);
   /** Разметка для точек с типом Activities */
@@ -126,12 +124,12 @@ const createEventEditTemplate = (pointOfTrip, options = {}) => {
           <label class="visually-hidden" for="event-start-time-1">
             From
           </label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${start}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${startDate}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">
             To
           </label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${end}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${endDate}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -204,8 +202,14 @@ export default class PointEdit extends AbstractSmartComponent {
     this._destination = point.destination;
     this._description = point.description;
     this._offers = point.offers;
+    this._startDate = point.startDate;
+    this._endDate = point.endDate;
 
-    this._submitHandler = null;
+    this._flatpickrStart = null;
+    this._flatpickrEnd = null;
+    this._submitHandlerEnd = null;
+
+    this._applyFlatpickr();
     this._subscribeOnEvents();
   }
 
@@ -217,6 +221,8 @@ export default class PointEdit extends AbstractSmartComponent {
       destination: this._destination,
       description: this._description,
       offers: this._offers,
+      startDate: this._startDate,
+      endDate: this._endDate,
     });
   }
 
@@ -235,6 +241,8 @@ export default class PointEdit extends AbstractSmartComponent {
     this._destination = point.destination;
     this._description = point.description;
     this._offers = point.offers;
+    this._startDate = point.startDate;
+    this._endDate = point.endDate;
 
     this.rerender();
   }
@@ -256,7 +264,39 @@ export default class PointEdit extends AbstractSmartComponent {
     this.getElement().querySelector(`.event__favorite-checkbox`).addEventListener(`change`, handler);
   }
 
-  /** Приватный метод, который подписывается на события: Изменение типа точки маршрута и пункта назначения */
+  rerender() {
+    super.rerender();
+
+    this._applyFlatpickr();
+  }
+
+  /** Приватный метод, который подключает flatpickr к элементам с датой */
+  _applyFlatpickr() {
+    if (this._flatpickrStart || this._flatpickrEnd) {
+      this._flatpickrStart.destroy();
+      this._flatpickrStart = null;
+      this._flatpickrEnd.destroy();
+      this._flatpickrEnd = null;
+    }
+
+    const dateStartElements = this.getElement().querySelector(`#event-start-time-1`);
+    const dateEndElements = this.getElement().querySelector(`#event-end-time-1`);
+
+    this._flatpickrStart = flatpickr(dateStartElements, {
+      defaultDate: this._startDate || `today`,
+      enableTime: true,
+      dateFormat: `d/m/y H:i`,
+    });
+
+    this._flatpickrEnd = flatpickr(dateEndElements, {
+      defaultDate: this._endDate || `today`,
+      enableTime: true,
+      dateFormat: `d/m/y H:i`,
+      minDate: this._startDate,
+    });
+  }
+
+  /** Приватный метод, который подписывается на события: Изменение типа точки маршрута, пункта назначения, даты начала и конца, цены */
   _subscribeOnEvents() {
     const element = this.getElement();
 
@@ -294,5 +334,30 @@ export default class PointEdit extends AbstractSmartComponent {
       this.rerender();
     });
 
+    element.querySelector(`#event-start-time-1`).addEventListener(`change`, (evt) => {
+      const pointStartDate = evt.target.value;
+      if (this._startDate === pointStartDate) {
+        return;
+      }
+
+      this._startDate = pointStartDate;
+
+      if (this._startDate > this._endDate) {
+        this._endDate = this._startDate;
+      }
+
+      this.rerender();
+    });
+
+    element.querySelector(`#event-end-time-1`).addEventListener(`change`, (evt) => {
+      const pointEndDate = evt.target.value;
+      if (this._endDate === pointEndDate) {
+        return;
+      }
+
+      this._endDate = pointEndDate;
+
+      this.rerender();
+    });
   }
 }
