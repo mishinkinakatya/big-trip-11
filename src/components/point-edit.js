@@ -286,7 +286,7 @@ export default class PointEdit extends AbstractSmartComponent {
       if (!this._point.allDestinations.includes(this._destination)) {
         this._description = [];
       } else {
-        this._description = POINTS_DESTINATION_WITH_DESCRIPTION[POINTS_DESTINATION_WITH_DESCRIPTION.findIndex((it) => it.destination === this._destination)].description;
+        this._description = POINTS_DESTINATION_WITH_DESCRIPTION.find((it) => it.destination === this._destination).description;
       }
 
       this.rerender();

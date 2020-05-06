@@ -6,14 +6,13 @@ const generatePointOfTrip = () => {
   const pointAction = generateRandomArrayItem(Object.keys(POINTS_ACTION_WITH_OFFERS));
   const allDestinations = ALL_DESTINATION;
   const destination = generateRandomArrayItem(allDestinations);
-  const description = POINTS_DESTINATION_WITH_DESCRIPTION[POINTS_DESTINATION_WITH_DESCRIPTION.findIndex((it) => it.destination === destination)].description;
+  const description = POINTS_DESTINATION_WITH_DESCRIPTION.find((it) => it.destination === destination).description;
   const typeWithPreposition = `${ALL_POINT_ACTION[pointAction]}`;
   const title = `${typeWithPreposition} ${destination}`;
   const startDate = getRandomStartDate();
   const endDate = getRandomEndDate(startDate);
   const durationInMs = Date.parse(endDate) - Date.parse(startDate);
   const offers = POINTS_ACTION_WITH_OFFERS[pointAction];
-
 
   return {
     type: pointAction,
