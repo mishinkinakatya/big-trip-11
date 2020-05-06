@@ -15,6 +15,7 @@ const generatePointOfTrip = () => {
   const offers = POINTS_ACTION_WITH_OFFERS[pointAction];
 
   return {
+    id: String(new Date() + Math.random()),
     allActivities: Object.keys(POINT_ACTIVITY),
     allTransports: Object.keys(POINT_TRANSPORT),
     allDestinations,

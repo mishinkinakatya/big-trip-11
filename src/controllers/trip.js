@@ -35,7 +35,7 @@ export default class TripController {
   /**
    * Свойства контроллера "Маршрут путешествия"
    * @property {*} this._container - Компонент, внутри которого будет рендериться маршрут путешествия
-   * @property {*} this._points - Массив со всеми точками маршрута
+   * @property {*} this._pointsModel - Модель задач "Точки маршрута"
    * @property {*} this._showedPointControllers - Массив со всеми показанынми контроллерами "Точка маршрута"
    * @property {*} this._noPointsComponent - Компонент, который будет рендериться, если нет ни одной точки маршрута
    * @property {*} this._sortComponent - Компонент "Сортировка"
@@ -45,11 +45,12 @@ export default class TripController {
    * @property {*} this._sortTypeChangeHandler - Приватный метод - колбэк для клика по типу сортировки (перерисовывает точки маршрута при изменении типа сортировки)
    * @property {*} this._getPointsDays - Приватный метод, который возвращает все даты путешествия
    * @param {*} container Компонент, внутри которого будет рендериться маршрут путешествия
+   * @param {*} pointsModel Модель задач "Точки маршрута"
    */
-  constructor(container) {
+  constructor(container, pointsModel) {
     this._container = container;
+    this._pointsModel = pointsModel;
 
-    this._points = [];
     this._showedPointControllers = [];
     this._noPointsComponent = new NoPointsComponent();
     this._sortComponent = new SortComponent();
@@ -67,9 +68,9 @@ export default class TripController {
    * Метод для рендеринга всех точек маршрута
    * @param {array} points Массив со всеми точками маршрута
    */
-  render(points) {
-    this._points = points;
-    const isPoints = this._points.length === 0;
+  render() {
+    const points = this._pointsModel.getPoints();
+    const isPoints = points.length === 0;
 
     if (isPoints) {
       render(this._container, this._noPointsComponent, RenderPosition.BEFOREEND);
@@ -79,13 +80,13 @@ export default class TripController {
     render(this._container, this._sortComponent, RenderPosition.BEFOREEND);
 
     render(this._container, this._tripDays, RenderPosition.BEFOREEND);
-    const newPoints = this._renderPointsToDays(this._getPointsDays(), this._points);
+    const newPoints = this._renderPointsToDays(this._getPointsDays(), points);
     this._showedPointControllers = this._showedPointControllers.concat(newPoints);
   }
 
   /** @return {*} Приватный метод, который возвращает все даты путешествия */
   _getPointsDays() {
-    return this._points.map((it) => [`${it.startDate.getFullYear()}-${castDateTimeFormat(it.startDate.getMonth())}-${castDateTimeFormat(it.startDate.getDate())}`].join(`, `));
+    return this._pointsModel.getPoints().map((it) => [`${it.startDate.getFullYear()}-${castDateTimeFormat(it.startDate.getMonth())}-${castDateTimeFormat(it.startDate.getDate())}`].join(`, `));
   }
 
   /**
@@ -167,7 +168,9 @@ export default class TripController {
    * @param {*} sortType Тип сортировки
    */
   _sortTypeChangeHandler(sortType) {
-    const sortedPoints = getSortedPoints(this._points, sortType);
+    const points = this._pointsModel.getPoints();
+
+    const sortedPoints = getSortedPoints(points, sortType);
     this._tripDays.clearContent();
     let newPoints = [];
 
@@ -189,14 +192,11 @@ export default class TripController {
    * @param {*} newData Новые данные
    */
   _dataChangeHandler(pointController, oldData, newData) {
-    const index = this._points.findIndex((it) => it === oldData);
-    if (index === -1) {
-      return;
+    const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
+
+    if (isSuccess) {
+      pointController.render(newData);
     }
-
-    this._points = [].concat(this._points.slice(0, index), newData, this._points.slice(index + 1));
-
-    pointController.render(this._points[index]);
   }
 
   /** Приватный метод - колбэк, который уведомляет все подписанные на него контроллеры, что они должны изменить вид (переключает в дефолтный режим все контроллеры "Точка маршрута") */

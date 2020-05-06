@@ -1,5 +1,6 @@
 import TripController from "./controllers/trip.js";
 import FilterComponent from "./components/filter.js";
+import PointsModel from "./models/points.js";
 import SiteMenuComponent from "./components/site-menu.js";
 import TripCostComponent from "./components/trip-cost.js";
 import TripInfoComponent from "./components/trip-info.js";
@@ -31,6 +32,10 @@ const allPoints = generatePointsOfTrip(POINTS_COUNT);
 /** Элемент, внутри которого будет рендериться Маршрут путешествия */
 const tripPointsElement = document.querySelector(`.trip-events`);
 
+/** Инстанс модели "Точки маршрута" */
+const pointsModel = new PointsModel();
+pointsModel.setPoints(allPoints);
+
 /** Инстанс контроллера "Маршрут путешествия" */
-const tripController = new TripController(tripPointsElement);
-tripController.render(allPoints);
+const tripController = new TripController(tripPointsElement, pointsModel);
+tripController.render();
