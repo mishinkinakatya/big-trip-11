@@ -1,11 +1,13 @@
 import AbstractComponent from "./abstract-component.js";
 
+/** Тип сортировки */
 export const SortType = {
   EVENT: `sort-event`,
   TIME: `sort-time`,
   PRICE: `sort-price`,
 };
 
+/** @return {*} Функция, которая возвращает разметку компонента "Сортировка" */
 const createSortTemplate = () =>
   `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
     <span class="trip-sort__item  trip-sort__item--day">Day</span>
@@ -38,20 +40,32 @@ const createSortTemplate = () =>
     <span class="trip-sort__item  trip-sort__item--offers">Offers</span>
   </form>`;
 
+/** Компонент: "Сортировка" */
 export default class Sort extends AbstractComponent {
+  /**
+   * Свойства компонента "Сортировка"
+   * @property {*} this._currentSortType - Выбранный тип сортировки
+   */
   constructor() {
     super();
 
     this._currentSortType = SortType.EVENT;
   }
+
+  /** @return {*} Метод, который возвращает разметку компонента "Сортировка" */
   getTemplate() {
     return createSortTemplate();
   }
 
+  /** @return {*} Метод, который возвращает выбранный тип сортировки */
   getSortType() {
     return this._currentSortType;
   }
 
+  /**
+   * Метод, который устанавливает колбэк на клик по типу сортировки
+   * @param {*} handler Колбэк для клика по типу сортировки
+   */
   setSortTypeChangeHandler(handler) {
     this.getElement().addEventListener(`click`, (evt) => {
 
