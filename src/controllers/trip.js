@@ -5,7 +5,7 @@ import NoPointsComponent from "../components/no-points.js";
 import PointController from "../controllers/point.js";
 import SortComponent, {SortType} from "../components/sort.js";
 import TripDaysComponent from "../components/trip-days.js";
-import {render, RenderPosition} from "../utils/render.js";
+import {render, remove, RenderPosition} from "../utils/render.js";
 
 /**
  * @return {*} Функция, котороя возвращает отсортированный массив событий
@@ -141,7 +141,6 @@ export default class TripController {
     let newPoints = [];
 
     if (this._daysOfTripControllers.includes(this._tripWithoutDays)) {
-      // debugger;
       newPoints = points.map((point) => {
         return this._renderPoint(this._tripDays.getElement().querySelector(`.trip-events__list`), point);
       });
@@ -175,19 +174,16 @@ export default class TripController {
     const points = this._pointsModel.getPoints();
 
     const sortedPoints = getSortedPoints(points, sortType);
-    this._tripDays.clearContent();
+    this._removeDaysOfTrip();
     let newPoints = [];
-    let daysOfTrip = [];
 
     if (sortType !== SortType.EVENT) {
-      daysOfTrip = this._renderTripWithoutDays();
-      this._daysOfTripControllers = daysOfTrip;
+      this._daysOfTripControllers = this._renderTripWithoutDays();
       newPoints = this._renderPointsToDays(sortedPoints);
     }
 
     if (sortType === SortType.EVENT) {
-      daysOfTrip = this._renderDaysOfTrip(this._getPointsDays());
-      this._daysOfTripControllers = daysOfTrip;
+      this._daysOfTripControllers = this._renderDaysOfTrip(this._getPointsDays());
       newPoints = this._renderPointsToDays(sortedPoints);
     }
 
@@ -213,15 +209,21 @@ export default class TripController {
     this._showedPointControllers.forEach((it) => it.setDefaultView());
   }
 
+  _removeDaysOfTrip() {
+    this._daysOfTripControllers.forEach((dayOfTripController) => remove(dayOfTripController));
+    this._daysOfTripControllers = [];
+  }
+
   _removePoints() {
     this._showedPointControllers.forEach((pointController) => pointController.destroy());
     this._showedPointControllers = [];
   }
 
   _updatePoints() {
-    // this._tripDays.clearContent();
+    this._removeDaysOfTrip();
     this._removePoints();
-    this._renderPointsToDays(this._getPointsDays(), this._pointsModel.getPoints());
+    this._daysOfTripControllers = this._renderDaysOfTrip(this._getPointsDays());
+    this._renderPointsToDays(this._pointsModel.getPoints());
   }
 
   _filterChangeHandler() {

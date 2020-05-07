@@ -13,11 +13,5 @@ export default class TripDays extends AbstractComponent {
   getTemplate() {
     return createTripDaysTemplate();
   }
-
-  /** @return {*} Метод, который возвращает компонент "Блок с днями путешествия" без событий */
-  clearContent() {
-    this.getElement().innerHTML = ``;
-    return this;
-  }
 }
 
