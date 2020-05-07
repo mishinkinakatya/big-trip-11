@@ -1,5 +1,6 @@
 import {castDateTimeFormat} from "../utils/common.js";
 import DayOfTripComponent from "../components/day-of-trip.js";
+import TripWithoutDaysComponent from "../components/trip-without-days.js";
 import NoPointsComponent from "../components/no-points.js";
 import PointController from "../controllers/point.js";
 import SortComponent, {SortType} from "../components/sort.js";
@@ -53,9 +54,12 @@ export default class TripController {
     this._pointsModel = pointsModel;
 
     this._showedPointControllers = [];
+    this._daysOfTripControllers = [];
+
     this._noPointsComponent = new NoPointsComponent();
     this._sortComponent = new SortComponent();
     this._tripDays = new TripDaysComponent();
+    this._tripWithoutDays = new TripWithoutDaysComponent();
 
     this._dataChangeHandler = this._dataChangeHandler.bind(this);
     this._viewChangeHandler = this._viewChangeHandler.bind(this);
@@ -75,17 +79,19 @@ export default class TripController {
   render() {
     const points = this._pointsModel.getPoints();
     const isPoints = points.length === 0;
-console.log(`333`);
-console.log(points);
+
     if (isPoints) {
       render(this._container, this._noPointsComponent, RenderPosition.BEFOREEND);
       return;
     }
 
     render(this._container, this._sortComponent, RenderPosition.BEFOREEND);
-
     render(this._container, this._tripDays, RenderPosition.BEFOREEND);
-    const newPoints = this._renderPointsToDays(this._getPointsDays(), points);
+
+    const daysOfTrip = this._renderDaysOfTrip(this._getPointsDays());
+    this._daysOfTripControllers = this._daysOfTripControllers.concat(daysOfTrip);
+
+    const newPoints = this._renderPointsToDays(points);
     this._showedPointControllers = this._showedPointControllers.concat(newPoints);
   }
 
@@ -107,49 +113,42 @@ console.log(points);
   }
 
   /**
-   * @return {*} Приватный метод, который возвращает все дни маршрута и отрисовывает их
-   * @param {*} daysOfPoints Массив с о всеми днями точек маршрута
-   */
+    * @return {*} Приватный метод, который возвращает все контроллеры "Один день маршрута" и отрисовывает их
+    * @param {*} daysOfPoints Массив с о всеми днями точек маршрута
+    */
   _renderDaysOfTrip(daysOfPoints) {
+    const daysOfTrip = [];
     const uniqueSortDays = Array.from(new Set(daysOfPoints)).sort();
-    if (uniqueSortDays.lenght !== 0) {
-      uniqueSortDays.map((it, i) => {
-        render(this._tripDays.getElement(), new DayOfTripComponent(i + 1, it), RenderPosition.BEFOREEND);
-      });
-    } else {
-      render(this._tripDays.getElement(), new DayOfTripComponent(``, ``), RenderPosition.BEFOREEND);
-    }
+    uniqueSortDays.map((it, i) => {
+      const dayOfTrip = new DayOfTripComponent(i + 1, it);
+      render(this._tripDays.getElement(), dayOfTrip, RenderPosition.BEFOREEND);
+      daysOfTrip.push(dayOfTrip);
+    });
+    return daysOfTrip;
+  }
 
-    if (daysOfPoints) {
-      return this._tripDays.getElement().querySelectorAll(`.trip-days__item`);
-    } else {
-      return this._tripDays.getElement().querySelectorAll(`.trip-events__list`);
-    }
-
+  /** @return {*} Приватный метод, который возвращает контроллер "Маршрут без разделения по дням" и рендерит его */
+  _renderTripWithoutDays() {
+    render(this._tripDays.getElement(), this._tripWithoutDays, RenderPosition.BEFOREEND);
+    return [this._tripWithoutDays];
   }
 
   /**
    * @return {*} Приватный метод для отрисовки точек маршрута, сгруппированных по дням
-   * @param {*} daysOfPoints Массив с о всеми днями точек маршрута
    * @param {*} points Массив всех точек маршрута
    */
-  _renderPointsToDays(daysOfPoints, points) {
+  _renderPointsToDays(points) {
     let newPoints = [];
 
-    if (daysOfPoints === null) {
-      this._renderDaysOfTrip(daysOfPoints);
-      render(this._tripDays.getElement(), new DayOfTripComponent(``, ``), RenderPosition.BEFOREEND);
-
+    if (this._daysOfTripControllers.includes(this._tripWithoutDays)) {
+      // debugger;
       newPoints = points.map((point) => {
         return this._renderPoint(this._tripDays.getElement().querySelector(`.trip-events__list`), point);
       });
     } else {
-      const allTripDays = this._renderDaysOfTrip(daysOfPoints);
-
-      allTripDays.forEach((day) => {
-        const tripPointsOfDayElement = day.querySelector(`.trip-events__list`);
-        const tripDay = day.querySelector(`.day__date`).getAttribute(`dateTime`);
-
+      this._daysOfTripControllers.forEach((day) => {
+        const tripPointsOfDayElement = day.getElement().querySelector(`.trip-events__list`);
+        const tripDay = day.getElement().querySelector(`.day__date`).getAttribute(`dateTime`);
         const tripDate = tripDay.slice(8, 10);
         const tripMonth = tripDay.slice(5, 7);
 
@@ -165,7 +164,6 @@ console.log(points);
         newPoints = newPoints.concat(newItems);
       });
     }
-
     return newPoints;
   }
 
@@ -179,13 +177,18 @@ console.log(points);
     const sortedPoints = getSortedPoints(points, sortType);
     this._tripDays.clearContent();
     let newPoints = [];
+    let daysOfTrip = [];
 
     if (sortType !== SortType.EVENT) {
-      newPoints = this._renderPointsToDays(null, sortedPoints);
+      daysOfTrip = this._renderTripWithoutDays();
+      this._daysOfTripControllers = daysOfTrip;
+      newPoints = this._renderPointsToDays(sortedPoints);
     }
 
     if (sortType === SortType.EVENT) {
-      newPoints = this._renderPointsToDays(this._getPointsDays(), sortedPoints);
+      daysOfTrip = this._renderDaysOfTrip(this._getPointsDays());
+      this._daysOfTripControllers = daysOfTrip;
+      newPoints = this._renderPointsToDays(sortedPoints);
     }
 
     this._showedPointControllers = newPoints;
@@ -216,7 +219,7 @@ console.log(points);
   }
 
   _updatePoints() {
-    // debugger;
+    // this._tripDays.clearContent();
     this._removePoints();
     this._renderPointsToDays(this._getPointsDays(), this._pointsModel.getPoints());
   }
