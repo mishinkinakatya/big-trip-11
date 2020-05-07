@@ -38,7 +38,7 @@ const generateRandomArrayFromAnother = (initialArray, newArrayMinLength, newArra
 
 const getRandomStartDate = () => {
   const targetDate = new Date();
-  const diffDate = getRandomIntegerNumber(0, 10);
+  const diffDate = getRandomIntegerNumber(-10, 10);
 
   const diffHours = getRandomIntegerNumber(0, 23);
   const diffMinutes = getRandomIntegerNumber(0, 59);

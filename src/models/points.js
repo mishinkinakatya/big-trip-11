@@ -20,6 +20,10 @@ export default class Points {
 
   /** @return {*} Метод, который возвращает точки маршрута, соответствующие выбранному фильтру */
   getPoints() {
+    // console.log(`1111`);
+    // console.log(this._activeFilterType);
+    // console.log(`2222`);
+    // console.log(getPointsByFilter(this._points, this._activeFilterType));
     return getPointsByFilter(this._points, this._activeFilterType);
   }
 
@@ -60,13 +64,14 @@ export default class Points {
    * @param {*} filterType Выбранный тип фильтра
    */
   setFilterType(filterType) {
+
     this._activeFilterType = filterType;
     this._callHandlers(this._filterChangeHandlers);
   }
 
   /**
  * Метод, который устанавливает колбэк, который будет вызывать модель, если изменился фильтр
- * @param {*} handler Колбэк для клика по кнопке Save
+ * @param {*} handler Колбэк для изменения фильтра
  */
   setFilterChangeHandler(handler) {
     this._filterChangeHandlers.push(handler);

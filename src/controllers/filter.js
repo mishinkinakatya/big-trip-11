@@ -29,7 +29,7 @@ export default class Filter {
     const oldComponent = this._filterComponent;
 
     this._filterComponent = new FilterComponent(filters);
-    this._filterComponent.setFilterChangeHandler(this._dataChangeHandler);
+    this._filterComponent.setFilterChangeHandler(this._filterChangeHandler);
 
     if (oldComponent) {
       replace(this._filterComponent, oldComponent);
@@ -40,7 +40,7 @@ export default class Filter {
   }
 
   _filterChangeHandler(filterType) {
-    this._pointsModel.setFilter(filterType);
+    this._pointsModel.setFilterType(filterType);
     this._activeFilterType = filterType;
   }
 

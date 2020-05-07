@@ -43,7 +43,7 @@ export default class TripController {
    * @property {*} this._dataChangeHandler - Метод, который измененяет данные и перерисовывает компонент
    * @property {*} this._viewChangeHandler - Приватный метод - колбэк, который уведомляет все подписанные на него контроллеры, что они должны изменить вид (переключает в дефолтный режим все контроллеры "Точка маршрута")
    * @property {*} this._sortTypeChangeHandler - Приватный метод - колбэк для клика по типу сортировки (перерисовывает точки маршрута при изменении типа сортировки)
-   * @property {*} this._filterChangeHandler - Приватный метод - колбэк для клика по типу сортировки (перерисовывает точки маршрута при изменении типа сортировки)
+   * @property {*} this._filterChangeHandler - Приватный метод - колбэк для клика по типу фильтра (перерисовывает точки маршрута при изменении типа фильтра)
    * @property {*} this._getPointsDays - Приватный метод, который возвращает все даты путешествия
    * @param {*} container Компонент, внутри которого будет рендериться маршрут путешествия
    * @param {*} pointsModel Модель задач "Точки маршрута"
@@ -75,7 +75,8 @@ export default class TripController {
   render() {
     const points = this._pointsModel.getPoints();
     const isPoints = points.length === 0;
-
+console.log(`333`);
+console.log(points);
     if (isPoints) {
       render(this._container, this._noPointsComponent, RenderPosition.BEFOREEND);
       return;
@@ -124,6 +125,7 @@ export default class TripController {
     } else {
       return this._tripDays.getElement().querySelectorAll(`.trip-events__list`);
     }
+
   }
 
   /**
@@ -214,6 +216,7 @@ export default class TripController {
   }
 
   _updatePoints() {
+    // debugger;
     this._removePoints();
     this._renderPointsToDays(this._getPointsDays(), this._pointsModel.getPoints());
   }
