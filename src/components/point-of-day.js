@@ -21,7 +21,9 @@ const createOfferMarkup = (offerType, offerPrice) => {
  * @param {*} pointOfDay Объект, содержащий свойства компонента "Точка маршрута в режиме Default"
  */
 const createPointOfDayTemplate = (pointOfDay) => {
-  const {type, title, price, startDate, endDate, duration, offers} = pointOfDay;
+  const {type, typeWithPreposition, destination, price, startDate, endDate, duration, offers} = pointOfDay;
+
+  const title = `${typeWithPreposition} ${destination}`;
 
   const startDay = formatDate(startDate);
   const endDay = formatDate(endDate);
@@ -32,14 +34,14 @@ const createPointOfDayTemplate = (pointOfDay) => {
   const OFFERS_MAX_COUNT = 3;
 
   /** Массив, содержащий выбранные опции */
-  const checkedOffers = offers.filter((offer) => {
+  const checkedOffers = offers ? offers.filter((offer) => {
     return offer.isChecked;
-  });
+  }) : null;
 
   /** Массив, содержащий опции, которые будут отображаться в компонента "Точка маршрута в режиме Default" */
-  const showingOffersOfDay = checkedOffers.slice(0, OFFERS_MAX_COUNT);
+  const showingOffersOfDay = checkedOffers ? checkedOffers.slice(0, OFFERS_MAX_COUNT) : null;
   /** Разметка для блока с дополнительными опциями */
-  const offersMarkup = showingOffersOfDay.map((it) => createOfferMarkup(it.type, it.price)).join(`\n`);
+  const offersMarkup = showingOffersOfDay ? showingOffersOfDay.map((it) => createOfferMarkup(it.type, it.price)).join(`\n`) : null;
 
   return (
     `<li class="trip-events__item">

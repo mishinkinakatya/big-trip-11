@@ -20,10 +20,6 @@ export default class Points {
 
   /** @return {*} Метод, который возвращает точки маршрута, соответствующие выбранному фильтру */
   getPoints() {
-    // console.log(`1111`);
-    // console.log(this._activeFilterType);
-    // console.log(`2222`);
-    // console.log(getPointsByFilter(this._points, this._activeFilterType));
     return getPointsByFilter(this._points, this._activeFilterType);
   }
 
@@ -83,6 +79,33 @@ export default class Points {
    */
   setDataChangeHandler(handler) {
     this._dataChangeHandlers.push(handler);
+  }
+
+  /**
+   * Метод для добавления компонента "Точка маршрута" в модель
+   * @param {*} point Компонент "Точка маршрута"
+   */
+  addPoint(point) {
+    this._points = [].concat(point, this._points);
+    this._callHandlers(this._dataChangeHandlers);
+  }
+
+  /**
+   * @return {*} Метод для удаления компонента "Точка маршрута" из модели
+   * @param {*} id Id компонента "Точка маршрута", который нужно удалить
+   */
+  removePoint(id) {
+    const index = this._points.findIndex((it) => it.id === id);
+
+    if (index === -1) {
+      return false;
+    }
+
+    this._points = []. concat(this._points.slice(0, index), this._points.slice(index + 1));
+
+    this._callHandlers(this._dataChangeHandlers);
+
+    return true;
   }
 
   /**

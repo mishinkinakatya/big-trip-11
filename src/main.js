@@ -7,7 +7,7 @@ import TripInfoComponent from "./components/trip-info.js";
 import {generatePointsOfTrip} from "./mock/points-of-trip.js";
 import {render, RenderPosition} from "./utils/render.js";
 
-const POINTS_COUNT = 23;
+const POINTS_COUNT = 7;
 /** Элемент, внутри которого будет рендериться вся страница */
 const tripMainElement = document.querySelector(`.trip-main`);
 render(tripMainElement, new TripInfoComponent(), RenderPosition.AFTERBEGIN);
@@ -38,3 +38,9 @@ filterController.render();
 /** Инстанс контроллера "Маршрут путешествия" */
 const tripController = new TripController(tripPointsElement, pointsModel);
 tripController.render();
+
+const addButton = tripMainElement.querySelector(`.trip-main__event-add-btn`);
+addButton.addEventListener(`click`, () => {
+  // addButton.disabled = true;
+  tripController.createPoint();
+});

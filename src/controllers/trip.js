@@ -2,7 +2,7 @@ import {castDateTimeFormat} from "../utils/common.js";
 import DayOfTripComponent from "../components/day-of-trip.js";
 import TripWithoutDaysComponent from "../components/trip-without-days.js";
 import NoPointsComponent from "../components/no-points.js";
-import PointController from "../controllers/point.js";
+import PointController, {Mode as PointControllerMode, EmptyPoint} from "./point.js";
 import SortComponent, {SortType} from "../components/sort.js";
 import TripDaysComponent from "../components/trip-days.js";
 import {render, remove, RenderPosition} from "../utils/render.js";
@@ -60,6 +60,7 @@ export default class TripController {
     this._sortComponent = new SortComponent();
     this._tripDays = new TripDaysComponent();
     this._tripWithoutDays = new TripWithoutDaysComponent();
+    this._creatingPoint = null;
 
     this._dataChangeHandler = this._dataChangeHandler.bind(this);
     this._viewChangeHandler = this._viewChangeHandler.bind(this);
@@ -107,7 +108,7 @@ export default class TripController {
  */
   _renderPoint(tripList, point) {
     const pointController = new PointController(tripList, this._dataChangeHandler, this._viewChangeHandler);
-    pointController.render(point);
+    pointController.render(point, PointControllerMode.DEFAULT);
 
     return pointController;
   }
@@ -191,17 +192,45 @@ export default class TripController {
   }
 
   /**
-   * Приватный метод - колбэк, который изменяет данные (клик по звёздочке (Favorite))
+   * Приватный метод - колбэк, который изменяет данные
    * @param {*} pointController Контроллер точки маршрута
    * @param {*} oldData Старые данные
    * @param {*} newData Новые данные
    */
   _dataChangeHandler(pointController, oldData, newData) {
-    const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
+    if (oldData === EmptyPoint) {
+      // Добавление Точки маршрута
+      this._creatingPoint = null;
+      if (newData === null) {
+        pointController.destroy();
+        this._updatePoints();
+      } else {
+        this._pointsModel.addPoint(newData);
+        pointController.render(newData, PointControllerMode.DEFAULT);
 
-    if (isSuccess) {
-      pointController.render(newData);
+        this._showedPointControllers = [].concat(pointController, this._showedPointControllers);
+      }
+    } else if (newData === null) {
+      // Удаление Точки маршрута
+      this._pointsModel.removePoint(oldData.id);
+      this._updatePoints();
+    } else {
+      // Обновление Точки маршрута
+      const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
+
+      if (isSuccess) {
+        pointController.render(newData, PointControllerMode.DEFAULT);
+      }
     }
+  }
+
+  createPoint() {
+    if (this._creatingPoint) {
+      return;
+    }
+
+    this._creatingPoint = new PointController(this._tripDays.getElement().querySelector(`.trip-events__list`), this._dataChangeHandler, this._viewChangeHandler);
+    this._creatingPoint.render(EmptyPoint, PointControllerMode.ADDING);
   }
 
   /** Приватный метод - колбэк, который уведомляет все подписанные на него контроллеры, что они должны изменить вид (переключает в дефолтный режим все контроллеры "Точка маршрута") */

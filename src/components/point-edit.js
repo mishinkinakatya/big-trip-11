@@ -1,6 +1,6 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import {POINTS_ACTION_WITH_OFFERS, POINTS_DESTINATION_WITH_DESCRIPTION} from "../utils/common.js";
-import {ALL_POINT_ACTION} from "../const.js";
+import {ALL_POINT_ACTION, POINT_ACTIVITY, POINT_TRANSPORT, ALL_DESTINATION} from "../const.js";
 import flatpickr from "flatpickr";
 
 import "flatpickr/dist/flatpickr.min.css";
@@ -63,20 +63,21 @@ const createPhotosMarkup = (photo) => {
  * @param {*} options Объект, содержащий интерактивные свойства компонента "Точка маршрута в режиме Edit"
  */
 const createEventEditTemplate = (pointOfTrip, options = {}) => {
-  const {allActivities, allTransports, allDestinations, photos, isFavorite, price} = pointOfTrip;
+  const {photos, isFavorite, price} = pointOfTrip;
   const {type, typeWithPreposition, destination, description, offers, startDate, endDate} = options;
+
   /** Разметка для точек с типом Transport */
-  const pointTransportsMarkup = allTransports.map((it) => createPointTypeMarkup(it)).join(`\n`);
+  const pointTransportsMarkup = Object.keys(POINT_TRANSPORT).map((it) => createPointTypeMarkup(it)).join(`\n`);
   /** Разметка для точек с типом Activities */
-  const pointActivitiesMarkup = allActivities.map((it) => createPointTypeMarkup(it)).join(`\n`);
+  const pointActivitiesMarkup = Object.keys(POINT_ACTIVITY).map((it) => createPointTypeMarkup(it)).join(`\n`);
   /** Разметка для "Пунктов назначения для точек маршрута" */
-  const pointDestinationsMarkup = allDestinations.map((it) => createDestinationMarkup(it)).join(`\n`);
+  const pointDestinationsMarkup = ALL_DESTINATION.map((it) => createDestinationMarkup(it)).join(`\n`);
   /** Разметка для "Дополнительных опций для точки маршрута" */
-  const offersMarkup = offers.map((it) => createOfferMarkup(it.type, it.price, it.isChecked)).join(`\n`);
+  const offersMarkup = offers ? offers.map((it) => createOfferMarkup(it.type, it.price, it.isChecked)).join(`\n`) : null;
   /** Разметка для "Описания точки маршрута" */
-  const descriptionMarkup = description.join(`\n`);
+  const descriptionMarkup = description ? description.join(`\n`) : ``;
   /** Разметка для "Фотографий точки маршрута" */
-  const photosMarkup = photos.map((it) => createPhotosMarkup(it)).join(`\n`);
+  const photosMarkup = photos ? photos.map((it) => createPhotosMarkup(it)).join(`\n`) : ``;
 
   /** Флаг: Показывать блок "Дополнительные опции для точки маршрута"? */
   const isOfferShowing = !!offersMarkup;
@@ -187,6 +188,22 @@ const createEventEditTemplate = (pointOfTrip, options = {}) => {
   );
 };
 
+const parseFormData = (formData) => {
+  return {
+    id: null,
+    description: null,
+    destination: formData.get(`event-destination`),
+    endDate: formData.get(`event-end-time`),
+    isFavorite: formData.get(`.event-favorite`),
+    offers: null,
+    photos: null,
+    price: formData.get(`event-price`),
+    startDate: formData.get(`event-start-time`),
+    type: formData.get(`event-type`),
+    typeWithPreposition: formData.get(`event__type-output`),
+  };
+};
+
 /** Компонент: "Точка маршрута в режиме Edit" */
 export default class PointEdit extends AbstractSmartComponent {
   /**
@@ -207,7 +224,8 @@ export default class PointEdit extends AbstractSmartComponent {
 
     this._flatpickrStart = null;
     this._flatpickrEnd = null;
-    this._submitHandlerEnd = null;
+    this._submitHandler = null;
+    this._resetButtonClickHandler = null;
 
     this._applyFlatpickr();
     this._subscribeOnEvents();
@@ -229,6 +247,7 @@ export default class PointEdit extends AbstractSmartComponent {
   /** Метод, который перенавешивает слушателей */
   recoveryListeners() {
     this.setSubmitHandler(this._submitHandler);
+    this.setResetButtonClickHandler(this._resetButtonClickHandler);
     this._subscribeOnEvents();
   }
 
@@ -245,6 +264,14 @@ export default class PointEdit extends AbstractSmartComponent {
     this._endDate = point.endDate;
 
     this.rerender();
+  }
+
+  getData() {
+    const form = this.getElement();
+    const formData = new FormData(form);
+    // console.log(parseFormData(formData))
+
+    return parseFormData(formData);
   }
 
   /**
@@ -264,10 +291,30 @@ export default class PointEdit extends AbstractSmartComponent {
     this.getElement().querySelector(`.event__favorite-checkbox`).addEventListener(`change`, handler);
   }
 
+  setResetButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, handler);
+
+    this._resetButtonClickHandler = handler;
+  }
+
   rerender() {
     super.rerender();
 
     this._applyFlatpickr();
+  }
+
+  removeElement() {
+    if (this._flatpickrStart) {
+      this._flatpickrStart.destroy();
+      this._flatpickrStart = null;
+    }
+
+    if (this._flatpickrEnd) {
+      this._flatpickrEnd.destroy();
+      this._flatpickrEnd = null;
+    }
+
+    super.removeElement();
   }
 
   /** Приватный метод, который подключает flatpickr к элементам с датой */
@@ -325,7 +372,7 @@ export default class PointEdit extends AbstractSmartComponent {
       }
 
       this._destination = pointDestination;
-      if (!this._point.allDestinations.includes(this._destination)) {
+      if (!ALL_DESTINATION.includes(this._destination)) {
         this._description = [];
       } else {
         this._description = POINTS_DESTINATION_WITH_DESCRIPTION.find((it) => it.destination === this._destination).description;

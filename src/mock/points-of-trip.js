@@ -1,14 +1,12 @@
-import {POINT_ACTIVITY, POINT_TRANSPORT, ALL_POINT_ACTION, ALL_DESTINATION} from "../const.js";
+import {ALL_POINT_ACTION, ALL_DESTINATION} from "../const.js";
 import {getPointDurationInMs, generateRandomArrayItem, getRandomIntegerNumber, getPointDurationInDHM, getRandomStartDate, getRandomEndDate, POINTS_DESTINATION_WITH_DESCRIPTION, POINTS_ACTION_WITH_OFFERS} from "../utils/common.js";
 
 
 const generatePointOfTrip = () => {
   const pointAction = generateRandomArrayItem(Object.keys(POINTS_ACTION_WITH_OFFERS));
-  const allDestinations = ALL_DESTINATION;
-  const destination = generateRandomArrayItem(allDestinations);
+  const destination = generateRandomArrayItem(ALL_DESTINATION);
   const description = POINTS_DESTINATION_WITH_DESCRIPTION.find((it) => it.destination === destination).description;
   const typeWithPreposition = `${ALL_POINT_ACTION[pointAction]}`;
-  const title = `${typeWithPreposition} ${destination}`;
   const startDate = getRandomStartDate();
   const endDate = getRandomEndDate(startDate);
   const durationInMs = getPointDurationInMs(startDate, endDate);
@@ -16,9 +14,6 @@ const generatePointOfTrip = () => {
 
   return {
     id: String(new Date() + Math.random()),
-    allActivities: Object.keys(POINT_ACTIVITY),
-    allTransports: Object.keys(POINT_TRANSPORT),
-    allDestinations,
     description,
     destination,
     duration: getPointDurationInDHM(startDate, endDate),
@@ -29,7 +24,6 @@ const generatePointOfTrip = () => {
     photos: generatePhotoSrc(getRandomIntegerNumber(1, 5)),
     price: getRandomIntegerNumber(0, 100),
     startDate,
-    title,
     type: pointAction,
     typeWithPreposition,
   };

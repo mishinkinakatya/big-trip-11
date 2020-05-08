@@ -2,10 +2,25 @@ import PointOfDayComponent from "../components/point-of-day.js";
 import PointEditComponent from "../components/point-edit.js";
 import {render, replace, remove, RenderPosition} from "../utils/render.js";
 
-
-const Mode = {
+export const Mode = {
+  ADDING: `adding`,
   DEFAULT: `default`,
   EDIT: `edit`,
+};
+
+export const EmptyPoint = {
+  id: null,
+  description: ``,
+  destination: ``,
+  duration: null,
+  endDate: null,
+  isFavorite: false,
+  offers: null,
+  photos: null,
+  price: ``,
+  startDate: null,
+  type: `bus`,
+  typeWithPreposition: `Bus to`,
 };
 
 /** Контроллер: "Точка маршрута" */
@@ -35,10 +50,12 @@ export default class PointController {
   /**
   * Метод для рендеринга точки маршрута
   * @param {object} point Объект, который описывает свойства одной точки маршрута
+  * @param {string} mode Режим, в котором находится точка маршрута
   */
-  render(point) {
+  render(point, mode) {
     const oldPointOfDayComponent = this._pointOfDayComponent;
     const oldPointEditComponent = this._pointEditComponent;
+    this._mode = mode;
 
     this._pointOfDayComponent = new PointOfDayComponent(point);
     this._pointEditComponent = new PointEditComponent(point);
@@ -50,9 +67,11 @@ export default class PointController {
 
     this._pointEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
-      this._replaceEditToPoint();
+      const data = this._pointEditComponent.getData();
+      this._dataChangeHandler(this, point, data);
       document.removeEventListener(`keydown`, this._escKeyDownHandler);
     });
+    this._pointEditComponent.setResetButtonClickHandler(() => this._dataChangeHandler(this, point, null));
 
     this._pointEditComponent.setFavoriteChangeHandler(() => {
       this._dataChangeHandler(this, point, Object.assign({}, point, {
@@ -60,11 +79,24 @@ export default class PointController {
       }));
     });
 
-    if (oldPointOfDayComponent && oldPointEditComponent) {
-      replace(this._pointOfDayComponent, oldPointOfDayComponent);
-      replace(this._pointEditComponent, oldPointEditComponent);
-    } else {
-      render(this._container, this._pointOfDayComponent, RenderPosition.BEFOREEND);
+    switch (mode) {
+      case Mode.DEFAULT:
+        if (oldPointOfDayComponent && oldPointEditComponent) {
+          replace(this._pointOfDayComponent, oldPointOfDayComponent);
+          replace(this._pointEditComponent, oldPointEditComponent);
+          this._replaceEditToPoint();
+        } else {
+          render(this._container, this._pointOfDayComponent, RenderPosition.BEFOREEND);
+        }
+        break;
+      case Mode.ADDING:
+        if (oldPointOfDayComponent && oldPointEditComponent) {
+          remove(oldPointOfDayComponent);
+          remove(oldPointEditComponent);
+        }
+        document.addEventListener(`keydown`, this._escKeyDownHandler);
+        render(this._container, this._pointEditComponent, RenderPosition.AFTERBEGIN);
+        break;
     }
   }
 
@@ -93,7 +125,9 @@ export default class PointController {
   _replaceEditToPoint() {
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
     this._pointEditComponent.reset();
-    replace(this._pointOfDayComponent, this._pointEditComponent);
+    if (document.contains(this._pointEditComponent.getElement())) {
+      replace(this._pointOfDayComponent, this._pointEditComponent);
+    }
     this._mode = Mode.DEFAULT;
   }
 
@@ -104,6 +138,9 @@ export default class PointController {
     const isEscKey = evt.key === `Esc` || evt.key === `Escape`;
 
     if (isEscKey) {
+      if (this._mode === Mode.ADDING) {
+        this._dataChangeHandler(this, EmptyPoint, null);
+      }
       this._replaceEditToPoint();
       document.removeEventListener(`keydown`, this._escKeyDownHandler);
     }
