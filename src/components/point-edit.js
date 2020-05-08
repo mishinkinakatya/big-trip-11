@@ -2,6 +2,7 @@ import AbstractSmartComponent from "./abstract-smart-component.js";
 import {POINTS_ACTION_WITH_OFFERS, POINTS_DESTINATION_WITH_DESCRIPTION} from "../utils/common.js";
 import {ALL_POINT_ACTION, POINT_ACTIVITY, POINT_TRANSPORT, ALL_DESTINATION} from "../const.js";
 import flatpickr from "flatpickr";
+import moment from "moment";
 
 import "flatpickr/dist/flatpickr.min.css";
 /**
@@ -13,7 +14,7 @@ const createPointTypeMarkup = (pointType) => {
   return (
     `<div class="event__type-item">
       <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
-      <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${type[0].toUpperCase() + type.slice(1)}</label>
+      <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${ALL_POINT_ACTION[type].substr(0, type.length)}</label>
     </div>`
   );
 };
@@ -189,18 +190,21 @@ const createEventEditTemplate = (pointOfTrip, options = {}) => {
 };
 
 const parseFormData = (formData) => {
+  const destination = formData.get(`event-destination`);
+  const description = destination ? POINTS_DESTINATION_WITH_DESCRIPTION.find((it) => it.destination === destination).description : ``;
+
   return {
     id: null,
-    description: null,
-    destination: formData.get(`event-destination`),
-    endDate: formData.get(`event-end-time`),
+    description,
+    destination,
+    endDate: moment(formData.get(`event-end-time`)).toDate(),
     isFavorite: formData.get(`.event-favorite`),
     offers: null,
     photos: null,
     price: formData.get(`event-price`),
-    startDate: formData.get(`event-start-time`),
+    startDate: moment(formData.get(`event-start-time`)).toDate(),
     type: formData.get(`event-type`),
-    typeWithPreposition: formData.get(`event__type-output`),
+    // typeWithPreposition: formData.get(`event__type-output`),
   };
 };
 
@@ -269,7 +273,6 @@ export default class PointEdit extends AbstractSmartComponent {
   getData() {
     const form = this.getElement();
     const formData = new FormData(form);
-    // console.log(parseFormData(formData))
 
     return parseFormData(formData);
   }

@@ -60,6 +60,7 @@ export default class TripController {
     this._sortComponent = new SortComponent();
     this._tripDays = new TripDaysComponent();
     this._tripWithoutDays = new TripWithoutDaysComponent();
+
     this._creatingPoint = null;
 
     this._dataChangeHandler = this._dataChangeHandler.bind(this);
@@ -229,7 +230,7 @@ export default class TripController {
       return;
     }
 
-    this._creatingPoint = new PointController(this._tripDays.getElement().querySelector(`.trip-events__list`), this._dataChangeHandler, this._viewChangeHandler);
+    this._creatingPoint = new PointController(this._tripDays.getElement(), this._dataChangeHandler, this._viewChangeHandler);
     this._creatingPoint.render(EmptyPoint, PointControllerMode.ADDING);
   }
 
