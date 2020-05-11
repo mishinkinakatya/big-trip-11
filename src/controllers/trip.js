@@ -3,7 +3,8 @@ import DayOfTripComponent from "../components/day-of-trip.js";
 import TripWithoutDaysComponent from "../components/trip-without-days.js";
 import NoPointsComponent from "../components/no-points.js";
 import PointController, {Mode as PointControllerMode, EmptyPoint} from "./point.js";
-import SortComponent, {SortType} from "../components/sort.js";
+import SortComponent from "../components/sort.js";
+import {SortType} from "../const.js";
 import TripDaysComponent from "../components/trip-days.js";
 import {render, remove, RenderPosition} from "../utils/render.js";
 

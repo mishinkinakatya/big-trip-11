@@ -1,4 +1,5 @@
 import AbstractComponent from "./abstract-component.js";
+import {FilterType} from "../const.js";
 
 const FILTER_ID_PREFIX = `filter-`;
 
@@ -7,29 +8,27 @@ const getFilterNameById = (id) => {
 };
 
 /** @return {*} Метод, который возвращает разметку одного фильтра
- * @param {*} filter Фильтр
- * @param {*} isChecked Флаг: Фильтр выбран?
+ * @param {*} activeFilterType Активный фильтр
  */
-const createFilterMarkup = (filter, isChecked) => {
-  const {name} = filter;
-  return (
-    `<div class="trip-filters__filter">
-      <input id="filter-${name}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${name}" ${isChecked ? `checked` : ``}>
-      <label class="trip-filters__filter-label" for="filter-${name}">${name}</label>
-    </div>`
-  );
+const createFilterMarkup = (activeFilterType) => {
+  return Object.values(FilterType).map((it) => {
+
+    return (
+      `<div class="trip-filters__filter">
+        <input id="filter-${it}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${it}" ${it === activeFilterType ? `checked` : ``}>
+        <label class="trip-filters__filter-label" for="filter-${it}">${it}</label>
+      </div>`
+    );
+  }).join(`\n`);
 };
 
 /** @return {*} Метод, который возвращает разметку компонента "Фильтрация"
- * @param {*} filters Массив фильтров
+ * @param {*} activeFilterType Активный фильтр
  */
-const createFilterTemplate = (filters) => {
-  /** Разметка для всех фильтров */
-  const filtersMarkup = filters.map((it) => createFilterMarkup(it, it.isChecked)).join(`\n`);
-
+const createFilterTemplate = (activeFilterType) => {
   return (
     `<form class="trip-filters" action="#" method="get">
-      ${filtersMarkup}
+      ${createFilterMarkup(activeFilterType)}
       <button class="visually-hidden" type="submit">Accept filter</button>
     </form>`
   );
@@ -39,20 +38,21 @@ const createFilterTemplate = (filters) => {
 export default class Filter extends AbstractComponent {
   /**
    * Свойства компонента "Фильтрация"
-   * @property {*} this._filters - Массив фильтров
-   * @param {*} filters Массив фильтров
+   * @property {*} this._getActiveFilterType
+   * @param {*} getActiveFilterType
    */
-  constructor(filters) {
+  constructor(getActiveFilterType) {
     super();
-    this._filters = filters;
+    this._getActiveFilterType = getActiveFilterType;
   }
 
   /** @return {*} Метод, который возвращает разметку компонента "Фильтрация" */
   getTemplate() {
-    return createFilterTemplate(this._filters);
+    const activeFilterType = this._getActiveFilterType();
+    return createFilterTemplate(activeFilterType);
   }
 
-  setFilterChangeHandler(handler) {
+  setFilterTypeChangeHandler(handler) {
     this.getElement().addEventListener(`change`, (evt) => {
       const filterName = getFilterNameById(evt.target.id);
       handler(filterName);

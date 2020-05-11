@@ -1,8 +1,7 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {POINTS_ACTION_WITH_OFFERS, POINTS_DESTINATION_WITH_DESCRIPTION, getPointDurationInDHM} from "../utils/common.js";
+import {POINTS_ACTION_WITH_OFFERS, POINTS_DESTINATION_WITH_DESCRIPTION} from "../utils/common.js";
 import {ALL_POINT_ACTION, POINT_ACTIVITY, POINT_TRANSPORT, ALL_DESTINATION} from "../const.js";
 import flatpickr from "flatpickr";
-import moment from "moment";
 
 import "flatpickr/dist/flatpickr.min.css";
 
@@ -162,27 +161,27 @@ const createEventEditTemplate = (pointOfTrip, options = {}) => {
       ${isPointDetailsShowing ?
       `<section class="event__details">
       ${isOfferShowing ?
-        `<section class="event__section  event__section--offers">
+      `<section class="event__section  event__section--offers">
           <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
           <div class="event__available-offers">
           ${offersMarkup}
           </div>
         </section>`
-        : ``}
+      : ``}
 
         <section class="event__section  event__section--destination">
         ${isDescriptionShowing ?
-        `<h3 class="event__section-title  event__section-title--destination">Destination</h3>
+      `<h3 class="event__section-title  event__section-title--destination">Destination</h3>
           <p class="event__destination-description">${descriptionMarkup}</p>`
-        : ``}
+      : ``}
       ${isPhotosShowing ?
-        `<div class="event__photos-container">
+      `<div class="event__photos-container">
             <div class="event__photos-tape">
             ${photosMarkup}
             </div>
           </div>`
-        : ``}
+      : ``}
         </section>
       </section>`
       : ``}
@@ -190,37 +189,21 @@ const createEventEditTemplate = (pointOfTrip, options = {}) => {
   );
 };
 
-const parseFormData = (formData) => {
-  const destination = formData.get(`event-destination`);
-  const description = destination ? POINTS_DESTINATION_WITH_DESCRIPTION.find((it) => it.destination === destination).description : ``;
-  const type = formData.get(`event-type`);
-  const startDate = moment(formData.get(`event-start-time`)).toDate();
-  const endDate = moment(formData.get(`event-end-time`)).toDate();
-  return {
-    description,
-    destination,
-    duration: getPointDurationInDHM(startDate, endDate),
-    endDate,
-    isFavorite: formData.get(`.event-favorite`),
-    offers: ``,
-    photos: null,
-    price: formData.get(`event-price`),
-    startDate,
-    type,
-    typeWithPreposition: ALL_POINT_ACTION[type],
-  };
-};
-
 /** Компонент: "Точка маршрута в режиме Edit" */
 export default class PointEdit extends AbstractSmartComponent {
   /**
    * Свойства компонента "Точка маршрута в режиме Edit"
    * @property {*} this._point - Компонент "Точка маршрута в режиме DEFAULT"
-   * @param {*} point Компонент "Точка маршрута в режиме DEFAULT"
+   * @param {*} getActualPointData
+   * @param {*} updateTempPoint
+   * @param {*} getTempPointData
    */
-  constructor(point) {
+  constructor(getActualPointData, updateTempPoint, getTempPointData) {
     super();
-    this._point = point;
+    this._getActualPointData = getActualPointData;
+    this._updateTempPoint = updateTempPoint;
+    this._getTempPointData = getTempPointData;
+    const point = getActualPointData();
     this._type = point.type;
     this._typeWithPreposition = point.typeWithPreposition;
     this._destination = point.destination;
@@ -234,13 +217,15 @@ export default class PointEdit extends AbstractSmartComponent {
     this._submitHandler = null;
     this._resetButtonClickHandler = null;
 
+
     this._applyFlatpickr();
     this._subscribeOnEvents();
   }
 
   /** @return {*} Метод, который возвращает разметку компонента "Точка маршрута в режиме Edit" */
   getTemplate() {
-    return createEventEditTemplate(this._point, {
+    const point = this._getActualPointData();
+    return createEventEditTemplate(point, {
       type: this._type,
       typeWithPreposition: this._typeWithPreposition,
       destination: this._destination,
@@ -260,7 +245,7 @@ export default class PointEdit extends AbstractSmartComponent {
 
   /** Метод, котоырй сбрасывает все изменения в контроллере */
   reset() {
-    const point = this._point;
+    const point = this._getActualPointData();
 
     this._type = point.type;
     this._typeWithPreposition = point.typeWithPreposition;
@@ -271,16 +256,6 @@ export default class PointEdit extends AbstractSmartComponent {
     this._endDate = point.endDate;
 
     this.rerender();
-  }
-
-  getData() {
-    const form = this.getElement();
-    const formData = new FormData(form);
-    // debugger;
-
-    console.log(`formData`);
-    console.log(parseFormData(formData));
-    return parseFormData(formData);
   }
 
   /**
@@ -302,7 +277,6 @@ export default class PointEdit extends AbstractSmartComponent {
 
   setResetButtonClickHandler(handler) {
     this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, handler);
-
     this._resetButtonClickHandler = handler;
   }
 
@@ -361,63 +335,90 @@ export default class PointEdit extends AbstractSmartComponent {
     const element = this.getElement();
 
     element.querySelector(`.event__type-list`).addEventListener(`change`, (evt) => {
-
       if (evt.target.tagName !== `INPUT`) {
         return;
       }
 
       const pointType = evt.target.value;
-      if (this._type === pointType) {
-        return;
-      }
+      this._onChangeDataPoint((tempPoint) => {
+        if (this._type === pointType && tempPoint.type === pointType) {
+          return null;
+        }
 
-      this._type = pointType;
-      this._typeWithPreposition = `${ALL_POINT_ACTION[this._type]}`;
-      this._offers = POINTS_ACTION_WITH_OFFERS[this._type];
+        const pointTypeWithPreposition = `${ALL_POINT_ACTION[pointType]}`;
+        const pointOffers = POINTS_ACTION_WITH_OFFERS[pointType];
 
-      this.rerender();
+        const newTempPoint = tempPoint;
+        newTempPoint.type = pointType;
+        this._type = pointType;
+        newTempPoint.typeWithPreposition = pointTypeWithPreposition;
+        this._typeWithPreposition = pointTypeWithPreposition;
+        newTempPoint.offers = pointOffers;
+        this._offers = pointOffers;
+
+        return newTempPoint;
+      });
     });
 
     element.querySelector(`.event__input--destination`).addEventListener(`change`, (evt) => {
       const pointDestination = evt.target.value;
-      if (this._destination === pointDestination) {
-        return;
-      }
 
-      this._destination = pointDestination;
-      if (!ALL_DESTINATION.includes(this._destination)) {
-        this._description = [];
-      } else {
-        this._description = POINTS_DESTINATION_WITH_DESCRIPTION.find((it) => it.destination === this._destination).description;
-      }
+      this._onChangeDataPoint((tempPoint) => {
+        if (this._destination === pointDestination && tempPoint.destination === pointDestination) {
+          return null;
+        }
 
-      this.rerender();
+        const pointDescription = POINTS_DESTINATION_WITH_DESCRIPTION.find((it) => it.destination === pointDestination).description;
+
+        const newTempPoint = tempPoint;
+        newTempPoint.destination = pointDestination;
+        this._destination = pointDestination;
+        newTempPoint.description = pointDescription;
+        this._description = pointDescription;
+        return newTempPoint;
+      });
     });
 
     element.querySelector(`#event-start-time-1`).addEventListener(`change`, (evt) => {
       const pointStartDate = evt.target.value;
-      if (this._startDate === pointStartDate) {
-        return;
-      }
+      this._onChangeDataPoint((tempPoint) => {
+        if (this._startDate === pointStartDate && tempPoint.startDate === pointStartDate) {
+          return null;
+        }
+        const newTempPoint = tempPoint;
 
-      this._startDate = pointStartDate;
+        if (pointStartDate > tempPoint.endDate) {
+          newTempPoint.endDate = pointStartDate;
+          this._endDate = pointStartDate;
+        }
 
-      if (this._startDate > this._endDate) {
-        this._endDate = this._startDate;
-      }
-
-      this.rerender();
+        newTempPoint.startDate = pointStartDate;
+        this._startDate = pointStartDate;
+        return newTempPoint;
+      });
     });
 
     element.querySelector(`#event-end-time-1`).addEventListener(`change`, (evt) => {
       const pointEndDate = evt.target.value;
-      if (this._endDate === pointEndDate) {
-        return;
-      }
-
-      this._endDate = pointEndDate;
-
-      this.rerender();
+      this._onChangeDataPoint((tempPoint) => {
+        if (this._endDate === pointEndDate && tempPoint.endDate === pointEndDate) {
+          return null;
+        }
+        const newTempPoint = tempPoint;
+        newTempPoint.endDate = pointEndDate;
+        this._endDate = pointEndDate;
+        return newTempPoint;
+      });
     });
+  }
+
+  // Если newTempPoint - null, то нет обновления модели и перерисовки
+  _onChangeDataPoint(applyChangeToTempPoint) {
+    const tempPoint = this._getTempPointData();
+    const newTempPoint = applyChangeToTempPoint(tempPoint);
+    if (newTempPoint) {
+      this._updateTempPoint(newTempPoint);
+      this.rerender();
+    }
   }
 }

@@ -1,5 +1,6 @@
 import {ALL_POINT_ACTION, ALL_DESTINATION} from "../const.js";
 import {getPointDurationInMs, generateRandomArrayItem, getRandomIntegerNumber, getPointDurationInDHM, getRandomStartDate, getRandomEndDate, POINTS_DESTINATION_WITH_DESCRIPTION, POINTS_ACTION_WITH_OFFERS} from "../utils/common.js";
+import PointModel from "../models/point-model.js";
 
 
 const generatePointOfTrip = () => {
@@ -12,7 +13,7 @@ const generatePointOfTrip = () => {
   const durationInMs = getPointDurationInMs(startDate, endDate);
   const offers = POINTS_ACTION_WITH_OFFERS[pointAction];
 
-  return {
+  const point = {
     id: String(new Date() + Math.random()),
     description,
     destination,
@@ -27,6 +28,8 @@ const generatePointOfTrip = () => {
     type: pointAction,
     typeWithPreposition,
   };
+
+  return new PointModel(point);
 };
 
 const generatePointsOfTrip = (count) => {

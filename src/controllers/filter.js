@@ -1,6 +1,6 @@
 import FilterComponent from "../components/filter.js";
 import {FilterType} from "../const.js";
-import {render, replace, RenderPosition} from "../utils/render.js";
+import {render, RenderPosition} from "../utils/render.js";
 
 /** Контроллер: "Фильтрация" */
 export default class Filter {

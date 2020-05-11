@@ -154,5 +154,17 @@ const FilterType = {
   PAST: `Past`,
 };
 
+export const SortType = {
+  EVENT: `sort-event`,
+  TIME: `sort-time`,
+  PRICE: `sort-price`,
+};
+
+export const PointMode = {
+  ADDING: `adding`,
+  DEFAULT: `default`,
+  EDIT: `edit`,
+};
+
 export {ALL_DESCRIPTION, ALL_DESTINATION, ALL_POINT_ACTION, ACTIONS_WITH_OFFERS, MONTH, POINT_ACTIVITY, POINT_TRANSPORT, FilterType};
 
