@@ -23,8 +23,6 @@ const createOfferMarkup = (offerType, offerPrice) => {
 const createPointOfDayTemplate = (pointOfDay) => {
   const {type, typeWithPreposition, destination, price, startDate, endDate, duration, offers} = pointOfDay;
 
-  const title = `${typeWithPreposition} ${destination}`;
-
   const startDay = formatDate(startDate);
   const endDay = formatDate(endDate);
 
@@ -49,7 +47,7 @@ const createPointOfDayTemplate = (pointOfDay) => {
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
         </div>
-        <h3 class="event__title">${title}</h3>
+        <h3 class="event__title">${typeWithPreposition} ${destination}</h3>
 
         <div class="event__schedule">
             <p class="event__time">

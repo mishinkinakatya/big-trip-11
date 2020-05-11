@@ -1,19 +1,20 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {POINTS_ACTION_WITH_OFFERS, POINTS_DESTINATION_WITH_DESCRIPTION} from "../utils/common.js";
+import {POINTS_ACTION_WITH_OFFERS, POINTS_DESTINATION_WITH_DESCRIPTION, getPointDurationInDHM} from "../utils/common.js";
 import {ALL_POINT_ACTION, POINT_ACTIVITY, POINT_TRANSPORT, ALL_DESTINATION} from "../const.js";
 import flatpickr from "flatpickr";
 import moment from "moment";
 
 import "flatpickr/dist/flatpickr.min.css";
+
 /**
 * @return {*} Функция, которая возвращает разметку блока "Тип точки маршрута"
-* @param {*} pointType Тип точки маршрута
+* @param {*} type Тип точки маршрута
+* @param {*} currentType Выбранный тип точки маршрута
 */
-const createPointTypeMarkup = (pointType) => {
-  const type = (pointType === `check`) ? `check-in` : pointType;
+const createPointTypeMarkup = (type, currentType) => {
   return (
     `<div class="event__type-item">
-      <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
+      <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${type === currentType ? `checked` : ``}>
       <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${ALL_POINT_ACTION[type].substr(0, type.length)}</label>
     </div>`
   );
@@ -68,13 +69,13 @@ const createEventEditTemplate = (pointOfTrip, options = {}) => {
   const {type, typeWithPreposition, destination, description, offers, startDate, endDate} = options;
 
   /** Разметка для точек с типом Transport */
-  const pointTransportsMarkup = Object.keys(POINT_TRANSPORT).map((it) => createPointTypeMarkup(it)).join(`\n`);
+  const pointTransportsMarkup = Object.keys(POINT_TRANSPORT).map((it) => createPointTypeMarkup(it, type)).join(`\n`);
   /** Разметка для точек с типом Activities */
-  const pointActivitiesMarkup = Object.keys(POINT_ACTIVITY).map((it) => createPointTypeMarkup(it)).join(`\n`);
+  const pointActivitiesMarkup = Object.keys(POINT_ACTIVITY).map((it) => createPointTypeMarkup(it, type)).join(`\n`);
   /** Разметка для "Пунктов назначения для точек маршрута" */
   const pointDestinationsMarkup = ALL_DESTINATION.map((it) => createDestinationMarkup(it)).join(`\n`);
   /** Разметка для "Дополнительных опций для точки маршрута" */
-  const offersMarkup = offers ? offers.map((it) => createOfferMarkup(it.type, it.price, it.isChecked)).join(`\n`) : null;
+  const offersMarkup = offers ? offers.map((it) => createOfferMarkup(it.type, it.price, it.isChecked)).join(`\n`) : ``;
   /** Разметка для "Описания точки маршрута" */
   const descriptionMarkup = description ? description.join(`\n`) : ``;
   /** Разметка для "Фотографий точки маршрута" */
@@ -161,27 +162,27 @@ const createEventEditTemplate = (pointOfTrip, options = {}) => {
       ${isPointDetailsShowing ?
       `<section class="event__details">
       ${isOfferShowing ?
-      `<section class="event__section  event__section--offers">
+        `<section class="event__section  event__section--offers">
           <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
           <div class="event__available-offers">
           ${offersMarkup}
           </div>
         </section>`
-      : ``}
+        : ``}
 
         <section class="event__section  event__section--destination">
         ${isDescriptionShowing ?
-      `<h3 class="event__section-title  event__section-title--destination">Destination</h3>
+        `<h3 class="event__section-title  event__section-title--destination">Destination</h3>
           <p class="event__destination-description">${descriptionMarkup}</p>`
-      : ``}
+        : ``}
       ${isPhotosShowing ?
-      `<div class="event__photos-container">
+        `<div class="event__photos-container">
             <div class="event__photos-tape">
             ${photosMarkup}
             </div>
           </div>`
-      : ``}
+        : ``}
         </section>
       </section>`
       : ``}
@@ -192,19 +193,21 @@ const createEventEditTemplate = (pointOfTrip, options = {}) => {
 const parseFormData = (formData) => {
   const destination = formData.get(`event-destination`);
   const description = destination ? POINTS_DESTINATION_WITH_DESCRIPTION.find((it) => it.destination === destination).description : ``;
-
+  const type = formData.get(`event-type`);
+  const startDate = moment(formData.get(`event-start-time`)).toDate();
+  const endDate = moment(formData.get(`event-end-time`)).toDate();
   return {
-    id: null,
     description,
     destination,
-    endDate: moment(formData.get(`event-end-time`)).toDate(),
+    duration: getPointDurationInDHM(startDate, endDate),
+    endDate,
     isFavorite: formData.get(`.event-favorite`),
-    offers: null,
+    offers: ``,
     photos: null,
     price: formData.get(`event-price`),
-    startDate: moment(formData.get(`event-start-time`)).toDate(),
-    type: formData.get(`event-type`),
-    // typeWithPreposition: formData.get(`event__type-output`),
+    startDate,
+    type,
+    typeWithPreposition: ALL_POINT_ACTION[type],
   };
 };
 
@@ -273,7 +276,10 @@ export default class PointEdit extends AbstractSmartComponent {
   getData() {
     const form = this.getElement();
     const formData = new FormData(form);
+    // debugger;
 
+    console.log(`formData`);
+    console.log(parseFormData(formData));
     return parseFormData(formData);
   }
 
@@ -333,15 +339,19 @@ export default class PointEdit extends AbstractSmartComponent {
     const dateEndElements = this.getElement().querySelector(`#event-end-time-1`);
 
     this._flatpickrStart = flatpickr(dateStartElements, {
+      altInput: true,
+      altFormat: `d/m/y H:i`,
+      allowInput: true,
       defaultDate: this._startDate || `today`,
       enableTime: true,
-      dateFormat: `d/m/y H:i`,
     });
 
     this._flatpickrEnd = flatpickr(dateEndElements, {
+      altInput: true,
+      altFormat: `d/m/y H:i`,
+      allowInput: true,
       defaultDate: this._endDate || `today`,
       enableTime: true,
-      dateFormat: `d/m/y H:i`,
       minDate: this._startDate,
     });
   }

@@ -26,16 +26,17 @@ export default class Filter {
       };
     });
 
-    const oldComponent = this._filterComponent;
+    // const oldComponent = this._filterComponent;
 
     this._filterComponent = new FilterComponent(filters);
     this._filterComponent.setFilterChangeHandler(this._filterChangeHandler);
+    render(container, this._filterComponent, RenderPosition.BEFOREEND);
 
-    if (oldComponent) {
-      replace(this._filterComponent, oldComponent);
-    } else {
-      render(container, this._filterComponent, RenderPosition.BEFOREEND);
-    }
+    // if (oldComponent) {
+    //   replace(this._filterComponent, oldComponent);
+    // } else {
+    //   render(container, this._filterComponent, RenderPosition.BEFOREEND);
+    // }
 
   }
 
@@ -45,6 +46,6 @@ export default class Filter {
   }
 
   _dataChangeHandler() {
-    this.render();
+    this._pointsModel.setFilterType(this._activeFilterType);
   }
 }

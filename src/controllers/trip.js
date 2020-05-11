@@ -54,7 +54,7 @@ export default class TripController {
     this._pointsModel = pointsModel;
 
     this._showedPointControllers = [];
-    this._daysOfTripControllers = [];
+    this._daysOfTrip = [];
 
     this._noPointsComponent = new NoPointsComponent();
     this._sortComponent = new SortComponent();
@@ -70,6 +70,7 @@ export default class TripController {
 
     this._sortComponent.setSortTypeChangeHandler(this._sortTypeChangeHandler);
     this._pointsModel.setFilterChangeHandler(this._filterChangeHandler);
+    this._pointsModel.setDataChangeHandler(this._dataChangeHandler);
 
     this._getPointsDays = this._getPointsDays.bind(this);
   }
@@ -91,10 +92,21 @@ export default class TripController {
     render(this._container, this._tripDays, RenderPosition.BEFOREEND);
 
     const daysOfTrip = this._renderDaysOfTrip(this._getPointsDays());
-    this._daysOfTripControllers = this._daysOfTripControllers.concat(daysOfTrip);
+    this._daysOfTrip = this._daysOfTrip.concat(daysOfTrip);
 
     const newPoints = this._renderPointsToDays(points);
     this._showedPointControllers = this._showedPointControllers.concat(newPoints);
+  }
+
+  /** Метод для создания и отрисовки нового компонента Точка маршрута */
+  createPoint() {
+    if (this._creatingPoint) {
+      return;
+    }
+
+    // this._viewChangeHandler();
+    this._creatingPoint = new PointController(this._tripDays.getElement(), this._dataChangeHandler, this._viewChangeHandler);
+    this._creatingPoint.render(EmptyPoint, PointControllerMode.ADDING);
   }
 
   /** @return {*} Приватный метод, который возвращает все даты путешествия */
@@ -142,12 +154,12 @@ export default class TripController {
   _renderPointsToDays(points) {
     let newPoints = [];
 
-    if (this._daysOfTripControllers.includes(this._tripWithoutDays)) {
+    if (this._daysOfTrip.includes(this._tripWithoutDays)) {
       newPoints = points.map((point) => {
         return this._renderPoint(this._tripDays.getElement().querySelector(`.trip-events__list`), point);
       });
     } else {
-      this._daysOfTripControllers.forEach((day) => {
+      this._daysOfTrip.forEach((day) => {
         const tripPointsOfDayElement = day.getElement().querySelector(`.trip-events__list`);
         const tripDay = day.getElement().querySelector(`.day__date`).getAttribute(`dateTime`);
         const tripDate = tripDay.slice(8, 10);
@@ -168,6 +180,28 @@ export default class TripController {
     return newPoints;
   }
 
+  _removeDaysOfTrip() {
+    this._daysOfTrip.forEach((dayOfTripController) => remove(dayOfTripController));
+    this._daysOfTrip = [];
+  }
+
+  _removePoints() {
+    this._showedPointControllers.forEach((pointController) => pointController.destroy());
+    this._showedPointControllers = [];
+  }
+
+  _updatePoints() {
+    this._removeDaysOfTrip();
+    this._removePoints();
+    this._daysOfTrip = this._renderDaysOfTrip(this._getPointsDays());
+    this._renderPointsToDays(this._pointsModel.getPoints());
+  }
+
+
+  _filterChangeHandler() {
+    this._updatePoints();
+  }
+
   /**
    * Приватный метод - колбэк для клика по типу сортировки (перерисовывает точки маршрута при изменении типа сортировки)
    * @param {*} sortType Тип сортировки
@@ -180,12 +214,12 @@ export default class TripController {
     let newPoints = [];
 
     if (sortType !== SortType.EVENT) {
-      this._daysOfTripControllers = this._renderTripWithoutDays();
+      this._daysOfTrip = this._renderTripWithoutDays();
       newPoints = this._renderPointsToDays(sortedPoints);
     }
 
     if (sortType === SortType.EVENT) {
-      this._daysOfTripControllers = this._renderDaysOfTrip(this._getPointsDays());
+      this._daysOfTrip = this._renderDaysOfTrip(this._getPointsDays());
       newPoints = this._renderPointsToDays(sortedPoints);
     }
 
@@ -225,38 +259,8 @@ export default class TripController {
     }
   }
 
-  createPoint() {
-    if (this._creatingPoint) {
-      return;
-    }
-
-    this._creatingPoint = new PointController(this._tripDays.getElement(), this._dataChangeHandler, this._viewChangeHandler);
-    this._creatingPoint.render(EmptyPoint, PointControllerMode.ADDING);
-  }
-
   /** Приватный метод - колбэк, который уведомляет все подписанные на него контроллеры, что они должны изменить вид (переключает в дефолтный режим все контроллеры "Точка маршрута") */
   _viewChangeHandler() {
     this._showedPointControllers.forEach((it) => it.setDefaultView());
-  }
-
-  _removeDaysOfTrip() {
-    this._daysOfTripControllers.forEach((dayOfTripController) => remove(dayOfTripController));
-    this._daysOfTripControllers = [];
-  }
-
-  _removePoints() {
-    this._showedPointControllers.forEach((pointController) => pointController.destroy());
-    this._showedPointControllers = [];
-  }
-
-  _updatePoints() {
-    this._removeDaysOfTrip();
-    this._removePoints();
-    this._daysOfTripControllers = this._renderDaysOfTrip(this._getPointsDays());
-    this._renderPointsToDays(this._pointsModel.getPoints());
-  }
-
-  _filterChangeHandler() {
-    this._updatePoints();
   }
 }

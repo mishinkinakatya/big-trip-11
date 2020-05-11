@@ -1,6 +1,8 @@
 import PointOfDayComponent from "../components/point-of-day.js";
 import PointEditComponent from "../components/point-edit.js";
 import {render, replace, remove, RenderPosition} from "../utils/render.js";
+import {POINTS_ACTION_WITH_OFFERS} from "../utils/common.js";
+
 
 export const Mode = {
   ADDING: `adding`,
@@ -9,16 +11,15 @@ export const Mode = {
 };
 
 export const EmptyPoint = {
-  id: null,
   description: ``,
   destination: ``,
   duration: null,
-  endDate: null,
+  endDate: Date.now(),
   isFavorite: false,
-  offers: null,
+  offers: POINTS_ACTION_WITH_OFFERS[`bus`],
   photos: null,
   price: ``,
-  startDate: null,
+  startDate: Date.now(),
   type: `bus`,
   typeWithPreposition: `Bus to`,
 };
@@ -69,9 +70,10 @@ export default class PointController {
       evt.preventDefault();
       const data = this._pointEditComponent.getData();
       this._dataChangeHandler(this, point, data);
-      document.removeEventListener(`keydown`, this._escKeyDownHandler);
+      // document.removeEventListener(`keydown`, this._escKeyDownHandler);
     });
-    this._pointEditComponent.setResetButtonClickHandler(() => this._dataChangeHandler(this, point, null));
+
+    this._pointEditComponent.setResetButtonClickHandler(() => this._dataChangeHandler(this, point, oldPointOfDayComponent));
 
     this._pointEditComponent.setFavoriteChangeHandler(() => {
       this._dataChangeHandler(this, point, Object.assign({}, point, {

@@ -18,6 +18,15 @@ export default class Points {
     this._filterChangeHandlers = [];
   }
 
+  /**
+ * Метод для добавления компонента "Точка маршрута" в модель
+ * @param {*} point Компонент "Точка маршрута"
+ */
+  addPoint(point) {
+    this._points = [].concat(point, this._points);
+    this._callHandlers(this._dataChangeHandlers);
+  }
+
   /** @return {*} Метод, который возвращает точки маршрута, соответствующие выбранному фильтру */
   getPoints() {
     return getPointsByFilter(this._points, this._activeFilterType);
@@ -26,6 +35,34 @@ export default class Points {
   /** @return {*} Метод, который возвращает все точки маршрута */
   getPointsAll() {
     return this._points;
+  }
+
+  /**
+   * @return {*} Метод для удаления компонента "Точка маршрута" из модели
+   * @param {*} id Id компонента "Точка маршрута", который нужно удалить
+   */
+  removePoint(id) {
+    const index = this._points.findIndex((it) => it.id === id);
+
+    if (index === -1) {
+      return false;
+    }
+
+    this._points = [].concat(this._points.slice(0, index), this._points.slice(index + 1));
+
+    this._callHandlers(this._dataChangeHandlers);
+
+    return true;
+  }
+
+  /**
+   * Метод, который устанавливает активный фильтр и уведомляет наблюдателей, что тип фильтра изменился
+   * @param {*} filterType Выбранный тип фильтра
+   */
+  setFilterType(filterType) {
+
+    this._activeFilterType = filterType;
+    this._callHandlers(this._filterChangeHandlers);
   }
 
   /**
@@ -56,24 +93,6 @@ export default class Points {
   }
 
   /**
-   * Метод, который устанавливает активный фильтр и уведомляет наблюдателей, что тип фильтра изменился
-   * @param {*} filterType Выбранный тип фильтра
-   */
-  setFilterType(filterType) {
-
-    this._activeFilterType = filterType;
-    this._callHandlers(this._filterChangeHandlers);
-  }
-
-  /**
- * Метод, который устанавливает колбэк, который будет вызывать модель, если изменился фильтр
- * @param {*} handler Колбэк для изменения фильтра
- */
-  setFilterChangeHandler(handler) {
-    this._filterChangeHandlers.push(handler);
-  }
-
-  /**
    * Метод, который устанавливает колбэк, который будет вызывать модель, если она изменилась
    * @param {*} handler Колбэк для клика по кнопке Save
    */
@@ -82,30 +101,11 @@ export default class Points {
   }
 
   /**
-   * Метод для добавления компонента "Точка маршрута" в модель
-   * @param {*} point Компонент "Точка маршрута"
-   */
-  addPoint(point) {
-    this._points = [].concat(point, this._points);
-    this._callHandlers(this._dataChangeHandlers);
-  }
-
-  /**
-   * @return {*} Метод для удаления компонента "Точка маршрута" из модели
-   * @param {*} id Id компонента "Точка маршрута", который нужно удалить
-   */
-  removePoint(id) {
-    const index = this._points.findIndex((it) => it.id === id);
-
-    if (index === -1) {
-      return false;
-    }
-
-    this._points = []. concat(this._points.slice(0, index), this._points.slice(index + 1));
-
-    this._callHandlers(this._dataChangeHandlers);
-
-    return true;
+ * Метод, который устанавливает колбэк, который будет вызывать модель, если изменился фильтр
+ * @param {*} handler Колбэк для изменения фильтра
+ */
+  setFilterChangeHandler(handler) {
+    this._filterChangeHandlers.push(handler);
   }
 
   /**
