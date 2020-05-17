@@ -1,38 +1,26 @@
 import AbstractController from "./abstract-controller";
-import {render, RenderPosition} from "../utils/render.js";
-import NoPointsComponent from "../components/no-points.js";
 import TripDays from "../components/trip-days";
 
 export default class PointsController extends AbstractController {
   constructor(container, model) {
     super(model);
     this._container = container;
-    this._noPointsComponent = new NoPointsComponent();
+
+    this._tripDays = new TripDays();
+
+    this._rerender = this._rerender.bind(this);
+    this.getModel().setActualPointsControllersChangeObserver(this._rerender);
   }
 
-  /**
-   * Метод для рендеринга всех точек маршрута
-   * @param {array} points Массив со всеми точками маршрута
-   */
   render() {
-    const points = this.getModel().getPointsAll();
-    const isPoints = points.length === 0;
+    const points = this.getModel().getActualPoints();
+    const sortType = this.getModel().getActiveSortType();
+    this._tripDays.render(this._container, points, sortType);
 
-    if (isPoints) {
-      render(this._container, this._noPointsComponent, RenderPosition.BEFOREEND);
-      return;
-    }
+  }
 
-    // render(this._container, this._sortComponent, RenderPosition.BEFOREEND);
-    const tripDays = new TripDays();
-    tripDays.render(this._container, points);
-
-    // render(this._container, this._tripDays, RenderPosition.BEFOREEND);
-
-    // const daysOfTrip = this._renderDaysOfTrip(this._getPointsDays());
-    // this._daysOfTrip = this._daysOfTrip.concat(daysOfTrip);
-
-    // const newPoints = this._renderPointsToDays(points);
-    // this._showedPointControllers = this._showedPointControllers.concat(newPoints);
+  _rerender() {
+    this._tripDays.clearTripDays();
+    this.render();
   }
 }

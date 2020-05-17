@@ -29,6 +29,20 @@ const render = (container, component, place) => {
   }
 };
 
+const renderElementToElement = (parent, child, place) => {
+  switch (place) {
+    case RenderPosition.AFTERBEGIN:
+      parent.prepend(child);
+      break;
+    case RenderPosition.AFTEREND:
+      parent.after(child);
+      break;
+    case RenderPosition.BEFOREEND:
+      parent.append(child);
+      break;
+  }
+};
+
 /**
  * Функция для замены одного компонента на другой
  * @param {*} newComponent Новый компонент
@@ -38,6 +52,16 @@ const replace = (newComponent, oldComponent) => {
   const parentElement = oldComponent.getElement().parentElement;
   const newElement = newComponent.getElement();
   const oldElement = oldComponent.getElement();
+
+  const isExistElements = !!(parentElement && newElement && oldElement);
+
+  if (isExistElements && parentElement.contains(oldElement)) {
+    parentElement.replaceChild(newElement, oldElement);
+  }
+};
+
+const replaceElement = (newElement, oldElement) => {
+  const parentElement = oldElement.parentElement;
 
   const isExistElements = !!(parentElement && newElement && oldElement);
 
@@ -62,4 +86,4 @@ export const RenderPosition = {
   BEFOREEND: `beforeend`,
 };
 
-export {createElement, render, replace, remove};
+export {createElement, render, renderElementToElement, replace, replaceElement, remove};

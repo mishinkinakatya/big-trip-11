@@ -4,7 +4,7 @@ import {isFutureDate, isPastDate} from "./common.js";
 
 const getFuturePoints = (points, date) => {
   return points.filter((point) => {
-    const startDate = point.startDate;
+    const startDate = point.getModel().getActualPoint().startDate;
 
     return isFutureDate(date, startDate);
   });
@@ -12,7 +12,7 @@ const getFuturePoints = (points, date) => {
 
 const getPastPoints = (points, date) => {
   return points.filter((point) => {
-    const endDate = point.endDate;
+    const endDate = point.getModel().getActualPoint().endDate;
 
     return isPastDate(date, endDate);
   });

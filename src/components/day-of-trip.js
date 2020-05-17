@@ -20,33 +20,24 @@ const createDescriptionDate = (item) => {
 * @param {*} number Порядковый номер дня маршрута
 * @param {*} day Дата дня маршрута
 */
-const createDayInfoMarkup = (number, day) => {
-  const descriptionDate = createDescriptionDate(day);
-  return (
-    `<div class="day__info">
+const createDayInfoMarkup = (number, day) =>
+  `<div class="day__info">
     ${number && day ?
-      `<span class="day__counter">${number}</span>
-      <time class="day__date" datetime="${day}">${descriptionDate}</time>`
-      : ``}
-    </div>`
-  );
-};
+    `<span class="day__counter">${number}</span>
+      <time class="day__date" datetime="${day}">${createDescriptionDate(day)}</time>`
+    : ``}
+  </div>`;
 
 /**
  * @return {*} Функция, которая возвращает разметку компонента "Один день маршрута"
  * @param {*} number Порядковый номер дня маршрута
  * @param {*} day Дата дня маршрута
  */
-const createDayOfTripTemplate = (number, day) => {
-  const dayInfoMarkup = createDayInfoMarkup(number, day);
-
-  return (
-    `<li class="trip-days__item  day">
-      ${dayInfoMarkup}
-      <ul class="trip-events__list"></ul>
-    </li>`
-  );
-};
+const createDayOfTripTemplate = (number, day) =>
+  `<li class="trip-days__item  day">
+    ${createDayInfoMarkup(number, day)}
+    <ul class="trip-events__list"></ul>
+  </li>`;
 
 /** Компонент: "Один день маршрута" */
 export default class DayOfTrip extends AbstractComponent {

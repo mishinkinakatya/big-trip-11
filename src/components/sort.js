@@ -1,5 +1,6 @@
 import AbstractComponent from "./abstract-component.js";
-import {SortType} from "../const.js";
+import {ChangePropertyType, SortType} from "../const.js";
+import {remove} from "../utils/render.js";
 
 
 /** @return {*} Функция, которая возвращает разметку компонента "Сортировка"
@@ -53,6 +54,10 @@ export default class Sort extends AbstractComponent {
     return createSortTemplate(activeSortType);
   }
 
+  clearSort() {
+    remove(this);
+  }
+
   /**
    * Метод, который устанавливает колбэк на клик по типу сортировки
    * @param {*} handler Колбэк для клика по типу сортировки
@@ -71,7 +76,7 @@ export default class Sort extends AbstractComponent {
         return;
       }
 
-      handler(activeSortType);
+      handler(sortType, ChangePropertyType.FROM_VIEW);
     });
   }
 }

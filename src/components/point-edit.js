@@ -1,61 +1,65 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {POINTS_ACTION_WITH_OFFERS, POINTS_DESTINATION_WITH_DESCRIPTION} from "../utils/common.js";
-import {ALL_POINT_ACTION, POINT_ACTIVITY, POINT_TRANSPORT, ALL_DESTINATION} from "../const.js";
+import {getPointDurationInDHM, POINTS_ACTION_WITH_OFFERS, POINTS_DESTINATION_WITH_DESCRIPTION} from "../utils/common.js";
+import {ALL_DESTINATION, ALL_POINT_ACTION, POINT_ACTIVITY, POINT_TRANSPORT} from "../const.js";
 import flatpickr from "flatpickr";
-
+import moment from "moment";
 import "flatpickr/dist/flatpickr.min.css";
+
+const OFFER_NAME_PREFIX = `event-offer-`;
+
+const getOfferByName = (name) => {
+  return name.substring(OFFER_NAME_PREFIX.length);
+};
 
 /**
 * @return {*} Функция, которая возвращает разметку блока "Тип точки маршрута"
 * @param {*} type Тип точки маршрута
 * @param {*} currentType Выбранный тип точки маршрута
 */
-const createPointTypeMarkup = (type, currentType) => {
-  return (
-    `<div class="event__type-item">
-      <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${type === currentType ? `checked` : ``}>
-      <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${ALL_POINT_ACTION[type].substr(0, type.length)}</label>
-    </div>`
-  );
-};
+const createPointTypeMarkup = (type, currentType) =>
+  `<div class="event__type-item">
+    <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${type === currentType ? `checked` : ``}>
+    <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${ALL_POINT_ACTION[type].substr(0, type.length)}</label>
+  </div>`;
 
-/**
-* @return {*} Функция, которая возвращает разметку блока "Пункт назначения для точки маршрута"
-* @param {*} pointDestination Пункт назначения
-*/
-const createDestinationMarkup = (pointDestination) => {
+/** @return {*} Функция, которая возвращает разметку блока "Пункт назначения для точки маршрута" */
+const createDestinationMarkup = () => {
   return (
-    `<option value="${pointDestination}"></option>`
+    ALL_DESTINATION.map((it) => {
+      return (`<option value="${it}"></option>`);
+    }).join(`\n`)
   );
 };
 
 /**
   * @return {*} Функция, которая возвращает разметку блока "Дополнительные опции для точки маршрута"
-  * @param {string} offer Дополнительные опция
-  * @param {number} offerPrice Цена дополнительной опции
-  * @param {boolean} isChecked Флаг: Опция выбрана?
+  * @param {string} offers Дополнительные опции
   */
-const createOfferMarkup = (offer, offerPrice, isChecked) => {
-  return (
-    `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer}-1" type="checkbox" name="event-offer-${offer}" ${isChecked ? `checked` : ``}>
-      <label class="event__offer-label" for="event-offer-${offer}-1">
-        <span class="event__offer-title">Add ${offer}</span>
-        &plus;
-        &euro;&nbsp;<span class="event__offer-price">${offerPrice}</span>
-      </label>
-    </div>`
-  );
+const createOfferMarkup = (offers) => {
+  return offers ? offers.map((it) => {
+    return (
+      `<div class="event__offer-selector">
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${it.type}-1" type="checkbox" name="event-offer-${it.type}" ${it.isChecked ? `checked` : ``}>
+        <label class="event__offer-label" for="event-offer-${it.type}-1">
+          <span class="event__offer-title">${it.type}</span>
+          &plus;
+          &euro;&nbsp;<span class="event__offer-price">${it.price}</span>
+        </label>
+      </div>`
+    );
+  }).join(`\n`) : ``;
 };
 
 /**
 * @return {*} Функция, которая возвращает разметку блока "Фотография точки маршрута"
-* @param {string} photo Src фотографии
+* @param {string} photos Src фотографии
 */
-const createPhotosMarkup = (photo) => {
-  return (
-    `<img class="event__photo" src="${photo}" alt="Event photo"></img>`
-  );
+const createPhotosMarkup = (photos) => {
+  return photos ? photos.map((it) => {
+    return (
+      `<img class="event__photo" src="${it}" alt="Event photo"></img>`
+    );
+  }).join(`\n`) : ``;
 };
 
 /**
@@ -63,29 +67,21 @@ const createPhotosMarkup = (photo) => {
  * @param {*} pointOfTrip Объект, содержащий свойства компонента "Точка маршрута в режиме Edit"
  * @param {*} options Объект, содержащий интерактивные свойства компонента "Точка маршрута в режиме Edit"
  */
-const createEventEditTemplate = (pointOfTrip, options = {}) => {
-  const {photos, isFavorite, price} = pointOfTrip;
-  const {type, typeWithPreposition, destination, description, offers, startDate, endDate} = options;
+const createEventEditTemplate = (pointOfTrip) => {
+  const {photos, isFavorite, price, type, typeWithPreposition, destination, description, offers, startDate, endDate} = pointOfTrip;
 
-  /** Разметка для точек с типом Transport */
   const pointTransportsMarkup = Object.keys(POINT_TRANSPORT).map((it) => createPointTypeMarkup(it, type)).join(`\n`);
-  /** Разметка для точек с типом Activities */
   const pointActivitiesMarkup = Object.keys(POINT_ACTIVITY).map((it) => createPointTypeMarkup(it, type)).join(`\n`);
-  /** Разметка для "Пунктов назначения для точек маршрута" */
-  const pointDestinationsMarkup = ALL_DESTINATION.map((it) => createDestinationMarkup(it)).join(`\n`);
-  /** Разметка для "Дополнительных опций для точки маршрута" */
-  const offersMarkup = offers ? offers.map((it) => createOfferMarkup(it.type, it.price, it.isChecked)).join(`\n`) : ``;
-  /** Разметка для "Описания точки маршрута" */
-  const descriptionMarkup = description ? description.join(`\n`) : ``;
-  /** Разметка для "Фотографий точки маршрута" */
-  const photosMarkup = photos ? photos.map((it) => createPhotosMarkup(it)).join(`\n`) : ``;
 
-  /** Флаг: Показывать блок "Дополнительные опции для точки маршрута"? */
+  const pointDestinationsMarkup = createDestinationMarkup();
+  const offersMarkup = createOfferMarkup(offers);
+  const descriptionMarkup = description ? description.join(`\n`) : ``;
+  const photosMarkup = createPhotosMarkup(photos);
+
   const isOfferShowing = !!offersMarkup;
-  /** Флаг: Показывать блок "Описание точки маршрута"? */
   const isDescriptionShowing = !!descriptionMarkup;
-  /** Флаг: Показывать блок "Фотографии точки маршрута"? */
   const isPhotosShowing = !!photosMarkup;
+
   /** Флаг: Показывать блок с Дополнительными опциями, Описанием и Фотографиями точки маршрута? */
   const isPointDetailsShowing = isOfferShowing || isDescriptionShowing || isPhotosShowing;
 
@@ -193,7 +189,6 @@ const createEventEditTemplate = (pointOfTrip, options = {}) => {
 export default class PointEdit extends AbstractSmartComponent {
   /**
    * Свойства компонента "Точка маршрута в режиме Edit"
-   * @property {*} this._point - Компонент "Точка маршрута в режиме DEFAULT"
    * @param {*} getActualPointData
    * @param {*} updateTempPoint
    * @param {*} getTempPointData
@@ -203,20 +198,13 @@ export default class PointEdit extends AbstractSmartComponent {
     this._getActualPointData = getActualPointData;
     this._updateTempPoint = updateTempPoint;
     this._getTempPointData = getTempPointData;
-    const point = getActualPointData();
-    this._type = point.type;
-    this._typeWithPreposition = point.typeWithPreposition;
-    this._destination = point.destination;
-    this._description = point.description;
-    this._offers = point.offers;
-    this._startDate = point.startDate;
-    this._endDate = point.endDate;
 
     this._flatpickrStart = null;
     this._flatpickrEnd = null;
     this._submitHandler = null;
     this._resetButtonClickHandler = null;
 
+    this._tempPoint = getTempPointData();
 
     this._applyFlatpickr();
     this._subscribeOnEvents();
@@ -224,16 +212,7 @@ export default class PointEdit extends AbstractSmartComponent {
 
   /** @return {*} Метод, который возвращает разметку компонента "Точка маршрута в режиме Edit" */
   getTemplate() {
-    const point = this._getActualPointData();
-    return createEventEditTemplate(point, {
-      type: this._type,
-      typeWithPreposition: this._typeWithPreposition,
-      destination: this._destination,
-      description: this._description,
-      offers: this._offers,
-      startDate: this._startDate,
-      endDate: this._endDate,
-    });
+    return createEventEditTemplate(this._tempPoint);
   }
 
   /** Метод, который перенавешивает слушателей */
@@ -243,21 +222,6 @@ export default class PointEdit extends AbstractSmartComponent {
     this._subscribeOnEvents();
   }
 
-  /** Метод, котоырй сбрасывает все изменения в контроллере */
-  reset() {
-    const point = this._getActualPointData();
-
-    this._type = point.type;
-    this._typeWithPreposition = point.typeWithPreposition;
-    this._destination = point.destination;
-    this._description = point.description;
-    this._offers = point.offers;
-    this._startDate = point.startDate;
-    this._endDate = point.endDate;
-
-    this.rerender();
-  }
-
   /**
    * Метод, который устанавливает колбэк на клик по кнопке Save
    * @param {*} handler Колбэк для клика по кнопке Save
@@ -265,14 +229,6 @@ export default class PointEdit extends AbstractSmartComponent {
   setSubmitHandler(handler) {
     this.getElement().querySelector(`.event__save-btn`).addEventListener(`click`, handler);
     this._submitHandler = handler;
-  }
-
-  /**
-   * Метод, который устанавливает колбэк на клик по звёздочке (Favorite)
-   * @param {*} handler Колбэк для клика по звёздочке (Favorite)
-   */
-  setFavoriteChangeHandler(handler) {
-    this.getElement().querySelector(`.event__favorite-checkbox`).addEventListener(`change`, handler);
   }
 
   setResetButtonClickHandler(handler) {
@@ -316,21 +272,32 @@ export default class PointEdit extends AbstractSmartComponent {
       altInput: true,
       altFormat: `d/m/y H:i`,
       allowInput: true,
-      defaultDate: this._startDate || `today`,
+      defaultDate: this._tempPoint.startDate || `today`,
       enableTime: true,
+      // time_24hr: true,
     });
 
     this._flatpickrEnd = flatpickr(dateEndElements, {
       altInput: true,
       altFormat: `d/m/y H:i`,
       allowInput: true,
-      defaultDate: this._endDate || `today`,
+      defaultDate: this._tempPoint.endDate || `today`,
       enableTime: true,
-      minDate: this._startDate,
+      minDate: this._tempPoint.startDate,
+      // time_24hr: true,
     });
   }
 
-  /** Приватный метод, который подписывается на события: Изменение типа точки маршрута, пункта назначения, даты начала и конца, цены */
+  // Если newTempPoint - null, то нет обновления модели и перерисовки
+  _onChangeDataPoint(applyChangeToTempPoint) {
+    const newTempPoint = applyChangeToTempPoint(this._tempPoint);
+    if (newTempPoint) {
+      this._updateTempPoint(newTempPoint);
+      this.rerender();
+    }
+  }
+
+  /** Приватный метод, который подписывается на события: Изменение типа точки маршрута, пункта назначения, даты начала и конца, цены и дополнительных опций */
   _subscribeOnEvents() {
     const element = this.getElement();
 
@@ -341,7 +308,7 @@ export default class PointEdit extends AbstractSmartComponent {
 
       const pointType = evt.target.value;
       this._onChangeDataPoint((tempPoint) => {
-        if (this._type === pointType && tempPoint.type === pointType) {
+        if (tempPoint.type === pointType) {
           return null;
         }
 
@@ -350,75 +317,102 @@ export default class PointEdit extends AbstractSmartComponent {
 
         const newTempPoint = tempPoint;
         newTempPoint.type = pointType;
-        this._type = pointType;
         newTempPoint.typeWithPreposition = pointTypeWithPreposition;
-        this._typeWithPreposition = pointTypeWithPreposition;
         newTempPoint.offers = pointOffers;
-        this._offers = pointOffers;
 
         return newTempPoint;
       });
     });
 
     element.querySelector(`.event__input--destination`).addEventListener(`change`, (evt) => {
-      const pointDestination = evt.target.value;
+      let pointDestination = evt.target.value;
 
       this._onChangeDataPoint((tempPoint) => {
-        if (this._destination === pointDestination && tempPoint.destination === pointDestination) {
+        if (tempPoint.destination === pointDestination) {
           return null;
         }
+        if (!ALL_DESTINATION.includes(pointDestination)) {
+          pointDestination = tempPoint.destination;
+        }
 
-        const pointDescription = POINTS_DESTINATION_WITH_DESCRIPTION.find((it) => it.destination === pointDestination).description;
+        const pointDescription = pointDestination !== `` ? POINTS_DESTINATION_WITH_DESCRIPTION.find((it) => it.destination === pointDestination).description : ``;
 
         const newTempPoint = tempPoint;
         newTempPoint.destination = pointDestination;
-        this._destination = pointDestination;
         newTempPoint.description = pointDescription;
-        this._description = pointDescription;
         return newTempPoint;
       });
     });
 
     element.querySelector(`#event-start-time-1`).addEventListener(`change`, (evt) => {
-      const pointStartDate = evt.target.value;
+      const pointStartDate = moment(evt.target.value).toDate();
       this._onChangeDataPoint((tempPoint) => {
-        if (this._startDate === pointStartDate && tempPoint.startDate === pointStartDate) {
+
+        if (tempPoint.startDate === pointStartDate) {
           return null;
         }
+
         const newTempPoint = tempPoint;
 
         if (pointStartDate > tempPoint.endDate) {
           newTempPoint.endDate = pointStartDate;
-          this._endDate = pointStartDate;
         }
 
         newTempPoint.startDate = pointStartDate;
-        this._startDate = pointStartDate;
+        newTempPoint.duration = getPointDurationInDHM(newTempPoint.startDate, newTempPoint.endDate);
         return newTempPoint;
       });
     });
 
     element.querySelector(`#event-end-time-1`).addEventListener(`change`, (evt) => {
-      const pointEndDate = evt.target.value;
+      const pointEndDate = moment(evt.target.value).toDate();
       this._onChangeDataPoint((tempPoint) => {
-        if (this._endDate === pointEndDate && tempPoint.endDate === pointEndDate) {
+        if (tempPoint.endDate === pointEndDate) {
           return null;
         }
         const newTempPoint = tempPoint;
         newTempPoint.endDate = pointEndDate;
-        this._endDate = pointEndDate;
+        newTempPoint.duration = getPointDurationInDHM(newTempPoint.startDate, newTempPoint.endDate);
         return newTempPoint;
       });
     });
-  }
 
-  // Если newTempPoint - null, то нет обновления модели и перерисовки
-  _onChangeDataPoint(applyChangeToTempPoint) {
-    const tempPoint = this._getTempPointData();
-    const newTempPoint = applyChangeToTempPoint(tempPoint);
-    if (newTempPoint) {
-      this._updateTempPoint(newTempPoint);
-      this.rerender();
-    }
+    element.querySelector(`.event__input--price`).addEventListener(`change`, (evt) => {
+      let pointPrice = evt.target.value;
+
+      this._onChangeDataPoint((tempPoint) => {
+        if (tempPoint.price === pointPrice) {
+          return null;
+        }
+        if (!Number.isInteger(Number(pointPrice))) {
+          pointPrice = tempPoint.price;
+        }
+        const newTempPoint = tempPoint;
+        newTempPoint.price = pointPrice;
+        return newTempPoint;
+      });
+    });
+
+    element.querySelector(`.event__favorite-checkbox`).addEventListener(`change`, () => {
+      this._onChangeDataPoint((tempPoint) => {
+
+        const newTempPoint = tempPoint;
+        newTempPoint.isFavorite = !tempPoint.isFavorite;
+        return newTempPoint;
+      });
+    });
+
+    element.querySelector(`.event__available-offers`).addEventListener(`change`, (evt) => {
+      const pointOffer = getOfferByName(evt.target.name);
+      this._onChangeDataPoint((tempPoint) => {
+
+        const newTempPoint = tempPoint;
+
+        const currentOfferIsChecked = tempPoint.offers.find((it) => it.type === pointOffer).isChecked;
+        newTempPoint.offers.find((it) => it.type === pointOffer).isChecked = !currentOfferIsChecked;
+        return newTempPoint;
+      });
+    });
+
   }
 }

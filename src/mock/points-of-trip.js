@@ -1,4 +1,4 @@
-import {ALL_POINT_ACTION, ALL_DESTINATION} from "../const.js";
+import {ALL_DESTINATION, ALL_POINT_ACTION} from "../const.js";
 import {getPointDurationInMs, generateRandomArrayItem, getRandomIntegerNumber, getPointDurationInDHM, getRandomStartDate, getRandomEndDate, POINTS_DESTINATION_WITH_DESCRIPTION, POINTS_ACTION_WITH_OFFERS} from "../utils/common.js";
 import PointModel from "../models/point-model.js";
 
@@ -29,7 +29,7 @@ const generatePointOfTrip = () => {
     typeWithPreposition,
   };
 
-  return new PointModel(point);
+  return new PointModel(point, point);
 };
 
 const generatePointsOfTrip = (count) => {

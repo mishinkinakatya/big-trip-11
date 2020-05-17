@@ -1,5 +1,6 @@
-import AbstractComponent from "./abstract-component.js";
-import {FilterType} from "../const.js";
+import AbstractSmartComponent from "./abstract-smart-component.js";
+import {ChangePropertyType, FilterType} from "../const.js";
+import {remove} from "../utils/render.js";
 
 const FILTER_ID_PREFIX = `filter-`;
 
@@ -9,13 +10,14 @@ const getFilterNameById = (id) => {
 
 /** @return {*} Метод, который возвращает разметку одного фильтра
  * @param {*} activeFilterType Активный фильтр
+ * @param {*} availableFilters Доступные фильтры
  */
-const createFilterMarkup = (activeFilterType) => {
+const createFilterMarkup = (activeFilterType, availableFilters) => {
+  const isAvailableFilters = availableFilters.length > 0 ? true : false;
   return Object.values(FilterType).map((it) => {
-
     return (
       `<div class="trip-filters__filter">
-        <input id="filter-${it}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${it}" ${it === activeFilterType ? `checked` : ``}>
+        <input id="filter-${it}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${it}" ${it === activeFilterType ? `checked` : ``} ${isAvailableFilters && availableFilters.includes(it) ? `` : `disabled`}>
         <label class="trip-filters__filter-label" for="filter-${it}">${it}</label>
       </div>`
     );
@@ -24,18 +26,16 @@ const createFilterMarkup = (activeFilterType) => {
 
 /** @return {*} Метод, который возвращает разметку компонента "Фильтрация"
  * @param {*} activeFilterType Активный фильтр
+ * @param {*} availableFilters Доступные фильтры
  */
-const createFilterTemplate = (activeFilterType) => {
-  return (
-    `<form class="trip-filters" action="#" method="get">
-      ${createFilterMarkup(activeFilterType)}
-      <button class="visually-hidden" type="submit">Accept filter</button>
-    </form>`
-  );
-};
+const createFilterTemplate = (activeFilterType, availableFilters) =>
+  `<form class="trip-filters" action="#" method="get">
+    ${createFilterMarkup(activeFilterType, availableFilters)}
+    <button class="visually-hidden" type="submit">Accept filter</button>
+  </form>`;
 
 /** Компонент: "Фильтрация" */
-export default class Filter extends AbstractComponent {
+export default class Filter extends AbstractSmartComponent {
   /**
    * Свойства компонента "Фильтрация"
    * @property {*} this._getActiveFilterType
@@ -44,18 +44,31 @@ export default class Filter extends AbstractComponent {
   constructor(getActiveFilterType) {
     super();
     this._getActiveFilterType = getActiveFilterType;
+    this._availableFilters = [];
   }
 
   /** @return {*} Метод, который возвращает разметку компонента "Фильтрация" */
   getTemplate() {
-    const activeFilterType = this._getActiveFilterType();
-    return createFilterTemplate(activeFilterType);
+    return createFilterTemplate(this._getActiveFilterType(), this._availableFilters);
+  }
+
+  clearFilter() {
+    remove(this);
+  }
+
+  recoveryListeners() {
+    this.setFilterTypeChangeHandler(this._filterTypeChangeHandler);
+  }
+
+  setAvailableFilters(filterTypes) {
+    this._availableFilters = filterTypes;
+    this.rerender();
   }
 
   setFilterTypeChangeHandler(handler) {
+    this._filterTypeChangeHandler = handler;
     this.getElement().addEventListener(`change`, (evt) => {
-      const filterName = getFilterNameById(evt.target.id);
-      handler(filterName);
+      handler(getFilterNameById(evt.target.id), ChangePropertyType.FROM_VIEW);
     });
   }
 }

@@ -8,9 +8,9 @@ export default class SortModel {
     return this._activeSortType;
   }
 
-  setActiveSortType(sortType) {
+  setActiveSortType(sortType, changePropertyType) {
     this._activeSortType = sortType;
-    this._activeSortTypeChangeObservers.forEach((handler) => handler(this._activeSortType));
+    this._activeSortTypeChangeObservers.forEach((handler) => handler(changePropertyType));
   }
 
   setActiveSortTypeChangeObserver(handler) {

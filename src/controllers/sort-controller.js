@@ -1,27 +1,43 @@
-import SortComponent from "../components/sort.js";
-import {render, RenderPosition} from "../utils/render.js";
 import AbstractController from "./abstract-controller.js";
+import SortComponent from "../components/sort.js";
+import {ChangePropertyType} from "../const.js";
+import {render, RenderPosition} from "../utils/render.js";
 
-/** Контроллер: "Сортировка" */
 export default class SortController extends AbstractController {
   constructor(container, model) {
     super(model);
     this._container = container;
-    this._sortTypeChangeHandler = this._sortTypeChangeHandler.bind(this);
+
     this._getActiveSortType = this._getActiveSortType.bind(this);
+    this._sortTypeChangeFromViewHandler = this._sortTypeChangeFromViewHandler.bind(this);
+    this._sortTypeChangeFromModelHandler = this._sortTypeChangeFromModelHandler.bind(this);
+    this._rerender = this._rerender.bind(this);
+    this.getModel().setActiveSortTypeChangeObserver(this._sortTypeChangeFromModelHandler);
+
+    this._sortComponent = new SortComponent(this._getActiveSortType);
   }
 
   render() {
-    const sortComponent = new SortComponent(this._getActiveSortType);
-    sortComponent.setSortTypeChangeHandler(this._sortTypeChangeHandler);
-    render(this._container, sortComponent, RenderPosition.BEFOREEND);
+    this._sortComponent.setSortTypeChangeHandler(this._sortTypeChangeFromViewHandler);
+    render(this._container, this._sortComponent, RenderPosition.BEFOREEND);
   }
 
   _getActiveSortType() {
     return this.getModel().getActiveSortType();
   }
 
-  _sortTypeChangeHandler(sortType) {
-    this.getModel().setActiveSortType(sortType);
+  _rerender() {
+    this._sortComponent.clearSort();
+    this.render();
+  }
+
+  _sortTypeChangeFromViewHandler(sortType) {
+    this.getModel().setActiveSortType(sortType, ChangePropertyType.FROM_VIEW);
+  }
+
+  _sortTypeChangeFromModelHandler(changePropertyType) {
+    if (changePropertyType === ChangePropertyType.FROM_MODEL) {
+      this._rerender();
+    }
   }
 }

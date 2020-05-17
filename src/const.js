@@ -166,5 +166,10 @@ export const PointMode = {
   EDIT: `edit`,
 };
 
+export const ChangePropertyType = {
+  FROM_VIEW: `from-view`,
+  FROM_MODEL: `from-model`,
+};
+
 export {ALL_DESCRIPTION, ALL_DESTINATION, ALL_POINT_ACTION, ACTIONS_WITH_OFFERS, MONTH, POINT_ACTIVITY, POINT_TRANSPORT, FilterType};
 
