@@ -7,7 +7,7 @@ import {POINTS_ACTION_WITH_OFFERS} from "../utils/common.js";
 export const EmptyPoint = {
   description: ``,
   destination: ``,
-  duration: ``,
+  duration: `00M`,
   endDate: new Date(),
   isFavorite: false,
   offers: POINTS_ACTION_WITH_OFFERS[`bus`],
@@ -65,6 +65,10 @@ export default class PointsModel {
     return this._actualPointsControllers;
   }
 
+  getPointsControllersSortedOnDays() {
+    return this._applySort(this._allPointsControllers, SortType.EVENT);
+  }
+
   /**
    * Метод, который записывает точки маршрута
    * @param {*} points Массив точек маршрута
@@ -114,7 +118,7 @@ export default class PointsModel {
         sortedPointsControllers = pointsControllers.sort((a, b) => b.getModel().getActualPoint().price - a.getModel().getActualPoint().price);
         break;
       case SortType.EVENT:
-        sortedPointsControllers = pointsControllers;
+        sortedPointsControllers = pointsControllers.sort((a, b) => a.getModel().getActualPoint().startDate - b.getModel().getActualPoint().startDate);
         break;
     }
     return sortedPointsControllers;

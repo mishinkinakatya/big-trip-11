@@ -7,7 +7,8 @@ import PointsModel from "./models/points-model.js";
 import SiteMenuComponent from "./components/site-menu.js";
 import SortController from "./controllers/sort-controller.js";
 import SortModel from "./models/sort-model.js";
-import TripInfoComponent from "./components/trip-info.js";
+import TripInfoController from "./controllers/trip-info-controller.js";
+import TripInfoModel from "./models/trip-info-model.js";
 import {generatePointsOfTrip} from "./mock/points-of-trip.js";
 import {render, RenderPosition} from "./utils/render.js";
 import {ChangePropertyType, FilterType, PointMode, SortType} from "./const.js";
@@ -15,13 +16,10 @@ import {ChangePropertyType, FilterType, PointMode, SortType} from "./const.js";
 const POINTS_COUNT = 23;
 /** Элемент, внутри которого будет рендериться вся страница */
 const tripMainElement = document.querySelector(`.trip-main`);
-render(tripMainElement, new TripInfoComponent(), RenderPosition.AFTERBEGIN);
 
 /** Элемент, внутри которого будут рендериться компонеты "Меню" и "Фильтрация" */
 const tripControlsElement = tripMainElement.querySelector(`.trip-controls`);
 const tripMenuElement = tripControlsElement.querySelector(`h2:first-child`);
-
-render(tripMenuElement, new SiteMenuComponent(), RenderPosition.AFTEREND);
 
 /** Массив всех точек маршрута */
 const allPoints = generatePointsOfTrip(POINTS_COUNT);
@@ -31,19 +29,26 @@ const tripPointsElement = document.querySelector(`.trip-events`);
 // Фильтры
 const filterModel = new FilterModel(FilterType.EVERYTHING);
 const filterController = new FilterController(tripControlsElement, filterModel);
-filterController.render();
 
 // Сортировка
 const sortModel = new SortModel(SortType.EVENT);
 const sortController = new SortController(tripPointsElement, sortModel);
 
-/** Инстанс модели "Точки маршрута" */
 const pointsModel = new PointsModel(sortModel, filterModel);
 const pointsControllers = allPoints.map((it) => new PointController(it));
+
 
 filterModel.setPointsModel(pointsModel);
 const pointsController = new PointsController(tripPointsElement, pointsModel);
 
+const tripInfoModel = new TripInfoModel(pointsModel);
+const tripInfoController = new TripInfoController(tripMainElement, tripInfoModel);
+
+
+// render
+tripInfoController.render();
+render(tripMenuElement, new SiteMenuComponent(), RenderPosition.AFTEREND);
+filterController.render();
 if (pointsControllers.length === 0) {
   render(tripPointsElement, new NoPointsComponent(), RenderPosition.BEFOREEND);
 } else {
