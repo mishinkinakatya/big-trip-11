@@ -4,6 +4,7 @@ import {remove} from "../utils/render.js";
 
 const FILTER_ID_PREFIX = `filter-`;
 
+// TODO! Заменить на data-атрибуты
 const getFilterNameById = (id) => {
   return id.substring(FILTER_ID_PREFIX.length);
 };
@@ -24,9 +25,10 @@ const createFilterMarkup = (activeFilterType, availableFilters) => {
   }).join(`\n`);
 };
 
-/** @return {*} Метод, который возвращает разметку компонента "Фильтрация"
+/**
  * @param {*} activeFilterType Активный фильтр
  * @param {*} availableFilters Доступные фильтры
+ * @return {*} Метод, который возвращает разметку компонента "Фильтрация"
  */
 const createFilterTemplate = (activeFilterType, availableFilters) =>
   `<form class="trip-filters" action="#" method="get">

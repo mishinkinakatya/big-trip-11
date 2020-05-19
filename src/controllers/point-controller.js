@@ -11,8 +11,6 @@ export default class PointController extends AbstractController {
     this._getActualPointData = this._getActualPointData.bind(this);
     this._getTempPointData = this._getTempPointData.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
-    this._createPointOfDayComponent = this._createPointOfDayComponent.bind(this);
-    this._createPointEditComponent = this._createPointEditComponent.bind(this);
 
     this.getModel().setModeChangeObserver((_, changePropertyType) => {
       if (changePropertyType === ChangePropertyType.FROM_MODEL) {

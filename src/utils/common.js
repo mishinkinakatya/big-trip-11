@@ -10,9 +10,7 @@ const castDateTimeFormat = (value) => {
   return value < 10 ? `0${value}` : String(value);
 };
 
-const formatTime = (date) => {
-  return moment(date).format(`HH:mm`);
-};
+const formatTime = (date) => moment(date).format(`HH:mm`);
 
 const formatDate = (date) => {
   return moment(date).format(`YYYY-MM-DD`);
@@ -129,15 +127,11 @@ const generatePointsWithOffers = (points) => {
 };
 
 // Когда данные будут приходить с сервера - эта константа переедет в point-edit
-const POINTS_ACTION_WITH_OFFERS = generatePointsWithOffers(ACTIONS_WITH_OFFERS);
+const pointsActionWithOffers = generatePointsWithOffers(ACTIONS_WITH_OFFERS);
 
-const isFutureDate = (nowDate, startDate) => {
-  return startDate > nowDate;
-};
+const isFutureDate = (nowDate, startDate) => startDate > nowDate;
 
-const isPastDate = (nowDate, endDate) => {
-  return endDate < nowDate;
-};
+const isPastDate = (nowDate, endDate) => endDate < nowDate;
 
-export {getPointDurationInDHM, getPointDurationInMs, castDateTimeFormat, formatDate, formatTime, generateRandomArrayFromAnother, generateRandomArrayItem, getRandomEndDate, getRandomIntegerNumber, getRandomStartDate, isFutureDate, isPastDate, POINTS_ACTION_WITH_OFFERS, POINTS_DESTINATION_WITH_DESCRIPTION};
+export {getPointDurationInDHM, getPointDurationInMs, castDateTimeFormat, formatDate, formatTime, generateRandomArrayFromAnother, generateRandomArrayItem, getRandomEndDate, getRandomIntegerNumber, getRandomStartDate, isFutureDate, isPastDate, pointsActionWithOffers, POINTS_DESTINATION_WITH_DESCRIPTION};
 

@@ -1,17 +1,17 @@
 import {ALL_DESTINATION, ALL_POINT_ACTION} from "../const.js";
-import {getPointDurationInMs, generateRandomArrayItem, getRandomIntegerNumber, getPointDurationInDHM, getRandomStartDate, getRandomEndDate, POINTS_DESTINATION_WITH_DESCRIPTION, POINTS_ACTION_WITH_OFFERS} from "../utils/common.js";
+import {getPointDurationInMs, generateRandomArrayItem, getRandomIntegerNumber, getPointDurationInDHM, getRandomStartDate, getRandomEndDate, POINTS_DESTINATION_WITH_DESCRIPTION, pointsActionWithOffers} from "../utils/common.js";
 import PointModel from "../models/point-model.js";
 
 
 const generatePointOfTrip = () => {
-  const pointAction = generateRandomArrayItem(Object.keys(POINTS_ACTION_WITH_OFFERS));
+  const pointAction = generateRandomArrayItem(Object.keys(pointsActionWithOffers));
   const destination = generateRandomArrayItem(ALL_DESTINATION);
   const description = POINTS_DESTINATION_WITH_DESCRIPTION.find((it) => it.destination === destination).description;
   const typeWithPreposition = `${ALL_POINT_ACTION[pointAction]}`;
   const startDate = getRandomStartDate();
   const endDate = getRandomEndDate(startDate);
   const durationInMs = getPointDurationInMs(startDate, endDate);
-  const offers = POINTS_ACTION_WITH_OFFERS[pointAction];
+  const offers = pointsActionWithOffers[pointAction];
 
   const point = {
     id: String(new Date() + Math.random()),

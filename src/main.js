@@ -58,10 +58,9 @@ if (pointsControllers.length === 0) {
 }
 
 const setDisabledForAddButton = () => {
-  const isAddingPoints = pointsModel.getActualPoints().find((point) => {
+  addButton.disabled = pointsModel.getActualPoints().find((point) => {
     return point.getModel().getMode() === PointMode.ADDING;
   });
-  addButton.disabled = isAddingPoints;
 };
 
 pointsModel.setActualPointsControllersChangeObserver(setDisabledForAddButton);

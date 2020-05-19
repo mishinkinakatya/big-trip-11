@@ -2,7 +2,7 @@ import PointController from "../controllers/point-controller.js";
 import PointModel from "./point-model.js";
 import {getPointsByFilter} from "../utils/filter.js";
 import {ChangePropertyType, FilterType, PointMode, SortType} from "../const.js";
-import {POINTS_ACTION_WITH_OFFERS} from "../utils/common.js";
+import {pointsActionWithOffers} from "../utils/common.js";
 
 export const EmptyPoint = {
   description: ``,
@@ -10,7 +10,7 @@ export const EmptyPoint = {
   duration: `00M`,
   endDate: new Date(),
   isFavorite: false,
-  offers: POINTS_ACTION_WITH_OFFERS[`bus`],
+  offers: pointsActionWithOffers[`bus`],
   photos: null,
   price: ``,
   startDate: new Date(),
@@ -46,19 +46,8 @@ export default class PointsModel {
     });
 
     // binds
-    this._applyFilter = this._applyFilter.bind(this);
-    this._applySort = this._applySort.bind(this);
-    this._callHandlers = this._callActualPointsControllersChangeObservers.bind(this);
     this._removePoint = this._removePoint.bind(this);
-    this._resetAllPoints = this._resetAllPoints.bind(this);
-    this._setPossiblePointsForFilters = this._setPossiblePointsForFilters.bind(this);
-    this._updateActualPoints = this._updateActualPoints.bind(this);
     this._updateActualPointsBeforeChangeMode = this._updateActualPointsBeforeChangeMode.bind(this);
-  }
-
-  /** @return {*} Метод, который возвращает все точки маршрута */
-  getAllPoints() {
-    return this._allPointsControllers;
   }
 
   getActualPoints() {
@@ -109,19 +98,16 @@ export default class PointsModel {
   }
 
   _applySort(pointsControllers, activeSortType) {
-    let sortedPointsControllers = [];
     switch (activeSortType) {
       case SortType.TIME:
-        sortedPointsControllers = pointsControllers.sort((a, b) => b.getModel().getActualPoint().durationInMs - a.getModel().getActualPoint().durationInMs);
-        break;
+        return pointsControllers.sort((a, b) => b.getModel().getActualPoint().durationInMs - a.getModel().getActualPoint().durationInMs);
       case SortType.PRICE:
-        sortedPointsControllers = pointsControllers.sort((a, b) => b.getModel().getActualPoint().price - a.getModel().getActualPoint().price);
-        break;
+        return pointsControllers.sort((a, b) => b.getModel().getActualPoint().price - a.getModel().getActualPoint().price);
       case SortType.EVENT:
-        sortedPointsControllers = pointsControllers.sort((a, b) => a.getModel().getActualPoint().startDate - b.getModel().getActualPoint().startDate);
-        break;
+        return pointsControllers.sort((a, b) => a.getModel().getActualPoint().startDate - b.getModel().getActualPoint().startDate);
+      default:
+        throw new Error(`Sort type is invalid`);
     }
-    return sortedPointsControllers;
   }
 
   _removePoint(pointModel) {

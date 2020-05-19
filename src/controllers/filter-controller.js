@@ -10,7 +10,6 @@ export default class FilterController extends AbstractController {
     this._container = container;
 
     this._filterTypeChangeFromViewHandler = this._filterTypeChangeFromViewHandler.bind(this);
-    this._filterTypeChangeFromModelHandler = this._filterTypeChangeFromModelHandler.bind(this);
     this._getActiveFilterType = this._getActiveFilterType.bind(this);
     this._availableFilterChangesHandler = this._availableFilterChangesHandler.bind(this);
 
@@ -29,12 +28,6 @@ export default class FilterController extends AbstractController {
 
   _getActiveFilterType() {
     return this.getModel().getActiveFilterType();
-  }
-
-  _filterTypeChangeFromModelHandler(changePropertyType) {
-    if (changePropertyType === ChangePropertyType.FROM_MODEL) {
-      this._rerender();
-    }
   }
 
   _filterTypeChangeFromViewHandler(filterType) {

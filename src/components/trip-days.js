@@ -17,8 +17,6 @@ export default class TripDays extends AbstractComponent {
     this._tripWithoutDays = new TripWithoutDaysComponent();
     this._dayOfTrip = new DayOfTripComponent();
 
-    this._renderDaysOfTrip = this._renderDaysOfTrip.bind(this);
-    this._getPointsDays = this._getPointsDays.bind(this);
     this._viewChangeObserverHandler = this._viewChangeObserverHandler.bind(this);
   }
 

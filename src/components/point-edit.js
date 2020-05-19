@@ -1,5 +1,5 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {getPointDurationInDHM, POINTS_ACTION_WITH_OFFERS, POINTS_DESTINATION_WITH_DESCRIPTION} from "../utils/common.js";
+import {getPointDurationInDHM, pointsActionWithOffers, POINTS_DESTINATION_WITH_DESCRIPTION} from "../utils/common.js";
 import {ALL_DESTINATION, ALL_POINT_ACTION, POINT_ACTIVITY, POINT_TRANSPORT} from "../const.js";
 import flatpickr from "flatpickr";
 import moment from "moment";
@@ -313,7 +313,7 @@ export default class PointEdit extends AbstractSmartComponent {
         }
 
         const pointTypeWithPreposition = `${ALL_POINT_ACTION[pointType]}`;
-        const pointOffers = POINTS_ACTION_WITH_OFFERS[pointType];
+        const pointOffers = pointsActionWithOffers[pointType];
 
         const newTempPoint = tempPoint;
         newTempPoint.type = pointType;

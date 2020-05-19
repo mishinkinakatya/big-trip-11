@@ -19,7 +19,7 @@ export default class TripInfoController extends AbstractController {
 
   _rerender(tripInfo) {
     this._tripInfoComponent.clearTripInfo();
-    this._tripInfoComponent = new TripInfoComponent(tripInfo.title, tripInfo.dates, tripInfo.coast);
+    this._tripInfoComponent = new TripInfoComponent(tripInfo.title, tripInfo.dates, tripInfo.cost);
     this.render();
   }
 }

@@ -40,6 +40,8 @@ const renderElementToElement = (parent, child, place) => {
     case RenderPosition.BEFOREEND:
       parent.append(child);
       break;
+    default:
+      throw new Error(`RenderPosition is invalid`);
   }
 };
 

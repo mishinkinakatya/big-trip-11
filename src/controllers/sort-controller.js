@@ -11,7 +11,6 @@ export default class SortController extends AbstractController {
     this._getActiveSortType = this._getActiveSortType.bind(this);
     this._sortTypeChangeFromViewHandler = this._sortTypeChangeFromViewHandler.bind(this);
     this._sortTypeChangeFromModelHandler = this._sortTypeChangeFromModelHandler.bind(this);
-    this._rerender = this._rerender.bind(this);
     this.getModel().setActiveSortTypeChangeObserver(this._sortTypeChangeFromModelHandler);
 
     this._sortComponent = new SortComponent(this._getActiveSortType);
