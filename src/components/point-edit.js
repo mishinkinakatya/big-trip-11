@@ -388,7 +388,7 @@ export default class PointEdit extends AbstractSmartComponent {
           pointPrice = tempPoint.price;
         }
         const newTempPoint = tempPoint;
-        newTempPoint.price = pointPrice;
+        newTempPoint.price = Number(pointPrice);
         return newTempPoint;
       });
     });

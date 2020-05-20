@@ -21,6 +21,14 @@ export default class SortController extends AbstractController {
     render(this._container, this._sortComponent, RenderPosition.BEFOREEND);
   }
 
+  hide() {
+    this._sortComponent.hide();
+  }
+
+  show() {
+    this._sortComponent.show();
+  }
+
   _getActiveSortType() {
     return this.getModel().getActiveSortType();
   }

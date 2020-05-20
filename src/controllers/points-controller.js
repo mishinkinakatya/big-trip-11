@@ -1,12 +1,12 @@
 import AbstractController from "./abstract-controller";
-import TripDays from "../components/trip-days";
+import TripDaysComponent from "../components/trip-days";
 
 export default class PointsController extends AbstractController {
   constructor(container, model) {
     super(model);
     this._container = container;
 
-    this._tripDays = new TripDays();
+    this._tripDaysComponent = new TripDaysComponent();
 
     this._rerender = this._rerender.bind(this);
     this.getModel().setActualPointsControllersChangeObserver(this._rerender);
@@ -15,12 +15,20 @@ export default class PointsController extends AbstractController {
   render() {
     const points = this.getModel().getActualPoints();
     const sortType = this.getModel().getActiveSortType();
-    this._tripDays.render(this._container, points, sortType);
+    this._tripDaysComponent.render(this._container, points, sortType);
 
   }
 
+  hide() {
+    this._tripDaysComponent.hide();
+  }
+
+  show() {
+    this._tripDaysComponent.show();
+  }
+
   _rerender() {
-    this._tripDays.clearTripDays();
+    this._tripDaysComponent.clearTripDays();
     this.render();
   }
 }
