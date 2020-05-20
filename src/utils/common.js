@@ -10,9 +10,7 @@ const castDateTimeFormat = (value) => {
   return value < 10 ? `0${value}` : String(value);
 };
 
-const formatTime = (date) => {
-  return moment(date).format(`hh:mm`);
-};
+const formatTime = (date) => moment(date).format(`HH:mm`);
 
 const formatDate = (date) => {
   return moment(date).format(`YYYY-MM-DD`);
@@ -38,7 +36,7 @@ const generateRandomArrayFromAnother = (initialArray, newArrayMinLength, newArra
 
 const getRandomStartDate = () => {
   const targetDate = new Date();
-  const diffDate = getRandomIntegerNumber(0, 10);
+  const diffDate = getRandomIntegerNumber(-10, 10);
 
   const diffHours = getRandomIntegerNumber(0, 23);
   const diffMinutes = getRandomIntegerNumber(0, 59);
@@ -129,7 +127,11 @@ const generatePointsWithOffers = (points) => {
 };
 
 // Когда данные будут приходить с сервера - эта константа переедет в point-edit
-const POINTS_ACTION_WITH_OFFERS = generatePointsWithOffers(ACTIONS_WITH_OFFERS);
+const pointsActionWithOffers = generatePointsWithOffers(ACTIONS_WITH_OFFERS);
 
-export {getPointDurationInDHM, getPointDurationInMs, castDateTimeFormat, formatDate, formatTime, generateRandomArrayFromAnother, generateRandomArrayItem, getRandomEndDate, getRandomIntegerNumber, getRandomStartDate, POINTS_ACTION_WITH_OFFERS, POINTS_DESTINATION_WITH_DESCRIPTION};
+const isFutureDate = (nowDate, startDate) => startDate > nowDate;
+
+const isPastDate = (nowDate, endDate) => endDate < nowDate;
+
+export {getPointDurationInDHM, getPointDurationInMs, castDateTimeFormat, formatDate, formatTime, generateRandomArrayFromAnother, generateRandomArrayItem, getRandomEndDate, getRandomIntegerNumber, getRandomStartDate, isFutureDate, isPastDate, pointsActionWithOffers, POINTS_DESTINATION_WITH_DESCRIPTION};
 

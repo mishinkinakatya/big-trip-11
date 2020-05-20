@@ -29,6 +29,22 @@ const render = (container, component, place) => {
   }
 };
 
+const renderElementToElement = (parent, child, place) => {
+  switch (place) {
+    case RenderPosition.AFTERBEGIN:
+      parent.prepend(child);
+      break;
+    case RenderPosition.AFTEREND:
+      parent.after(child);
+      break;
+    case RenderPosition.BEFOREEND:
+      parent.append(child);
+      break;
+    default:
+      throw new Error(`RenderPosition is invalid`);
+  }
+};
+
 /**
  * Функция для замены одного компонента на другой
  * @param {*} newComponent Новый компонент
@@ -46,6 +62,25 @@ const replace = (newComponent, oldComponent) => {
   }
 };
 
+const replaceElement = (newElement, oldElement) => {
+  const parentElement = oldElement.parentElement;
+
+  const isExistElements = !!(parentElement && newElement && oldElement);
+
+  if (isExistElements && parentElement.contains(oldElement)) {
+    parentElement.replaceChild(newElement, oldElement);
+  }
+};
+
+/**
+ * Функция для удаления одного компонента
+ * @param {*} component Компонент
+ */
+const remove = (component) => {
+  component.getElement().remove();
+  component.removeElement();
+};
+
 /** Позиция относительно элемента, в который мы отрисовываем данные */
 export const RenderPosition = {
   AFTERBEGIN: `afterbegin`,
@@ -53,4 +88,4 @@ export const RenderPosition = {
   BEFOREEND: `beforeend`,
 };
 
-export {createElement, render, replace};
+export {createElement, render, renderElementToElement, replace, replaceElement, remove};
