@@ -1,5 +1,5 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {getPointDurationInDHM, pointsActionWithOffers, POINTS_DESTINATION_WITH_DESCRIPTION} from "../utils/common.js";
+import {getPointDurationInDHM, getPointDurationInMs, pointsActionWithOffers, POINTS_DESTINATION_WITH_DESCRIPTION} from "../utils/common.js";
 import {ALL_DESTINATION, ALL_POINT_ACTION, POINT_ACTIVITY, POINT_TRANSPORT} from "../const.js";
 import flatpickr from "flatpickr";
 import moment from "moment";
@@ -238,7 +238,6 @@ export default class PointEdit extends AbstractSmartComponent {
 
   rerender() {
     super.rerender();
-
     this._applyFlatpickr();
   }
 
@@ -274,7 +273,6 @@ export default class PointEdit extends AbstractSmartComponent {
       allowInput: true,
       defaultDate: this._tempPoint.startDate || `today`,
       enableTime: true,
-      // time_24hr: true,
     });
 
     this._flatpickrEnd = flatpickr(dateEndElements, {
@@ -284,7 +282,6 @@ export default class PointEdit extends AbstractSmartComponent {
       defaultDate: this._tempPoint.endDate || `today`,
       enableTime: true,
       minDate: this._tempPoint.startDate,
-      // time_24hr: true,
     });
   }
 
@@ -373,6 +370,7 @@ export default class PointEdit extends AbstractSmartComponent {
         const newTempPoint = tempPoint;
         newTempPoint.endDate = pointEndDate;
         newTempPoint.duration = getPointDurationInDHM(newTempPoint.startDate, newTempPoint.endDate);
+        newTempPoint.durationInMs = getPointDurationInMs(newTempPoint.startDate, newTempPoint.endDate);
         return newTempPoint;
       });
     });

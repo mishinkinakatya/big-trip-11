@@ -1,22 +1,18 @@
 import AbstractComponent from "./abstract-component";
-import {getPointDurationInDHM} from "../utils/common.js";
-import {remove} from "../utils/render.js";
+import {ActionIcon} from "../const";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import {getPointDurationInDHM} from "../utils/common.js";
+import {remove} from "../utils/render.js";
 
 const BAR_HEIGHT = 55;
 const MIN_BLOCK_HEIGHT = 4;
 
 const createLabels = (types) => {
+  const actualTypes = Object.keys(types);
   return {
-    type: Object.keys(types).map((type) => type.toUpperCase()),
-    // type: Object.keys(types).map((type) => {
-    //   const image = new Image();
-    //   image.src = `img/icons/${type}.png`;
-    //   const resultView = image + `` + type.toUpperCase();
-    //   return resultView;
-    // }),
-    height: types.length >= 3 ? BAR_HEIGHT * types.length : BAR_HEIGHT * MIN_BLOCK_HEIGHT,
+    type: actualTypes.map((type) => ActionIcon[type]),
+    height: actualTypes.length >= 3 ? BAR_HEIGHT * actualTypes.length : BAR_HEIGHT * MIN_BLOCK_HEIGHT,
   };
 };
 
@@ -30,7 +26,7 @@ const createMoneyChart = (moneyStats) => {
     data: {
       labels: createLabels(moneyStats).type,
       datasets: [{
-        data: Object.values(moneyStats).sort((a, b) => b - a),
+        data: Object.values(moneyStats),
         backgroundColor: `#ffffff`,
         hoverBackgroundColor: `#ffffff`,
         anchor: `start`,
@@ -102,7 +98,7 @@ const createTransportChart = (transportStats) => {
     data: {
       labels: createLabels(transportStats).type,
       datasets: [{
-        data: Object.values(transportStats).sort((a, b) => b - a),
+        data: Object.values(transportStats),
         backgroundColor: `#ffffff`,
         hoverBackgroundColor: `#ffffff`,
         anchor: `start`,
@@ -174,7 +170,7 @@ const createTimeSpendChart = (timeSpendStats) => {
     data: {
       labels: createLabels(timeSpendStats).type,
       datasets: [{
-        data: Object.values(timeSpendStats).sort((a, b) => b - a),
+        data: Object.values(timeSpendStats),
         backgroundColor: `#ffffff`,
         hoverBackgroundColor: `#ffffff`,
         anchor: `start`,
@@ -237,7 +233,8 @@ const createTimeSpendChart = (timeSpendStats) => {
 };
 
 const createStatsTemplate = () =>
-  `<div>
+  `<section class="statistics">
+    <h2 class="visually-hidden">Trip statistics</h2>
     <div class="statistics__item statistics__item--money">
       <canvas class="statistics__chart  statistics__chart--money" width="900"></canvas>
     </div>
@@ -249,7 +246,7 @@ const createStatsTemplate = () =>
     <div class="statistics__item statistics__item--time-spend">
       <canvas class="statistics__chart  statistics__chart--time" width="900"></canvas>
     </div>
-  </div>`;
+  </section>`;
 
 export default class Stats extends AbstractComponent {
   constructor(moneyStats, transportStats, timeSpendStats) {

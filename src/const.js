@@ -37,6 +37,19 @@ const POINT_TRANSPORT = {
 
 const ALL_POINT_ACTION = Object.assign({}, POINT_TRANSPORT, POINT_ACTIVITY);
 
+export const ActionIcon = {
+  'taxi': `🚕 TAXI`,
+  'bus': `🚌 BUS`,
+  'train': `🚂 TRAIN`,
+  'ship': `🚢 SHIP`,
+  'transport': `🚙 TRANSPORT`,
+  'drive': `🚗 DRIVE`,
+  'flight': `✈️ FLIGHT`,
+  'check-in': `🏨 CHECK-IN`,
+  'sightseeing': `🏛️ SIGHTSEEING`,
+  'restaurant': `🍴 RESTAURANT`
+};
+
 // TODO!!! Научиться генерировать массив из имеющихся данных
 const ACTIONS_WITH_OFFERS = [
   {

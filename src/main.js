@@ -15,7 +15,7 @@ import {generatePointsOfTrip} from "./mock/points-of-trip.js";
 import {render, RenderPosition} from "./utils/render.js";
 import {ChangePropertyType, FilterType, PointMode, SortType, MenuItem} from "./const.js";
 
-const POINTS_COUNT = 3;
+const POINTS_COUNT = 23;
 /** Массив всех точек маршрута */
 const allPoints = generatePointsOfTrip(POINTS_COUNT);
 
@@ -27,7 +27,7 @@ const tripMenuElement = tripControlsElement.querySelector(`h2:first-child`);
 /** Элемент, внутри которого будет рендериться Маршрут путешествия */
 const tripPointsElement = document.querySelector(`.trip-events`);
 /** Элемент, внутри которого будет рендериться Статистика */
-const statsContainer = document.querySelector(`.statistics`);
+const statsContainer = document.querySelector(`main .page-body__container`);
 
 // Фильтры
 const filterModel = new FilterModel(FilterType.EVERYTHING);
@@ -56,13 +56,13 @@ const siteMenuComponent = new SiteMenuComponent();
 siteMenuComponent.setMenuItemChangeHandler((menuItem) => {
   switch (menuItem) {
     case MenuItem.TABLE:
-      statsController.hide();
+      statsController.remove();
       pointsController.show();
       addButton.disabled = false;
       break;
     case MenuItem.STATS:
       pointsController.hide();
-      statsController.show();
+      statsController.activate();
       addButton.disabled = true;
       break;
   }
@@ -75,7 +75,6 @@ filterController.render();
 if (pointsControllers.length === 0) {
   render(tripPointsElement, new NoPointsComponent(), RenderPosition.BEFOREEND);
 } else {
-  statsController.render();
   sortController.render();
   pointsController.render();
   pointsModel.setPoints(pointsControllers);

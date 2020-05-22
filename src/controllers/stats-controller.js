@@ -7,21 +7,19 @@ export default class StatsController extends AbstractController {
     super(container, model);
 
     this._statsComponent = new StatsComponent(``, ``, ``);
-
-    this._rerender = this._rerender.bind(this);
-    this.getModel().setStatsChangeObserver(this._rerender);
   }
 
-  render() {
+  activate() {
+    const actualStats = this.getModel().getActualStats();
+    this._statsComponent = new StatsComponent(actualStats.moneyStats, actualStats.transportStats, actualStats.timeSpendStats);
+
     render(this._container, this._statsComponent, RenderPosition.BEFOREEND);
     this._statsComponent.getMoneyChart();
     this._statsComponent.getTransportChart();
     this._statsComponent.getTimeSpendChart();
   }
 
-  _rerender(moneyStats, transportStats, timeSpendStats) {
+  remove() {
     this._statsComponent.clearStats();
-    this._statsComponent = new StatsComponent(moneyStats, transportStats, timeSpendStats);
-    this.render();
   }
 }
