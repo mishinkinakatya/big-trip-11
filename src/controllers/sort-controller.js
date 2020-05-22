@@ -5,8 +5,7 @@ import {render, RenderPosition} from "../utils/render.js";
 
 export default class SortController extends AbstractController {
   constructor(container, model) {
-    super(model);
-    this._container = container;
+    super(container, model);
 
     this._getActiveSortType = this._getActiveSortType.bind(this);
     this._sortTypeChangeFromViewHandler = this._sortTypeChangeFromViewHandler.bind(this);
@@ -19,14 +18,6 @@ export default class SortController extends AbstractController {
   render() {
     this._sortComponent.setSortTypeChangeHandler(this._sortTypeChangeFromViewHandler);
     render(this._container, this._sortComponent, RenderPosition.BEFOREEND);
-  }
-
-  hide() {
-    this._sortComponent.hide();
-  }
-
-  show() {
-    this._sortComponent.show();
   }
 
   _getActiveSortType() {

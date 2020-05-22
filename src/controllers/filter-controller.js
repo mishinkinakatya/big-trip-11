@@ -6,8 +6,7 @@ import {render, RenderPosition} from "../utils/render.js";
 
 export default class FilterController extends AbstractController {
   constructor(container, model) {
-    super(model);
-    this._container = container;
+    super(container, model);
 
     this._filterTypeChangeFromViewHandler = this._filterTypeChangeFromViewHandler.bind(this);
     this._getActiveFilterType = this._getActiveFilterType.bind(this);

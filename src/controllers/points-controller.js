@@ -3,8 +3,7 @@ import TripDaysComponent from "../components/trip-days";
 
 export default class PointsController extends AbstractController {
   constructor(container, model) {
-    super(model);
-    this._container = container;
+    super(container, model);
 
     this._tripDaysComponent = new TripDaysComponent();
 
@@ -17,14 +16,6 @@ export default class PointsController extends AbstractController {
     const sortType = this.getModel().getActiveSortType();
     this._tripDaysComponent.render(this._container, points, sortType);
 
-  }
-
-  hide() {
-    this._tripDaysComponent.hide();
-  }
-
-  show() {
-    this._tripDaysComponent.show();
   }
 
   _rerender() {

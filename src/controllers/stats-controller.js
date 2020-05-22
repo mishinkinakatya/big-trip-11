@@ -4,8 +4,7 @@ import {render, RenderPosition} from "../utils/render.js";
 
 export default class StatsController extends AbstractController {
   constructor(container, model) {
-    super(model);
-    this._container = container;
+    super(container, model);
 
     this._statsComponent = new StatsComponent(``, ``, ``);
 
@@ -15,14 +14,9 @@ export default class StatsController extends AbstractController {
 
   render() {
     render(this._container, this._statsComponent, RenderPosition.BEFOREEND);
-  }
-
-  hide() {
-    this._statsComponent.hide();
-  }
-
-  show() {
-    this._statsComponent.show();
+    this._statsComponent.getMoneyChart();
+    this._statsComponent.getTransportChart();
+    this._statsComponent.getTimeSpendChart();
   }
 
   _rerender(moneyStats, transportStats, timeSpendStats) {

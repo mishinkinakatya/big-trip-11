@@ -1,5 +1,4 @@
 import {ALL_POINT_ACTION, POINT_TRANSPORT} from "../const.js";
-import {getPointDurationInDHM} from "../utils/common.js";
 
 
 export default class StatsModel {
@@ -27,15 +26,11 @@ export default class StatsModel {
   }
 
   _changeStats() {
-console.log(this._pointsSortedOnDays);
     this._pointsSortedOnDays = this._getPointsSortedOnDays();
 
     this._moneyStats = this._getMoneyStats();
     this._transportStats = this._getTransportStats();
     this._timeSpendStats = this._getTimeSpendStats();
-console.log(this._moneyStats);
-console.log(this._transportStats);
-console.log(this._timeSpendStats);
     this._callStatsChangeObservers();
   }
 
@@ -44,12 +39,20 @@ console.log(this._timeSpendStats);
       return 0;
     }
 
-    return Object.keys(ALL_POINT_ACTION).map((action) => {
+    const actionsCost = {};
+    Object.keys(ALL_POINT_ACTION).forEach((action) => {
       const allPricesForCurrentAction = this._pointsSortedOnDays.filter((point) => point.type === action).map((point) => point.price);
-      return {
-        [action]: allPricesForCurrentAction.length > 0 ? allPricesForCurrentAction.reduce((acc, pointPrice) => acc + pointPrice) : 0,
-      };
+
+      const costOfCurrentAction = allPricesForCurrentAction.length > 0 ? allPricesForCurrentAction.reduce((acc, pointPrice) => acc + pointPrice) : 0;
+
+      return costOfCurrentAction !== 0
+        ? Object.assign(actionsCost, {
+          [action]: costOfCurrentAction,
+        })
+        : Object.assign(actionsCost);
     });
+
+    return actionsCost;
   }
 
   _getTransportStats() {
@@ -57,24 +60,39 @@ console.log(this._timeSpendStats);
       return 0;
     }
 
-    return Object.keys(POINT_TRANSPORT).map((transport) => {
-      return {
-        [transport]: this._pointsSortedOnDays.filter((point) => point.type === transport).length,
-      };
+    const transportsCount = {};
+    Object.keys(POINT_TRANSPORT).forEach((transport) => {
+      const countOfCurrentTransport = this._pointsSortedOnDays.filter((point) => point.type === transport).length;
+
+      return countOfCurrentTransport !== 0
+        ? Object.assign(transportsCount, {
+          [transport]: countOfCurrentTransport,
+        })
+        : Object.assign(transportsCount);
     });
+
+    return transportsCount;
   }
 
   _getTimeSpendStats() {
     if (this._pointsSortedOnDays.length === 0) {
-      return `00M`;
+      return 0;
     }
 
-    return Object.keys(ALL_POINT_ACTION).map((action) => {
+    const actionsTimeSpend = {};
+    Object.keys(ALL_POINT_ACTION).forEach((action) => {
       const allDurationsForCurrentAction = this._pointsSortedOnDays.filter((point) => point.type === action).map((point) => point.durationInMs);
-      return {
-        [action]: allDurationsForCurrentAction.length > 0 ? getPointDurationInDHM(allDurationsForCurrentAction.reduce((acc, pointDuration) => acc + pointDuration)) : `00M`,
-      };
+
+      const timeSpendOfCurrentAction = allDurationsForCurrentAction.length > 0 ? allDurationsForCurrentAction.reduce((acc, pointDuration) => acc + pointDuration) : 0;
+
+      return timeSpendOfCurrentAction !== 0
+        ? Object.assign(actionsTimeSpend, {
+          [action]: timeSpendOfCurrentAction,
+        })
+        : Object.assign(actionsTimeSpend);
     });
+
+    return actionsTimeSpend;
   }
 
   _callStatsChangeObservers() {

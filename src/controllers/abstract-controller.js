@@ -1,5 +1,8 @@
+const HIDDEN_CLASS = `trip-events--hidden`;
+
 export default class AbstractController {
-  constructor(model) {
+  constructor(container, model) {
+    this._container = container;
     this._model = model;
     this._view = null;
     this._oldView = null;
@@ -41,6 +44,18 @@ export default class AbstractController {
 
   setViewChangeObserver(handler) {
     this._viewChangeObserves.push(handler);
+  }
+
+  hide() {
+    if (this._container) {
+      this._container.classList.add(HIDDEN_CLASS);
+    }
+  }
+
+  show() {
+    if (this._container) {
+      this._container.classList.remove(HIDDEN_CLASS);
+    }
   }
 
   _callViewChangeObservers() {
