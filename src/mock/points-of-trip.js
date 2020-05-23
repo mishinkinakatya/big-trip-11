@@ -17,7 +17,7 @@ const generatePointOfTrip = () => {
     id: String(new Date() + Math.random()),
     description,
     destination,
-    duration: getPointDurationInDHM(startDate, endDate),
+    duration: getPointDurationInDHM(durationInMs),
     durationInMs,
     endDate,
     isFavorite: Math.random() > 0.5,

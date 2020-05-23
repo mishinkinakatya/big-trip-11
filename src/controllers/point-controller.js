@@ -5,7 +5,7 @@ import {ChangePropertyType, PointMode} from "../const.js";
 
 export default class PointController extends AbstractController {
   constructor(model) {
-    super(model);
+    super(null, model);
 
     this._updateTempPoint = this._updateTempPoint.bind(this);
     this._getActualPointData = this._getActualPointData.bind(this);

@@ -171,5 +171,10 @@ export const ChangePropertyType = {
   FROM_MODEL: `from-model`,
 };
 
+export const MenuItem = {
+  TABLE: `table`,
+  STATS: `stats`,
+};
+
 export {ALL_DESCRIPTION, ALL_DESTINATION, ALL_POINT_ACTION, ACTIONS_WITH_OFFERS, MONTH, POINT_ACTIVITY, POINT_TRANSPORT, FilterType};
 

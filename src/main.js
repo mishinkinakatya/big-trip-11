@@ -7,24 +7,27 @@ import PointsModel from "./models/points-model.js";
 import SiteMenuComponent from "./components/site-menu.js";
 import SortController from "./controllers/sort-controller.js";
 import SortModel from "./models/sort-model.js";
+import StatsController from "./controllers/stats-controller.js";
+import StatsModel from "./models/stats-model.js";
 import TripInfoController from "./controllers/trip-info-controller.js";
 import TripInfoModel from "./models/trip-info-model.js";
 import {generatePointsOfTrip} from "./mock/points-of-trip.js";
 import {render, RenderPosition} from "./utils/render.js";
-import {ChangePropertyType, FilterType, PointMode, SortType} from "./const.js";
+import {ChangePropertyType, FilterType, PointMode, SortType, MenuItem} from "./const.js";
 
-const POINTS_COUNT = 23;
+const POINTS_COUNT = 3;
+/** Массив всех точек маршрута */
+const allPoints = generatePointsOfTrip(POINTS_COUNT);
+
 /** Элемент, внутри которого будет рендериться вся страница */
 const tripMainElement = document.querySelector(`.trip-main`);
-
 /** Элемент, внутри которого будут рендериться компонеты "Меню" и "Фильтрация" */
 const tripControlsElement = tripMainElement.querySelector(`.trip-controls`);
 const tripMenuElement = tripControlsElement.querySelector(`h2:first-child`);
-
-/** Массив всех точек маршрута */
-const allPoints = generatePointsOfTrip(POINTS_COUNT);
 /** Элемент, внутри которого будет рендериться Маршрут путешествия */
 const tripPointsElement = document.querySelector(`.trip-events`);
+/** Элемент, внутри которого будет рендериться Статистика */
+const statsContainer = document.querySelector(`.statistics`);
 
 // Фильтры
 const filterModel = new FilterModel(FilterType.EVERYTHING);
@@ -37,21 +40,42 @@ const sortController = new SortController(tripPointsElement, sortModel);
 const pointsModel = new PointsModel(sortModel, filterModel);
 const pointsControllers = allPoints.map((it) => new PointController(it));
 
-
 filterModel.setPointsModel(pointsModel);
 const pointsController = new PointsController(tripPointsElement, pointsModel);
 
+// Информация о путешествии
 const tripInfoModel = new TripInfoModel(pointsModel);
 const tripInfoController = new TripInfoController(tripMainElement, tripInfoModel);
 
+// Статистика
+const statsModel = new StatsModel(pointsModel);
+const statsController = new StatsController(statsContainer, statsModel);
+
+const siteMenuComponent = new SiteMenuComponent();
+
+siteMenuComponent.setMenuItemChangeHandler((menuItem) => {
+  switch (menuItem) {
+    case MenuItem.TABLE:
+      statsController.hide();
+      pointsController.show();
+      addButton.disabled = false;
+      break;
+    case MenuItem.STATS:
+      pointsController.hide();
+      statsController.show();
+      addButton.disabled = true;
+      break;
+  }
+});
 
 // render
 tripInfoController.render();
-render(tripMenuElement, new SiteMenuComponent(), RenderPosition.AFTEREND);
+render(tripMenuElement, siteMenuComponent, RenderPosition.AFTEREND);
 filterController.render();
 if (pointsControllers.length === 0) {
   render(tripPointsElement, new NoPointsComponent(), RenderPosition.BEFOREEND);
 } else {
+  statsController.render();
   sortController.render();
   pointsController.render();
   pointsModel.setPoints(pointsControllers);

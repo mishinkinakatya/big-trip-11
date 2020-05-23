@@ -4,8 +4,7 @@ import {render, RenderPosition} from "../utils/render.js";
 
 export default class TripInfoController extends AbstractController {
   constructor(container, model) {
-    super(model);
-    this._container = container;
+    super(container, model);
 
     this._tripInfoComponent = new TripInfoComponent(``, ``, ``);
 

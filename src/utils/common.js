@@ -70,12 +70,11 @@ const getPointDurationInMs = (start, end) => {
   return calculatePointDuration(start, end).asMilliseconds();
 };
 
-const getPointDurationInDHM = (start, end) => {
-  const duration = calculatePointDuration(start, end);
+const getPointDurationInDHM = (pointDuration) => {
 
-  const dayCount = castDateTimeFormat(duration.days());
-  const hourCount = castDateTimeFormat(duration.hours());
-  const minutesCount = castDateTimeFormat(duration.minutes());
+  const dayCount = castDateTimeFormat(moment.duration(pointDuration, `milliseconds`).days());
+  const hourCount = castDateTimeFormat(moment.duration(pointDuration, `milliseconds`).hours());
+  const minutesCount = castDateTimeFormat(moment.duration(pointDuration, `milliseconds`).minutes());
 
   if (dayCount > 0) {
     return `${dayCount}D ${hourCount}H ${minutesCount}M`;
