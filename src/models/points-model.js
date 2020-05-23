@@ -2,20 +2,22 @@ import PointController from "../controllers/point-controller.js";
 import PointModel from "./point-model.js";
 import {getPointsByFilter} from "../utils/filter.js";
 import {ChangePropertyType, FilterType, PointMode, SortType} from "../const.js";
-import {pointsActionWithOffers} from "../utils/common.js";
+import {getStorage} from "../storage-provider.js";
 
-export const EmptyPoint = {
-  description: ``,
-  destination: ``,
-  duration: `00M`,
-  endDate: new Date(),
-  isFavorite: false,
-  offers: pointsActionWithOffers[`bus`],
-  photos: null,
-  price: ``,
-  startDate: new Date(),
-  type: `bus`,
-  typeWithPreposition: `Bus to`,
+const getEmptyPoint = (offers) => {
+  return {
+    description: ``,
+    destination: ``,
+    duration: `00M`,
+    endDate: new Date(),
+    isFavorite: false,
+    offers,
+    photos: null,
+    price: ``,
+    startDate: new Date(),
+    type: `bus`,
+    typeWithPreposition: `Bus to`,
+  };
 };
 
 export default class PointsModel {
@@ -72,7 +74,8 @@ export default class PointsModel {
   }
 
   createPoint() {
-    const emptyPoint = Object.assign({}, EmptyPoint);
+    const offers = getStorage().getAllOffers().find((item) => item.type === `bus`) ? getStorage().getAllOffers().find((item) => item.type === `bus`).offers : ``;
+    const emptyPoint = Object.assign({}, getEmptyPoint(offers));
     const pointModel = new PointModel(null, emptyPoint, PointMode.ADDING);
     pointModel.setModeChangeObserver(this._updateActualPointsBeforeChangeMode);
     pointModel.setRemovePointObserver(this._removePoint);

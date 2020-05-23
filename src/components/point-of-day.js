@@ -39,7 +39,7 @@ const createPointOfDayTemplate = (pointOfDay) => {
   /** Массив, содержащий опции, которые будут отображаться в компонента "Точка маршрута в режиме Default" */
   const showingOffersOfDay = checkedOffers ? checkedOffers.slice(0, OFFERS_MAX_COUNT) : null;
   /** Разметка для блока с дополнительными опциями */
-  const offersMarkup = showingOffersOfDay ? showingOffersOfDay.map((it) => createOfferMarkup(it.type, it.price)).join(`\n`) : null;
+  const offersMarkup = showingOffersOfDay ? showingOffersOfDay.map((it) => createOfferMarkup(it.title, it.price)).join(`\n`) : ``;
 
   return (
     `<li class="trip-events__item">

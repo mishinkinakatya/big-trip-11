@@ -65,7 +65,7 @@ export default class TripInfoModel {
       return 0;
     }
     const allPointsPrices = this._pointsSortedOnDays.map((point) => {
-      const checkedOffers = point.offers.filter((offer) => offer.isChecked).map((offer) => Number(offer.price));
+      const checkedOffers = point.offers ? point.offers.filter((offer) => offer.isChecked).map((offer) => Number(offer.price)) : ``;
       let offersPrice = 0;
       if (checkedOffers.length > 0) {
         offersPrice = checkedOffers.reduce((acc, price) => Number(price));
