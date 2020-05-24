@@ -11,13 +11,13 @@ export default class AbstractSmartComponent extends AbstractComponent {
   }
 
   /** Метод, который заменяет старый элемент на новый и навешивает на него обработчики */
-  rerender() {
-    const oldElement = this.getElement();
+  rerender(...theArgs) {
+    const oldElement = this.getElement(...theArgs);
     const parent = oldElement.parentElement;
 
     this.removeElement();
 
-    const newElement = this.getElement();
+    const newElement = this.getElement(...theArgs);
 
     parent.replaceChild(newElement, oldElement);
 

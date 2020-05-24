@@ -3,8 +3,7 @@ import PointEditComponent from "../components/point-edit.js";
 import PointOfDayComponent from "../components/point-of-day.js";
 import {ChangePropertyType, PointMode} from "../const.js";
 import {getApi} from "../api-provider.js";
-import {convertToServerModel} from "../utils/model-adapter.js";
-
+import {convertToClientModel, convertToServerModel} from "../utils/model-adapter.js";
 const SHAKE_ANIMATION_TIMEOUT = 600;
 
 export default class PointController extends AbstractController {
@@ -49,7 +48,13 @@ export default class PointController extends AbstractController {
   }
 
   _createPointEditComponent() {
-    const pointEditComponent = new PointEditComponent(this._getActualPointData, this._updateTempPoint, this._getTempPointData);
+    const pointEditComponent = new PointEditComponent(this.getModel().getMode(), this._getActualPointData, this._updateTempPoint, this._getTempPointData);
+
+    const handleTheError = () => {
+      pointEditComponent.rerender(false);
+      this._shake(pointEditComponent);
+    };
+
     pointEditComponent.setElementChangeObserver((_, newElement) => {
       this.setView(newElement);
     });
@@ -61,18 +66,20 @@ export default class PointController extends AbstractController {
         this.getModel().applyChanges();
         this.getModel().setMode(PointMode.DEFAULT, ChangePropertyType.FROM_VIEW);
         this.initView();
+        pointEditComponent.removeElement();
         document.removeEventListener(`keydown`, this._escKeyDownHandler);
       };
 
+      pointEditComponent.rerender(true);
+
       if (this.getModel().getMode() === PointMode.ADDING) {
         this._api.createPoint(convertToServerModel(tempPoint))
-          .then(() => {
+          .then((pointData) => {
+            this.getModel().updateTempPoint(convertToClientModel(pointData));
             changeModel();
           })
           .catch(() => {
-            this._shake(pointEditComponent);
-            pointEditComponent.getElement().disabled = false;
-            document.removeEventListener(`keydown`, this._escKeyDownHandler);
+            handleTheError();
           });
       } else if (this.getModel().getMode() === PointMode.EDIT) {
         this._api.updatePoint(convertToServerModel(tempPoint), tempPoint.id)
@@ -80,20 +87,25 @@ export default class PointController extends AbstractController {
             changeModel();
           })
           .catch(() => {
-            this._shake(pointEditComponent);
-            pointEditComponent.getElement().disabled = false;
-            document.removeEventListener(`keydown`, this._escKeyDownHandler);
+            handleTheError();
           });
       }
     });
     pointEditComponent.setResetButtonClickHandler(() => {
-      const model = this.getModel();
-      if (model.isInit()) {
-        model.resetChanges();
-        model.setMode(PointMode.DEFAULT, ChangePropertyType.FROM_VIEW);
-        this.initView();
-      } else {
-        model.removePoint();
+
+      pointEditComponent.rerender(true);
+
+      if (this.getModel().getMode() === PointMode.ADDING) {
+        this.getModel().removePoint();
+      } else if (this.getModel().getMode() === PointMode.EDIT) {
+        this._api.deletePoint(this.getModel().getTempPoint().id)
+          .then(() => {
+            this.getModel().removePoint();
+            pointEditComponent.removeElement();
+          })
+          .catch(() => {
+            handleTheError();
+          });
       }
     });
 

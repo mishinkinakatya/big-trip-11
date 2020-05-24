@@ -1,10 +1,18 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import {getPointDurationInDHM, getPointDurationInMs} from "../utils/common.js";
-import {ALL_POINT_ACTION, POINT_ACTIVITY, POINT_TRANSPORT} from "../const.js";
+import {ALL_POINT_ACTION, POINT_ACTIVITY, POINT_TRANSPORT, PointMode} from "../const.js";
 import flatpickr from "flatpickr";
 import moment from "moment";
 import "flatpickr/dist/flatpickr.min.css";
 import {getStorage} from "../storage-provider.js";
+
+const ButtonNames = {
+  SAVE_DEFAULT: `Save`,
+  DELETE_DEFAULT: `Delete`,
+  SAVE_SENDING: `Saving...`,
+  DELETE_SENDING: `Deleting...`,
+  CANCEL: `Cancel`,
+};
 
 const OFFER_NAME_PREFIX = `event-offer-`;
 
@@ -30,11 +38,11 @@ const createDestinationMarkup = () => {
   }).join(`\n`) : ``;
 };
 
-const createOfferMarkup = (offers) => {
+const createOfferMarkup = (offers, isDisabled) => {
   return offers ? offers.map((it) => {
     return (
       `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${it.title}-1" type="checkbox" name="event-offer-${it.title}" ${it.isChecked ? `checked` : ``}>
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${it.title}-1" type="checkbox" name="event-offer-${it.title}" ${it.isChecked ? `checked` : ``}  ${isDisabled}>
         <label class="event__offer-label" for="event-offer-${it.title}-1">
           <span class="event__offer-title">${it.title}</span>
           &plus;
@@ -57,17 +65,21 @@ const createPhotosMarkup = (photos) => {
   }).join(`\n`) : ``;
 };
 
-/**
- * @return {*} Функция, которая возвращает разметку компонента "Точка маршрута в режиме Edit"
- * @param {*} pointOfTrip Объект, содержащий свойства компонента "Точка маршрута в режиме Edit"
- */
-const createEventEditTemplate = (pointOfTrip) => {
+const createEventEditTemplate = (pointOfTrip, mode, isSending) => {
   const {photos, isFavorite, price, type, typeWithPreposition, destination, description, offers, startDate, endDate} = pointOfTrip;
+
+  const submitButton = !isSending ? ButtonNames.SAVE_DEFAULT : ButtonNames.SAVE_SENDING;
+  let resetButton = ButtonNames.CANCEL;
+  if (mode === PointMode.EDIT) {
+    resetButton = !isSending ? ButtonNames.DELETE_DEFAULT : ButtonNames.DELETE_SENDING;
+  }
+
+  const isDisabled = isSending ? `disabled` : ``;
 
   const pointTransportsMarkup = Object.keys(POINT_TRANSPORT).map((it) => createPointTypeMarkup(it, type)).join(`\n`);
   const pointActivitiesMarkup = Object.keys(POINT_ACTIVITY).map((it) => createPointTypeMarkup(it, type)).join(`\n`);
   const pointDestinationsMarkup = createDestinationMarkup();
-  const offersMarkup = createOfferMarkup(offers);
+  const offersMarkup = createOfferMarkup(offers, isDisabled);
   const descriptionMarkup = description ? description : ``;
   const photosMarkup = createPhotosMarkup(photos);
 
@@ -86,7 +98,7 @@ const createEventEditTemplate = (pointOfTrip) => {
             <span class="visually-hidden">Choose event type</span>
             <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
           </label>
-          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled}>
 
           <div class="event__type-list">
             <fieldset class="event__type-group">
@@ -105,7 +117,7 @@ const createEventEditTemplate = (pointOfTrip) => {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${typeWithPreposition}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1" ${isDisabled}>
           <datalist id="destination-list-1">
             ${pointDestinationsMarkup}
           </datalist>
@@ -115,12 +127,12 @@ const createEventEditTemplate = (pointOfTrip) => {
           <label class="visually-hidden" for="event-start-time-1">
             From
           </label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${startDate}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${startDate}" ${isDisabled}>
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">
             To
           </label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${endDate}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${endDate}" ${isDisabled}>
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -128,11 +140,11 @@ const createEventEditTemplate = (pointOfTrip) => {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
+          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}" ${isDisabled}>
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">Cancel</button>
+        <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled}>${submitButton}</button>
+        <button class="event__reset-btn" type="reset" ${isDisabled}>${resetButton}</button>
 
         <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
         <label class="event__favorite-btn" for="event-favorite-1">
@@ -182,12 +194,14 @@ const createEventEditTemplate = (pointOfTrip) => {
 export default class PointEdit extends AbstractSmartComponent {
   /**
    * Свойства компонента "Точка маршрута в режиме Edit"
+   * @param {*} mode
    * @param {*} getActualPointData
    * @param {*} updateTempPoint
    * @param {*} getTempPointData
    */
-  constructor(getActualPointData, updateTempPoint, getTempPointData) {
+  constructor(mode, getActualPointData, updateTempPoint, getTempPointData) {
     super();
+    this._mode = mode;
     this._getActualPointData = getActualPointData;
     this._updateTempPoint = updateTempPoint;
     this._getTempPointData = getTempPointData;
@@ -203,9 +217,8 @@ export default class PointEdit extends AbstractSmartComponent {
     this._subscribeOnEvents();
   }
 
-  /** @return {*} Метод, который возвращает разметку компонента "Точка маршрута в режиме Edit" */
-  getTemplate() {
-    return createEventEditTemplate(this._tempPoint);
+  getTemplate(isSending) {
+    return createEventEditTemplate(this._tempPoint, this._mode, isSending);
   }
 
   /** Метод, который перенавешивает слушателей */
@@ -229,8 +242,8 @@ export default class PointEdit extends AbstractSmartComponent {
     this._resetButtonClickHandler = handler;
   }
 
-  rerender() {
-    super.rerender();
+  rerender(isSending) {
+    super.rerender(isSending);
     this._applyFlatpickr();
   }
 

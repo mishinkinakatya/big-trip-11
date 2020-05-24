@@ -53,6 +53,15 @@ export default class API {
       method: Method.POST,
       body: JSON.stringify(pointData),
       headers: new Headers({"Content-Type": `application/json`})
+    })
+      .then((response) => response.json());
+  }
+
+  deletePoint(id) {
+    return this._load({
+      baseUrl: basicUrls.COMMON,
+      addingUrl: `points/${id}`,
+      method: Method.DELETE
     });
   }
 
