@@ -117,7 +117,7 @@ const createEventEditTemplate = (pointOfTrip, mode, isSending) => {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${typeWithPreposition}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1" ${isDisabled}>
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1" ${isDisabled} required>
           <datalist id="destination-list-1">
             ${pointDestinationsMarkup}
           </datalist>
@@ -140,7 +140,7 @@ const createEventEditTemplate = (pointOfTrip, mode, isSending) => {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}" ${isDisabled}>
+          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}" ${isDisabled} required>
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled}>${submitButton}</button>
@@ -210,6 +210,7 @@ export default class PointEdit extends AbstractSmartComponent {
     this._flatpickrEnd = null;
     this._submitHandler = null;
     this._resetButtonClickHandler = null;
+    this._rollupButtonClickHandler = null;
 
     this._tempPoint = getTempPointData();
 
@@ -225,6 +226,7 @@ export default class PointEdit extends AbstractSmartComponent {
   recoveryListeners() {
     this.setSubmitHandler(this._submitHandler);
     this.setResetButtonClickHandler(this._resetButtonClickHandler);
+    this.setRollupButtonClickHandler(this._rollupButtonClickHandler);
     this._subscribeOnEvents();
   }
 
@@ -240,6 +242,11 @@ export default class PointEdit extends AbstractSmartComponent {
   setResetButtonClickHandler(handler) {
     this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, handler);
     this._resetButtonClickHandler = handler;
+  }
+
+  setRollupButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
+    this._rollupButtonClickHandler = handler;
   }
 
   rerender(isSending) {

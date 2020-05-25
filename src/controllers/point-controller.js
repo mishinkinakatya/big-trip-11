@@ -58,9 +58,18 @@ export default class PointController extends AbstractController {
     pointEditComponent.setElementChangeObserver((_, newElement) => {
       this.setView(newElement);
     });
-    pointEditComponent.setSubmitHandler((evt) => {
-      evt.preventDefault();
+    pointEditComponent.setSubmitHandler(() => {
       const tempPoint = this.getModel().getTempPoint();
+
+      if (tempPoint.destination === ``) {
+        pointEditComponent.getElement().querySelector(`.event__input--destination`).setCustomValidity(`Destinaton must be indicated`);
+        return;
+      }
+
+      if (tempPoint.price === ``) {
+        pointEditComponent.getElement().querySelector(`.event__input--price`).setCustomValidity(`Price must be indicated`);
+        return;
+      }
 
       const changeModel = () => {
         this.getModel().applyChanges();
@@ -109,6 +118,10 @@ export default class PointController extends AbstractController {
       }
     });
 
+    pointEditComponent.setRollupButtonClickHandler(() => {
+      this._resetChanges();
+    });
+
     return pointEditComponent;
   }
 
@@ -118,6 +131,18 @@ export default class PointController extends AbstractController {
 
   _getTempPointData() {
     return this.getModel().getTempPoint();
+  }
+
+  _resetChanges() {
+    const model = this.getModel();
+    if (model.isInit()) {
+      model.resetChanges();
+      model.setMode(PointMode.DEFAULT, ChangePropertyType.FROM_VIEW);
+      this.initView();
+    } else {
+      model.removePoint();
+    }
+    document.removeEventListener(`keydown`, this._escKeyDownHandler);
   }
 
   _shake(component) {
@@ -136,15 +161,7 @@ export default class PointController extends AbstractController {
     const isEscKey = evt.key === `Esc` || evt.key === `Escape`;
 
     if (isEscKey) {
-      const model = this.getModel();
-      if (model.isInit()) {
-        model.resetChanges();
-        model.setMode(PointMode.DEFAULT, ChangePropertyType.FROM_VIEW);
-        this.initView();
-      } else {
-        model.removePoint();
-      }
-      document.removeEventListener(`keydown`, this._escKeyDownHandler);
+      this._resetChanges();
     }
   }
 }
