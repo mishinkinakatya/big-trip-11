@@ -1,9 +1,10 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {getPointDurationInDHM, pointsActionWithOffers, POINTS_DESTINATION_WITH_DESCRIPTION} from "../utils/common.js";
-import {ALL_DESTINATION, ALL_POINT_ACTION, POINT_ACTIVITY, POINT_TRANSPORT} from "../const.js";
+import {getPointDurationInDHM, getPointDurationInMs} from "../utils/common.js";
+import {ALL_POINT_ACTION, POINT_ACTIVITY, POINT_TRANSPORT} from "../const.js";
 import flatpickr from "flatpickr";
 import moment from "moment";
 import "flatpickr/dist/flatpickr.min.css";
+import {getStorage} from "../storage-provider.js";
 
 const OFFER_NAME_PREFIX = `event-offer-`;
 
@@ -24,24 +25,18 @@ const createPointTypeMarkup = (type, currentType) =>
 
 /** @return {*} Функция, которая возвращает разметку блока "Пункт назначения для точки маршрута" */
 const createDestinationMarkup = () => {
-  return (
-    ALL_DESTINATION.map((it) => {
-      return (`<option value="${it}"></option>`);
-    }).join(`\n`)
-  );
+  return getStorage().isDestinations() ? getStorage().getAllDestinations().map((destination) => destination.name).map((name) => {
+    return (`<option value="${name}"></option>`);
+  }).join(`\n`) : ``;
 };
 
-/**
-  * @return {*} Функция, которая возвращает разметку блока "Дополнительные опции для точки маршрута"
-  * @param {string} offers Дополнительные опции
-  */
 const createOfferMarkup = (offers) => {
   return offers ? offers.map((it) => {
     return (
       `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${it.type}-1" type="checkbox" name="event-offer-${it.type}" ${it.isChecked ? `checked` : ``}>
-        <label class="event__offer-label" for="event-offer-${it.type}-1">
-          <span class="event__offer-title">${it.type}</span>
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${it.title}-1" type="checkbox" name="event-offer-${it.title}" ${it.isChecked ? `checked` : ``}>
+        <label class="event__offer-label" for="event-offer-${it.title}-1">
+          <span class="event__offer-title">${it.title}</span>
           &plus;
           &euro;&nbsp;<span class="event__offer-price">${it.price}</span>
         </label>
@@ -55,9 +50,9 @@ const createOfferMarkup = (offers) => {
 * @param {string} photos Src фотографии
 */
 const createPhotosMarkup = (photos) => {
-  return photos ? photos.map((it) => {
+  return photos ? photos.map((photo) => {
     return (
-      `<img class="event__photo" src="${it}" alt="Event photo"></img>`
+      `<img class="event__photo" src="${photo.src}" alt="${photo.description}"></img>`
     );
   }).join(`\n`) : ``;
 };
@@ -65,17 +60,15 @@ const createPhotosMarkup = (photos) => {
 /**
  * @return {*} Функция, которая возвращает разметку компонента "Точка маршрута в режиме Edit"
  * @param {*} pointOfTrip Объект, содержащий свойства компонента "Точка маршрута в режиме Edit"
- * @param {*} options Объект, содержащий интерактивные свойства компонента "Точка маршрута в режиме Edit"
  */
 const createEventEditTemplate = (pointOfTrip) => {
   const {photos, isFavorite, price, type, typeWithPreposition, destination, description, offers, startDate, endDate} = pointOfTrip;
 
   const pointTransportsMarkup = Object.keys(POINT_TRANSPORT).map((it) => createPointTypeMarkup(it, type)).join(`\n`);
   const pointActivitiesMarkup = Object.keys(POINT_ACTIVITY).map((it) => createPointTypeMarkup(it, type)).join(`\n`);
-
   const pointDestinationsMarkup = createDestinationMarkup();
   const offersMarkup = createOfferMarkup(offers);
-  const descriptionMarkup = description ? description.join(`\n`) : ``;
+  const descriptionMarkup = description ? description : ``;
   const photosMarkup = createPhotosMarkup(photos);
 
   const isOfferShowing = !!offersMarkup;
@@ -238,7 +231,6 @@ export default class PointEdit extends AbstractSmartComponent {
 
   rerender() {
     super.rerender();
-
     this._applyFlatpickr();
   }
 
@@ -274,7 +266,6 @@ export default class PointEdit extends AbstractSmartComponent {
       allowInput: true,
       defaultDate: this._tempPoint.startDate || `today`,
       enableTime: true,
-      // time_24hr: true,
     });
 
     this._flatpickrEnd = flatpickr(dateEndElements, {
@@ -284,7 +275,6 @@ export default class PointEdit extends AbstractSmartComponent {
       defaultDate: this._tempPoint.endDate || `today`,
       enableTime: true,
       minDate: this._tempPoint.startDate,
-      // time_24hr: true,
     });
   }
 
@@ -313,7 +303,7 @@ export default class PointEdit extends AbstractSmartComponent {
         }
 
         const pointTypeWithPreposition = `${ALL_POINT_ACTION[pointType]}`;
-        const pointOffers = pointsActionWithOffers[pointType];
+        const pointOffers = getStorage().isOffers() ? getStorage().getAllOffers().find((item) => item.type === pointType).offers : ``;
 
         const newTempPoint = tempPoint;
         newTempPoint.type = pointType;
@@ -331,15 +321,17 @@ export default class PointEdit extends AbstractSmartComponent {
         if (tempPoint.destination === pointDestination) {
           return null;
         }
-        if (!ALL_DESTINATION.includes(pointDestination)) {
+        if (!getStorage().getAllDestinations().map((destination) => destination.name).includes(pointDestination)) {
           pointDestination = tempPoint.destination;
         }
 
-        const pointDescription = pointDestination !== `` ? POINTS_DESTINATION_WITH_DESCRIPTION.find((it) => it.destination === pointDestination).description : ``;
+        const pointDescription = pointDestination !== `` ? getStorage().getAllDestinations().find((it) => it.name === pointDestination).description : ``;
+        const pointPhotos = pointDestination !== `` ? getStorage().getAllDestinations().find((it) => it.name === pointDestination).pictures : ``;
 
         const newTempPoint = tempPoint;
         newTempPoint.destination = pointDestination;
         newTempPoint.description = pointDescription;
+        newTempPoint.photos = pointPhotos;
         return newTempPoint;
       });
     });
@@ -373,6 +365,7 @@ export default class PointEdit extends AbstractSmartComponent {
         const newTempPoint = tempPoint;
         newTempPoint.endDate = pointEndDate;
         newTempPoint.duration = getPointDurationInDHM(newTempPoint.startDate, newTempPoint.endDate);
+        newTempPoint.durationInMs = getPointDurationInMs(newTempPoint.startDate, newTempPoint.endDate);
         return newTempPoint;
       });
     });
@@ -402,17 +395,19 @@ export default class PointEdit extends AbstractSmartComponent {
       });
     });
 
-    element.querySelector(`.event__available-offers`).addEventListener(`change`, (evt) => {
-      const pointOffer = getOfferByName(evt.target.name);
-      this._onChangeDataPoint((tempPoint) => {
+    if (element.querySelector(`.event__available-offers`)) {
+      element.querySelector(`.event__available-offers`).addEventListener(`change`, (evt) => {
+        const pointOffer = getOfferByName(evt.target.name);
+        this._onChangeDataPoint((tempPoint) => {
 
-        const newTempPoint = tempPoint;
+          const newTempPoint = tempPoint;
 
-        const currentOfferIsChecked = tempPoint.offers.find((it) => it.type === pointOffer).isChecked;
-        newTempPoint.offers.find((it) => it.type === pointOffer).isChecked = !currentOfferIsChecked;
-        return newTempPoint;
+          const currentOfferIsChecked = tempPoint.offers.find((it) => it.title === pointOffer).isChecked;
+          newTempPoint.offers.find((it) => it.title === pointOffer).isChecked = !currentOfferIsChecked;
+          return newTempPoint;
+        });
       });
-    });
+    }
 
   }
 }

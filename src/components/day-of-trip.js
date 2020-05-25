@@ -1,6 +1,5 @@
 import AbstractComponent from "./abstract-component.js";
 import {MONTH} from "../const.js";
-
 /**
 * @return {*} Функция, которая возвращает разметку блока "Тип точки маршрута"
 * @param {*} item Тип точки маршрута

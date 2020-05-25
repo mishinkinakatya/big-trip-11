@@ -1,37 +1,31 @@
 import {ALL_POINT_ACTION, POINT_TRANSPORT} from "../const.js";
 
-
 export default class StatsModel {
   constructor(pointsModel) {
     this._pointsModel = pointsModel;
     this._pointsSortedOnDays = this._getPointsSortedOnDays();
 
-
-    this._statsChangeObservers = [];
-
     this._moneyStats = this._getMoneyStats();
     this._transportStats = this._getTransportStats();
     this._timeSpendStats = this._getTimeSpendStats();
-
-    this._changeStats = this._changeStats.bind(this);
-    pointsModel.setActualPointsControllersChangeObserver(this._changeStats);
   }
 
-  setStatsChangeObserver(handler) {
-    this._statsChangeObservers.push(handler);
-  }
-
-  _getPointsSortedOnDays() {
-    return this._pointsModel.getPointsControllersSortedOnDays().map((pointController) => pointController.getModel().getActualPoint());
-  }
-
-  _changeStats() {
+  getActualStats() {
     this._pointsSortedOnDays = this._getPointsSortedOnDays();
 
     this._moneyStats = this._getMoneyStats();
     this._transportStats = this._getTransportStats();
     this._timeSpendStats = this._getTimeSpendStats();
-    this._callStatsChangeObservers();
+
+    return {
+      moneyStats: this._moneyStats,
+      transportStats: this._transportStats,
+      timeSpendStats: this._timeSpendStats,
+    };
+  }
+
+  _getPointsSortedOnDays() {
+    return this._pointsModel.getPointsControllersSortedOnDays().map((pointController) => pointController.getModel().getActualPoint());
   }
 
   _getMoneyStats() {
@@ -93,9 +87,5 @@ export default class StatsModel {
     });
 
     return actionsTimeSpend;
-  }
-
-  _callStatsChangeObservers() {
-    this._statsChangeObservers.forEach((handler) => handler(this._moneyStats, this._transportStats, this._timeSpendStats));
   }
 }
