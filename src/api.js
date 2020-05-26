@@ -5,17 +5,20 @@ const Method = {
   DELETE: `DELETE`
 };
 
+const StatusCode = {
+  OK: 200,
+  REDIRECT: 300,
+};
+
 const checkStatus = (response) => {
-  if (response.status >= 200 && response.status < 300) {
+  if (response.status >= StatusCode.OK && response.status < StatusCode.REDIRECT) {
     return response;
   } else {
     throw new Error(`${response.status}: ${response.statusText}`);
   }
 };
 
-const basicUrls = {
-  COMMON: `https://11.ecmascript.pages.academy/big-trip`,
-};
+const COMMON_URL = `https://11.ecmascript.pages.academy/big-trip`;
 
 export default class API {
   constructor(authorization) {
@@ -24,7 +27,7 @@ export default class API {
 
   getPoints() {
     return this._load({
-      baseUrl: basicUrls.COMMON,
+      baseUrl: COMMON_URL,
       addingUrl: `points`
     })
       .then((response) => response.json());
@@ -32,7 +35,7 @@ export default class API {
 
   getDestinations() {
     return this._load({
-      baseUrl: basicUrls.COMMON,
+      baseUrl: COMMON_URL,
       addingUrl: `destinations`
     })
       .then((response) => response.json());
@@ -40,7 +43,7 @@ export default class API {
 
   getOffers() {
     return this._load({
-      baseUrl: basicUrls.COMMON,
+      baseUrl: COMMON_URL,
       addingUrl: `offers`
     })
       .then((response) => response.json());
@@ -48,7 +51,7 @@ export default class API {
 
   createPoint(pointData) {
     return this._load({
-      baseUrl: basicUrls.COMMON,
+      baseUrl: COMMON_URL,
       addingUrl: `points`,
       method: Method.POST,
       body: JSON.stringify(pointData),
@@ -59,7 +62,7 @@ export default class API {
 
   deletePoint(id) {
     return this._load({
-      baseUrl: basicUrls.COMMON,
+      baseUrl: COMMON_URL,
       addingUrl: `points/${id}`,
       method: Method.DELETE
     });
@@ -67,7 +70,7 @@ export default class API {
 
   updatePoint(pointData, id) {
     return this._load({
-      baseUrl: basicUrls.COMMON,
+      baseUrl: COMMON_URL,
       addingUrl: `points/${id}`,
       method: Method.PUT,
       body: JSON.stringify(pointData),
@@ -75,7 +78,6 @@ export default class API {
     });
   }
 
-  // базовый метод на отправку запросов
   _load({baseUrl, addingUrl, method = Method.GET, body = null, headers = new Headers()}) {
     headers.append(`Authorization`, this._authorization);
 

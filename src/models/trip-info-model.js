@@ -5,7 +5,6 @@ export default class TripInfoModel {
     this._pointsModel = pointsModel;
     this._pointsSortedOnDays = this._getPointsSortedOnDays();
 
-
     this._tripInfoChangeObservers = [];
 
     this._tripInfo = {
@@ -24,16 +23,6 @@ export default class TripInfoModel {
 
   _getPointsSortedOnDays() {
     return this._pointsModel.getPointsControllersSortedOnDays().map((pointController) => pointController.getModel().getActualPoint());
-  }
-
-  _changeTripInfo() {
-    this._pointsSortedOnDays = this._getPointsSortedOnDays();
-
-    this._tripInfo.title = this._getTripTitle();
-    this._tripInfo.dates = this._getTripDates();
-    this._tripInfo.cost = this._getTripCost();
-
-    this._callTripInfoChangeObservers();
   }
 
   _getTripTitle() {
@@ -68,13 +57,23 @@ export default class TripInfoModel {
       const checkedOffers = point.offers ? point.offers.filter((offer) => offer.isChecked).map((offer) => Number(offer.price)) : ``;
       let offersPrice = 0;
       if (checkedOffers.length > 0) {
-        offersPrice = checkedOffers.reduce((acc, price) => Number(price));
+        offersPrice = checkedOffers.reduce((acc, price) => Number(acc) + Number(price));
       }
 
       return Number(point.price) + offersPrice;
     });
 
     return allPointsPrices.reduce((acc, pointPrice) => acc + pointPrice);
+  }
+
+  _changeTripInfo() {
+    this._pointsSortedOnDays = this._getPointsSortedOnDays();
+
+    this._tripInfo.title = this._getTripTitle();
+    this._tripInfo.dates = this._getTripDates();
+    this._tripInfo.cost = this._getTripCost();
+
+    this._callTripInfoChangeObservers();
   }
 
   _callTripInfoChangeObservers() {

@@ -5,12 +5,11 @@ export default class AbstractSmartComponent extends AbstractComponent {
     super();
     this._elementChangeObserves = [];
   }
-  /** Метод, который восстанавливает слушателей */
+
   recoveryListeners() {
     throw new Error(`Abstract method not implemented: recoveryListeners`);
   }
 
-  /** Метод, который заменяет старый элемент на новый и навешивает на него обработчики */
   rerender(...theArgs) {
     const oldElement = this.getElement(...theArgs);
     const parent = oldElement.parentElement;

@@ -29,24 +29,7 @@ export default class StatsModel {
   }
 
   _getMoneyStats() {
-    if (this._pointsSortedOnDays.length === 0) {
-      return 0;
-    }
-
-    const actionsCost = {};
-    Object.keys(ALL_POINT_ACTION).forEach((action) => {
-      const allPricesForCurrentAction = this._pointsSortedOnDays.filter((point) => point.type === action).map((point) => point.price);
-
-      const costOfCurrentAction = allPricesForCurrentAction.length > 0 ? allPricesForCurrentAction.reduce((acc, pointPrice) => acc + pointPrice) : 0;
-
-      return costOfCurrentAction !== 0
-        ? Object.assign(actionsCost, {
-          [action]: costOfCurrentAction,
-        })
-        : Object.assign(actionsCost);
-    });
-
-    return actionsCost;
+    return this._calculateValue(`price`);
   }
 
   _getTransportStats() {
@@ -69,23 +52,27 @@ export default class StatsModel {
   }
 
   _getTimeSpendStats() {
+    return this._calculateValue(`durationInMs`);
+  }
+
+  _calculateValue(property) {
     if (this._pointsSortedOnDays.length === 0) {
       return 0;
     }
 
-    const actionsTimeSpend = {};
+    const propertyValues = {};
     Object.keys(ALL_POINT_ACTION).forEach((action) => {
-      const allDurationsForCurrentAction = this._pointsSortedOnDays.filter((point) => point.type === action).map((point) => point.durationInMs);
+      const allValuesForCurrentAction = this._pointsSortedOnDays.filter((point) => point.type === action).map((point) => point[property]);
 
-      const timeSpendOfCurrentAction = allDurationsForCurrentAction.length > 0 ? allDurationsForCurrentAction.reduce((acc, pointDuration) => acc + pointDuration) : 0;
+      const valueOfCurrentAction = allValuesForCurrentAction.length > 0 ? allValuesForCurrentAction.reduce((acc, value) => acc + value) : 0;
 
-      return timeSpendOfCurrentAction !== 0
-        ? Object.assign(actionsTimeSpend, {
-          [action]: timeSpendOfCurrentAction,
+      return valueOfCurrentAction !== 0
+        ? Object.assign(propertyValues, {
+          [action]: valueOfCurrentAction,
         })
-        : Object.assign(actionsTimeSpend);
+        : Object.assign(propertyValues);
     });
 
-    return actionsTimeSpend;
+    return propertyValues;
   }
 }

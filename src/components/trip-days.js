@@ -2,13 +2,11 @@ import AbstractComponent from "./abstract-component.js";
 import DayOfTripComponent from "./day-of-trip.js";
 import TripWithoutDaysComponent from "./trip-without-days.js";
 import {castDateTimeFormat} from "../utils/common.js";
-import {render, renderElementToElement, remove, replaceElement, RenderPosition} from "../utils/render.js";
 import {PointMode, SortType} from "../const.js";
+import {render, renderElementToElement, remove, replaceElement, RenderPosition} from "../utils/render.js";
 
-/** @return {*} Функция, которая возвращает разметку компонента "Блок с днями путешествия" */
 const createTripDaysTemplate = () => `<ul class="trip-days"></ul>`;
 
-/** Компонент: "Блок с днями путешествия" */
 export default class TripDays extends AbstractComponent {
   constructor() {
     super();
@@ -20,7 +18,6 @@ export default class TripDays extends AbstractComponent {
     this._viewChangeObserverHandler = this._viewChangeObserverHandler.bind(this);
   }
 
-  /** @return {*} Метод, который возвращает разметку компонента "Блок с днями путешествия" */
   getTemplate() {
     return createTripDaysTemplate();
   }
@@ -46,10 +43,6 @@ export default class TripDays extends AbstractComponent {
     this._daysOfTrip.forEach((day) => remove(day));
   }
 
-  /**
-    *Приватный метод, который возвращает все контроллеры "Один день маршрута" и отрисовывает их
-    * @param {*} pointsControllers
-    */
   _renderDaysOfTrip(pointsControllers) {
     if (pointsControllers.length === 0) {
       return;
@@ -91,9 +84,6 @@ export default class TripDays extends AbstractComponent {
     });
   }
 
-  /** @return {*} Приватный метод, который возвращает все даты путешествия
-   * @param {*} pointsControllers
-   */
   _getPointsDays(pointsControllers) {
     const points = pointsControllers.map((it) => it.getModel().getActualPoint());
     return points.map((it) => [`${it.startDate.getFullYear()}-${castDateTimeFormat(it.startDate.getMonth())}-${castDateTimeFormat(it.startDate.getDate())}`].join(`, `));

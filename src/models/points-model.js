@@ -11,7 +11,13 @@ const getEmptyPoint = (offers) => {
     duration: `00M`,
     endDate: new Date(),
     isFavorite: false,
-    offers,
+    offers: offers.map((it) => {
+      return {
+        "title": it.title,
+        "price": it.price,
+        "isChecked": false
+      };
+    }),
     photos: null,
     price: ``,
     startDate: new Date(),
@@ -22,32 +28,28 @@ const getEmptyPoint = (offers) => {
 
 export default class PointsModel {
   constructor(sortModel, filterModel) {
-    // models
     this._sortModel = sortModel;
     this._filterModel = filterModel;
     this._allPointsControllers = [];
     this._actualPointsControllers = [];
     this._filtersWithPossiblePoints = [];
 
-    // Observers
     this._filtersWithPossiblePointsObservers = [];
     this._actualPointsControllersChangeObservers = [];
 
-    // set observes
     this._sortModel.setActiveSortTypeChangeObserver((changePropertyType) => {
       if (changePropertyType === ChangePropertyType.FROM_VIEW) {
-        this._resetAllPoints(this._allPointsControllers);
+        this.resetAllPoints(this._allPointsControllers);
         this._updateActualPoints();
       }
     });
     this._filterModel.setActiveFilterTypeChangeObserver((_, changePropertyType) => {
       if (changePropertyType === ChangePropertyType.FROM_VIEW) {
-        this._resetAllPoints(this._allPointsControllers);
+        this.resetAllPoints(this._allPointsControllers);
         this._updateActualPoints();
       }
     });
 
-    // binds
     this._removePoint = this._removePoint.bind(this);
     this._updateActualPointsBeforeChangeMode = this._updateActualPointsBeforeChangeMode.bind(this);
   }
@@ -60,10 +62,6 @@ export default class PointsModel {
     return this._applySort(this._allPointsControllers, SortType.EVENT);
   }
 
-  /**
-   * Метод, который записывает точки маршрута
-   * @param {*} points Массив точек маршрута
-   */
   setPoints(points) {
     this._allPointsControllers = Array.from(points);
     this._allPointsControllers.forEach((pointController) => {
@@ -74,7 +72,8 @@ export default class PointsModel {
   }
 
   createPoint() {
-    const offers = getStorage().getAllOffers().find((item) => item.type === `bus`) ? getStorage().getAllOffers().find((item) => item.type === `bus`).offers : ``;
+    const allOffers = getStorage().getAllOffers();
+    const offers = allOffers.find((item) => item.type === `bus`) ? allOffers.find((item) => item.type === `bus`).offers : ``;
     const emptyPoint = Object.assign({}, getEmptyPoint(offers));
     const pointModel = new PointModel(null, emptyPoint, PointMode.ADDING);
     pointModel.setModeChangeObserver(this._updateActualPointsBeforeChangeMode);
@@ -86,6 +85,19 @@ export default class PointsModel {
 
   getActiveSortType() {
     return this._sortModel.getActiveSortType();
+  }
+
+  resetAllPoints(pointsControllers) {
+    pointsControllers.forEach((pointController) => {
+      const model = pointController.getModel();
+      const mode = model.getMode();
+      if (mode === PointMode.EDIT) {
+        model.resetChanges();
+        model.setMode(PointMode.DEFAULT, ChangePropertyType.FROM_MODEL);
+      } else if (mode === PointMode.ADDING) {
+        model.removePoint();
+      }
+    });
   }
 
   setActualPointsControllersChangeObserver(handler) {
@@ -116,19 +128,6 @@ export default class PointsModel {
   _removePoint(pointModel) {
     this._allPointsControllers = this._allPointsControllers.filter((it) => it.getModel() !== pointModel);
     this._updateActualPoints();
-  }
-
-  _resetAllPoints(pointsControllers) {
-    pointsControllers.forEach((pointController) => {
-      const model = pointController.getModel();
-      const mode = model.getMode();
-      if (mode === PointMode.EDIT) {
-        model.resetChanges();
-        model.setMode(PointMode.DEFAULT, ChangePropertyType.FROM_MODEL);
-      } else if (mode === PointMode.ADDING) {
-        model.removePoint();
-      }
-    });
   }
 
   _setPossiblePointsForFilters(pointsControllers) {
@@ -167,7 +166,7 @@ export default class PointsModel {
         break;
       case PointMode.EDIT:
       case PointMode.ADDING:
-        this._resetAllPoints(notDefault);
+        this.resetAllPoints(notDefault);
         break;
     }
     this._callActualPointsControllersChangeObservers(this._actualPointsControllersChangeObservers);

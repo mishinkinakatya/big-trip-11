@@ -11,10 +11,6 @@ export default class PointModel {
     this._removePointObservers = [];
   }
 
-  isInit() {
-    return this._point !== null;
-  }
-
   getActualPoint() {
     return this._point === null ? this.getTempPoint() : Object.assign({}, this._point);
   }
@@ -49,6 +45,10 @@ export default class PointModel {
 
   updateTempPoint(point) {
     this._tempPoint = Object.assign({}, point);
+  }
+
+  isInit() {
+    return this._point !== null;
   }
 
   setModeChangeObserver(handler) {

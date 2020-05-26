@@ -50,6 +50,14 @@ export default class PointController extends AbstractController {
   _createPointEditComponent() {
     const pointEditComponent = new PointEditComponent(this.getModel().getMode(), this._getActualPointData, this._updateTempPoint, this._getTempPointData);
 
+    const changeModel = () => {
+      this.getModel().applyChanges();
+      this.getModel().setMode(PointMode.DEFAULT, ChangePropertyType.FROM_VIEW);
+      this.initView();
+      pointEditComponent.removeElement();
+      document.removeEventListener(`keydown`, this._escKeyDownHandler);
+    };
+
     const handleTheError = () => {
       pointEditComponent.rerender(false);
       this._shake(pointEditComponent);
@@ -58,7 +66,8 @@ export default class PointController extends AbstractController {
     pointEditComponent.setElementChangeObserver((_, newElement) => {
       this.setView(newElement);
     });
-    pointEditComponent.setSubmitHandler(() => {
+
+    pointEditComponent.setSubmitHandler((evt) => {
       const tempPoint = this.getModel().getTempPoint();
 
       if (tempPoint.destination === ``) {
@@ -71,13 +80,11 @@ export default class PointController extends AbstractController {
         return;
       }
 
-      const changeModel = () => {
-        this.getModel().applyChanges();
-        this.getModel().setMode(PointMode.DEFAULT, ChangePropertyType.FROM_VIEW);
-        this.initView();
-        pointEditComponent.removeElement();
-        document.removeEventListener(`keydown`, this._escKeyDownHandler);
-      };
+      if (tempPoint.price < 0) {
+        pointEditComponent.getElement().querySelector(`.event__input--price`).setCustomValidity(`Price must be positive integer number`);
+        return;
+      }
+      evt.preventDefault();
 
       pointEditComponent.rerender(true);
 
@@ -100,8 +107,8 @@ export default class PointController extends AbstractController {
           });
       }
     });
-    pointEditComponent.setResetButtonClickHandler(() => {
 
+    pointEditComponent.setResetButtonClickHandler(() => {
       pointEditComponent.rerender(true);
 
       if (this.getModel().getMode() === PointMode.ADDING) {
@@ -119,7 +126,7 @@ export default class PointController extends AbstractController {
     });
 
     pointEditComponent.setRollupButtonClickHandler(() => {
-      this._resetChanges();
+      this._reset();
     });
 
     return pointEditComponent;
@@ -133,7 +140,7 @@ export default class PointController extends AbstractController {
     return this.getModel().getTempPoint();
   }
 
-  _resetChanges() {
+  _reset() {
     const model = this.getModel();
     if (model.isInit()) {
       model.resetChanges();
@@ -161,7 +168,7 @@ export default class PointController extends AbstractController {
     const isEscKey = evt.key === `Esc` || evt.key === `Escape`;
 
     if (isEscKey) {
-      this._resetChanges();
+      this._reset();
     }
   }
 }
