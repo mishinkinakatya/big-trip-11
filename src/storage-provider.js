@@ -1,4 +1,4 @@
-import DataStorage from "./storage";
+import DataStorage from "./storage.js";
 
 let storage = null;
 

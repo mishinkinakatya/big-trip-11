@@ -68,6 +68,17 @@ export default class API {
     });
   }
 
+  sync(points) {
+    return this._load({
+      baseUrl: COMMON_URL,
+      addingUrl: `points/sync`,
+      method: Method.POST,
+      body: JSON.stringify(points),
+      headers: new Headers({"Content-Type": `application/json`})
+    })
+      .then((response) => response.json());
+  }
+
   updatePoint(pointData, id) {
     return this._load({
       baseUrl: COMMON_URL,

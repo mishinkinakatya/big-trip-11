@@ -15,9 +15,9 @@ import TripInfoController from "./controllers/trip-info-controller.js";
 import TripInfoModel from "./models/trip-info-model.js";
 import {ChangePropertyType, FilterType, PointMode, SortType, MenuItem} from "./const.js";
 import {convertToClientModel} from "./utils/model-adapter.js";
-import {render, remove, RenderPosition} from "./utils/render.js";
-import {getApi} from "./api-provider.js";
+import {getDataManager} from "./data-manager-provider.js";
 import {getStorage} from "./storage-provider.js";
+import {render, remove, RenderPosition} from "./utils/render.js";
 
 const tripMainElement = document.querySelector(`.trip-main`);
 const tripControlsElement = tripMainElement.querySelector(`.trip-controls`);
@@ -26,7 +26,7 @@ const tripPointsElement = document.querySelector(`.trip-events`);
 const statsContainer = document.querySelector(`main .page-body__container`);
 const addButton = tripMainElement.querySelector(`.trip-main__event-add-btn`);
 
-const api = getApi();
+const dataManager = getDataManager();
 const storage = getStorage();
 
 // init
@@ -60,9 +60,9 @@ render(tripMenuElement, siteMenuComponent, RenderPosition.AFTEREND);
 filterController.render();
 
 Promise.all([
-  api.getDestinations(),
-  api.getOffers(),
-  api.getPoints()
+  dataManager.getDestinations(),
+  dataManager.getOffers(),
+  dataManager.getPoints()
 ])
   .then((results) => {
     remove(loadingComponent);
@@ -124,5 +124,21 @@ addButton.addEventListener(`click`, () => {
   sortModel.setActiveSortType(SortType.EVENT, ChangePropertyType.FROM_MODEL);
   pointsModel.createPoint();
   setDisabledForAddButton();
+});
+
+// sw
+window.addEventListener(`load`, () => {
+  navigator.serviceWorker.register(`/sw.js`);
+});
+
+// sync
+window.addEventListener(`online`, () => {
+  document.title = document.title.replace(` [offline]`, ``);
+
+  dataManager.sync();
+});
+
+window.addEventListener(`offline`, () => {
+  document.title += ` [offline]`;
 });
 

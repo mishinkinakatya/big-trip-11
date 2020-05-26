@@ -2,8 +2,9 @@ import AbstractController from "./abstract-controller.js";
 import PointEditComponent from "../components/point-edit.js";
 import PointOfDayComponent from "../components/point-of-day.js";
 import {ChangePropertyType, PointMode} from "../const.js";
-import {getApi} from "../api-provider.js";
 import {convertToClientModel, convertToServerModel} from "../utils/model-adapter.js";
+import {getDataManager} from "../data-manager-provider.js";
+
 const SHAKE_ANIMATION_TIMEOUT = 600;
 
 export default class PointController extends AbstractController {
@@ -14,7 +15,7 @@ export default class PointController extends AbstractController {
     this._getActualPointData = this._getActualPointData.bind(this);
     this._getTempPointData = this._getTempPointData.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
-    this._api = getApi();
+    this._dataManager = getDataManager();
 
     this.getModel().setModeChangeObserver((_, changePropertyType) => {
       if (changePropertyType === ChangePropertyType.FROM_MODEL) {
@@ -89,7 +90,7 @@ export default class PointController extends AbstractController {
       pointEditComponent.rerender(true);
 
       if (this.getModel().getMode() === PointMode.ADDING) {
-        this._api.createPoint(convertToServerModel(tempPoint))
+        this._dataManager.createPoint(convertToServerModel(tempPoint))
           .then((pointData) => {
             this.getModel().updateTempPoint(convertToClientModel(pointData));
             changeModel();
@@ -98,7 +99,7 @@ export default class PointController extends AbstractController {
             handleTheError();
           });
       } else if (this.getModel().getMode() === PointMode.EDIT) {
-        this._api.updatePoint(convertToServerModel(tempPoint), tempPoint.id)
+        this._dataManager.updatePoint(convertToServerModel(tempPoint), tempPoint.id)
           .then(() => {
             changeModel();
           })
@@ -114,7 +115,7 @@ export default class PointController extends AbstractController {
       if (this.getModel().getMode() === PointMode.ADDING) {
         this.getModel().removePoint();
       } else if (this.getModel().getMode() === PointMode.EDIT) {
-        this._api.deletePoint(this.getModel().getTempPoint().id)
+        this._dataManager.deletePoint(this.getModel().getTempPoint().id)
           .then(() => {
             this.getModel().removePoint();
             pointEditComponent.removeElement();
