@@ -10,12 +10,12 @@ export default class FilterModel {
     this.setAvailableFilters = this.setAvailableFilters.bind(this);
   }
 
-  setPointsModel(pointsModel) {
-    pointsModel.setFiltersWithPossiblePointsChangeObserver(this.setAvailableFilters);
-  }
-
   getActiveFilterType() {
     return this._activeFilterType;
+  }
+
+  getAvailableFilters() {
+    return this._availableFilters;
   }
 
   setActiveFilterType(filterType, changePropertyType) {
@@ -28,8 +28,8 @@ export default class FilterModel {
     this._callAvailableFiltersChangeObservers(availableFilters);
   }
 
-  getAvailableFilters() {
-    return this._availableFilters;
+  setPointsModel(pointsModel) {
+    pointsModel.setFiltersWithPossiblePointsChangeObserver(this.setAvailableFilters);
   }
 
   setAvailableFiltersChangeObserver(handler) {

@@ -1,6 +1,5 @@
-import FilterComponent from "../components/filter.js";
-
 import AbstractController from "./abstract-controller.js";
+import FilterComponent from "../components/filter.js";
 import {ChangePropertyType} from "../const.js";
 import {render, RenderPosition} from "../utils/render.js";
 

@@ -1,3 +1,5 @@
+const COMMON_URL = `https://11.ecmascript.pages.academy/big-trip`;
+
 const Method = {
   GET: `GET`,
   POST: `POST`,
@@ -17,8 +19,6 @@ const checkStatus = (response) => {
     throw new Error(`${response.status}: ${response.statusText}`);
   }
 };
-
-const COMMON_URL = `https://11.ecmascript.pages.academy/big-trip`;
 
 export default class API {
   constructor(authorization) {
