@@ -10,11 +10,6 @@ const getPastPoints = (points, date) => {
   return points.filter((point) => isPastDate(date, point.getModel().getActualPoint().endDate));
 };
 
-/**
- * @param {array} points Массив с компонентами "Точка маршрута"
- * @param {string} filterType Тип фильтра
- * @return {*} Функция, котоаря возвращает компоненты точек маршрута по заданному фильтру
- */
 export const getPointsByFilter = (points, filterType) => {
   switch (filterType) {
     case FilterType.EVERYTHING:

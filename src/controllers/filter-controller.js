@@ -21,20 +21,15 @@ export default class FilterController extends AbstractController {
     render(this._container, this._filterComponent, RenderPosition.BEFOREEND);
   }
 
-  _availableFilterChangesHandler(filterTypes) {
-    this._filterComponent.setAvailableFilters(filterTypes);
-  }
-
   _getActiveFilterType() {
     return this.getModel().getActiveFilterType();
   }
 
-  _filterTypeChangeFromViewHandler(filterType) {
-    this.getModel().setActiveFilterType(filterType, ChangePropertyType.FROM_VIEW);
+  _availableFilterChangesHandler(filterTypes) {
+    this._filterComponent.setAvailableFilters(filterTypes);
   }
 
-  _rerender() {
-    this._sortComponent.clearSort();
-    this.render();
+  _filterTypeChangeFromViewHandler(filterType) {
+    this.getModel().setActiveFilterType(filterType, ChangePropertyType.FROM_VIEW);
   }
 }

@@ -1,11 +1,6 @@
 import AbstractComponent from "./abstract-component.js";
 import {formatDate, formatTime} from "../utils/common.js";
 
-/**
-* @return {*} Функция, которая возвращает разметку блока с дополнительными опциями компонента "Один день маршрута"
-* @param {*} offerType Тип опции
-* @param {*} offerPrice Цена опции
-*/
 const createOfferMarkup = (offerType, offerPrice) => {
   return (
     `<li class="event__offer">
@@ -16,10 +11,6 @@ const createOfferMarkup = (offerType, offerPrice) => {
   );
 };
 
-/**
- * @return {*} Функция, которая возвращает разметку компонента "Одна точка маршрута"
- * @param {*} pointOfDay Объект, содержащий свойства компонента "Точка маршрута в режиме Default"
- */
 const createPointOfDayTemplate = (pointOfDay) => {
   const {type, typeWithPreposition, destination, price, startDate, endDate, duration, offers} = pointOfDay;
 
@@ -31,14 +22,11 @@ const createPointOfDayTemplate = (pointOfDay) => {
 
   const OFFERS_MAX_COUNT = 3;
 
-  /** Массив, содержащий выбранные опции */
   const checkedOffers = offers ? offers.filter((offer) => {
     return offer.isChecked;
   }) : null;
 
-  /** Массив, содержащий опции, которые будут отображаться в компонента "Точка маршрута в режиме Default" */
   const showingOffersOfDay = checkedOffers ? checkedOffers.slice(0, OFFERS_MAX_COUNT) : null;
-  /** Разметка для блока с дополнительными опциями */
   const offersMarkup = showingOffersOfDay ? showingOffersOfDay.map((it) => createOfferMarkup(it.title, it.price)).join(`\n`) : ``;
 
   return (
@@ -75,27 +63,16 @@ const createPointOfDayTemplate = (pointOfDay) => {
   );
 };
 
-/** Компонент: "Одна точка маршрута" */
 export default class PointOfDay extends AbstractComponent {
-  /**
-   * Свойства компонента "Одна точка маршрута"
-   * @property {*} this._pointOfDay - Компонент "Точка маршрута в режиме Default"
-   * @param {*} pointOfDay Компонент "Точка маршрута в режиме Default"
-   */
   constructor(pointOfDay) {
     super();
     this._pointOfDay = pointOfDay;
   }
 
-  /** @return {*} Метод, который возвращает разметку компонента "Одна точка маршрута" */
   getTemplate() {
     return createPointOfDayTemplate(this._pointOfDay);
   }
 
-  /**
-   * Метод, который устанавливает колбэк на клик по стрелке Edit
-   * @param {*} handler Колбэк для клика по стрелке Edit
-   */
   setEditButtonClickHandler(handler) {
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
   }

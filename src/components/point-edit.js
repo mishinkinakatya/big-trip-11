@@ -1,10 +1,10 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {getPointDurationInDHM, getPointDurationInMs} from "../utils/common.js";
 import {ALL_POINT_ACTION, POINT_ACTIVITY, POINT_TRANSPORT, PointMode} from "../const.js";
+import {getPointDurationInDHM, getPointDurationInMs} from "../utils/common.js";
+import {getStorage} from "../storage-provider.js";
 import flatpickr from "flatpickr";
 import moment from "moment";
 import "flatpickr/dist/flatpickr.min.css";
-import {getStorage} from "../storage-provider.js";
 
 const ButtonNames = {
   SAVE_DEFAULT: `Save`,
@@ -20,18 +20,12 @@ const getOfferByName = (name) => {
   return name.substring(OFFER_NAME_PREFIX.length);
 };
 
-/**
-* @return {*} Функция, которая возвращает разметку блока "Тип точки маршрута"
-* @param {*} type Тип точки маршрута
-* @param {*} currentType Выбранный тип точки маршрута
-*/
 const createPointTypeMarkup = (type, currentType) =>
   `<div class="event__type-item">
     <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${type === currentType ? `checked` : ``}>
     <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${ALL_POINT_ACTION[type].substr(0, type.length)}</label>
   </div>`;
 
-/** @return {*} Функция, которая возвращает разметку блока "Пункт назначения для точки маршрута" */
 const createDestinationMarkup = () => {
   return getStorage().isDestinations() ? getStorage().getAllDestinations().map((destination) => destination.name).map((name) => {
     return (`<option value="${name}"></option>`);
@@ -53,10 +47,6 @@ const createOfferMarkup = (offers, isDisabled) => {
   }).join(`\n`) : ``;
 };
 
-/**
-* @return {*} Функция, которая возвращает разметку блока "Фотография точки маршрута"
-* @param {string} photos Src фотографии
-*/
 const createPhotosMarkup = (photos) => {
   return photos ? photos.map((photo) => {
     return (
@@ -87,7 +77,6 @@ const createEventEditTemplate = (pointOfTrip, mode, isSending) => {
   const isDescriptionShowing = !!descriptionMarkup;
   const isPhotosShowing = !!photosMarkup;
 
-  /** Флаг: Показывать блок с Дополнительными опциями, Описанием и Фотографиями точки маршрута? */
   const isPointDetailsShowing = isOfferShowing || isDescriptionShowing || isPhotosShowing;
 
   return (
@@ -190,15 +179,7 @@ const createEventEditTemplate = (pointOfTrip, mode, isSending) => {
   );
 };
 
-/** Компонент: "Точка маршрута в режиме Edit" */
 export default class PointEdit extends AbstractSmartComponent {
-  /**
-   * Свойства компонента "Точка маршрута в режиме Edit"
-   * @param {*} mode
-   * @param {*} getActualPointData
-   * @param {*} updateTempPoint
-   * @param {*} getTempPointData
-   */
   constructor(mode, getActualPointData, updateTempPoint, getTempPointData) {
     super();
     this._mode = mode;
@@ -222,31 +203,11 @@ export default class PointEdit extends AbstractSmartComponent {
     return createEventEditTemplate(this._tempPoint, this._mode, isSending);
   }
 
-  /** Метод, который перенавешивает слушателей */
   recoveryListeners() {
     this.setSubmitHandler(this._submitHandler);
     this.setResetButtonClickHandler(this._resetButtonClickHandler);
     this.setRollupButtonClickHandler(this._rollupButtonClickHandler);
     this._subscribeOnEvents();
-  }
-
-  /**
-   * Метод, который устанавливает колбэк на клик по кнопке Save
-   * @param {*} handler Колбэк для клика по кнопке Save
-   */
-  setSubmitHandler(handler) {
-    this.getElement().querySelector(`.event__save-btn`).addEventListener(`click`, handler);
-    this._submitHandler = handler;
-  }
-
-  setResetButtonClickHandler(handler) {
-    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, handler);
-    this._resetButtonClickHandler = handler;
-  }
-
-  setRollupButtonClickHandler(handler) {
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
-    this._rollupButtonClickHandler = handler;
   }
 
   rerender(isSending) {
@@ -268,7 +229,21 @@ export default class PointEdit extends AbstractSmartComponent {
     super.removeElement();
   }
 
-  /** Приватный метод, который подключает flatpickr к элементам с датой */
+  setSubmitHandler(handler) {
+    this.getElement().querySelector(`.event__save-btn`).addEventListener(`click`, handler);
+    this._submitHandler = handler;
+  }
+
+  setResetButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, handler);
+    this._resetButtonClickHandler = handler;
+  }
+
+  setRollupButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
+    this._rollupButtonClickHandler = handler;
+  }
+
   _applyFlatpickr() {
     if (this._flatpickrStart || this._flatpickrEnd) {
       this._flatpickrStart.destroy();
@@ -298,7 +273,6 @@ export default class PointEdit extends AbstractSmartComponent {
     });
   }
 
-  // Если newTempPoint - null, то нет обновления модели и перерисовки
   _onChangeDataPoint(applyChangeToTempPoint) {
     const newTempPoint = applyChangeToTempPoint(this._tempPoint);
     if (newTempPoint) {
@@ -307,7 +281,6 @@ export default class PointEdit extends AbstractSmartComponent {
     }
   }
 
-  /** Приватный метод, который подписывается на события: Изменение типа точки маршрута, пункта назначения, даты начала и конца, цены и дополнительных опций */
   _subscribeOnEvents() {
     const element = this.getElement();
 
@@ -371,7 +344,8 @@ export default class PointEdit extends AbstractSmartComponent {
         }
 
         newTempPoint.startDate = pointStartDate;
-        newTempPoint.duration = getPointDurationInDHM(newTempPoint.startDate, newTempPoint.endDate);
+        newTempPoint.durationInMs = getPointDurationInMs(newTempPoint.startDate, newTempPoint.endDate);
+        newTempPoint.duration = getPointDurationInDHM(newTempPoint.durationInMs);
         return newTempPoint;
       });
     });
@@ -384,8 +358,8 @@ export default class PointEdit extends AbstractSmartComponent {
         }
         const newTempPoint = tempPoint;
         newTempPoint.endDate = pointEndDate;
-        newTempPoint.duration = getPointDurationInDHM(newTempPoint.startDate, newTempPoint.endDate);
         newTempPoint.durationInMs = getPointDurationInMs(newTempPoint.startDate, newTempPoint.endDate);
+        newTempPoint.duration = getPointDurationInDHM(newTempPoint.durationInMs);
         return newTempPoint;
       });
     });
@@ -428,6 +402,5 @@ export default class PointEdit extends AbstractSmartComponent {
         });
       });
     }
-
   }
 }

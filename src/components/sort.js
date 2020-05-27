@@ -2,10 +2,6 @@ import AbstractComponent from "./abstract-component.js";
 import {ChangePropertyType, SortType} from "../const.js";
 import {remove} from "../utils/render.js";
 
-
-/** @return {*} Функция, которая возвращает разметку компонента "Сортировка"
- * @param {*} activeSortType
- */
 const createSortTemplate = (activeSortType) => {
   return (
     `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
@@ -41,14 +37,12 @@ const createSortTemplate = (activeSortType) => {
   );
 };
 
-/** Компонент: "Сортировка" */
 export default class Sort extends AbstractComponent {
   constructor(getActiveSortType) {
     super();
     this._getActiveSortType = getActiveSortType;
   }
 
-  /** @return {*} Метод, который возвращает разметку компонента "Сортировка" */
   getTemplate() {
     const activeSortType = this._getActiveSortType();
     return createSortTemplate(activeSortType);
@@ -58,10 +52,6 @@ export default class Sort extends AbstractComponent {
     remove(this);
   }
 
-  /**
-   * Метод, который устанавливает колбэк на клик по типу сортировки
-   * @param {*} handler Колбэк для клика по типу сортировки
-   */
   setSortTypeChangeHandler(handler) {
     this.getElement().addEventListener(`click`, (evt) => {
 

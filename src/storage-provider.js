@@ -1,12 +1,8 @@
-import DataStorage from "./storage";
+import DataStorage from "./storage.js";
 
 let storage = null;
 
-export const getStorage = () => {
-  if (storage) {
-    return storage;
-  } else {
-    storage = new DataStorage();
-    return storage;
-  }
-};
+storage = storage ? storage : storage = new DataStorage();
+
+export const getStorage = () => storage;
+

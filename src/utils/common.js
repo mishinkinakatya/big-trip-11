@@ -18,11 +18,11 @@ const getPointDurationInMs = (start, end) => {
   return calculatePointDuration(start, end).asMilliseconds();
 };
 
-const getPointDurationInDHM = (pointDuration) => {
+const getPointDurationInDHM = (pointDurationInMs) => {
 
-  const dayCount = castDateTimeFormat(moment.duration(pointDuration, `milliseconds`).days());
-  const hourCount = castDateTimeFormat(moment.duration(pointDuration, `milliseconds`).hours());
-  const minutesCount = castDateTimeFormat(moment.duration(pointDuration, `milliseconds`).minutes());
+  const dayCount = castDateTimeFormat(moment.duration(pointDurationInMs, `milliseconds`).days());
+  const hourCount = castDateTimeFormat(moment.duration(pointDurationInMs, `milliseconds`).hours());
+  const minutesCount = castDateTimeFormat(moment.duration(pointDurationInMs, `milliseconds`).minutes());
 
   if (dayCount > 0) {
     return `${dayCount}D ${hourCount}H ${minutesCount}M`;
@@ -33,9 +33,30 @@ const getPointDurationInDHM = (pointDuration) => {
   }
 };
 
+const deepCopyFunction = (inObject) => {
+  let outObject;
+  let value;
+  let key;
+
+  if (typeof inObject !== `object` || inObject === null) {
+    return inObject;
+  }
+
+  outObject = Array.isArray(inObject) ? [] : {};
+
+  for (key in inObject) {
+    if ({}.hasOwnProperty.call(inObject, key)) {
+      value = inObject[key];
+      outObject[key] = deepCopyFunction(value);
+    }
+  }
+
+  return outObject;
+};
+
 const isFutureDate = (nowDate, startDate) => startDate > nowDate;
 
 const isPastDate = (nowDate, endDate) => endDate < nowDate;
 
-export {getPointDurationInDHM, getPointDurationInMs, castDateTimeFormat, formatDate, formatTime, isFutureDate, isPastDate};
+export {deepCopyFunction, getPointDurationInDHM, getPointDurationInMs, castDateTimeFormat, formatDate, formatTime, isFutureDate, isPastDate};
 

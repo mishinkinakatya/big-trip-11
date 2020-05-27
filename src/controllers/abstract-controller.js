@@ -16,16 +16,6 @@ export default class AbstractController {
     return this._model;
   }
 
-  buildView() {
-    throw new Error(`Not implemented 'buildView' method`);
-  }
-
-  initView() {
-    this._oldView = this._view;
-    this._view = this.buildView();
-    this._callViewChangeObservers();
-  }
-
   getView() {
     if (this._view === null) {
       this._view = this.buildView();
@@ -42,8 +32,14 @@ export default class AbstractController {
     this._callViewChangeObservers();
   }
 
-  setViewChangeObserver(handler) {
-    this._viewChangeObserves.push(handler);
+  buildView() {
+    throw new Error(`Not implemented 'buildView' method`);
+  }
+
+  initView() {
+    this._oldView = this._view;
+    this._view = this.buildView();
+    this._callViewChangeObservers();
   }
 
   hide() {
@@ -56,6 +52,10 @@ export default class AbstractController {
     if (this._container) {
       this._container.classList.remove(HIDDEN_CLASS);
     }
+  }
+
+  setViewChangeObserver(handler) {
+    this._viewChangeObserves.push(handler);
   }
 
   _callViewChangeObservers() {

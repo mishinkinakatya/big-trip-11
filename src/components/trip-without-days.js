@@ -1,6 +1,5 @@
 import AbstractComponent from "./abstract-component.js";
 
-/** @return {*} Функция, которая возвращает разметку компонента "Маршрут без разделения по дням" */
 const createTripWithoutDaysTemplate = () => {
   return (
     `<li class="trip-days__item  day">
@@ -11,14 +10,12 @@ const createTripWithoutDaysTemplate = () => {
   );
 };
 
-/** Компонент: "Маршрут без разделения по дням" */
 export default class TripWithoutDays extends AbstractComponent {
   constructor() {
     super();
     this._points = [];
   }
 
-  /** @return {*} Метод, который возвращает разметку компонента "Маршрут без разделения по дням" */
   getTemplate() {
     return createTripWithoutDaysTemplate(this._points);
   }

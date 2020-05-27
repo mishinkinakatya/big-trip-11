@@ -6,13 +6,13 @@ import {getPointDurationInDHM} from "../utils/common.js";
 import {remove} from "../utils/render.js";
 
 const BAR_HEIGHT = 55;
-const MIN_BLOCK_HEIGHT = 4;
+const MIN_BLOCK_HEIGHT = 3;
 
 const createLabels = (types) => {
   const actualTypes = Object.keys(types);
   return {
     type: actualTypes.map((type) => ActionIcon[type]),
-    height: actualTypes.length >= 3 ? BAR_HEIGHT * actualTypes.length : BAR_HEIGHT * MIN_BLOCK_HEIGHT,
+    height: actualTypes.length >= MIN_BLOCK_HEIGHT ? BAR_HEIGHT * actualTypes.length : BAR_HEIGHT * MIN_BLOCK_HEIGHT,
   };
 };
 
