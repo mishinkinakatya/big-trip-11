@@ -3,42 +3,53 @@ import {getPointDurationInMs, getPointDurationInDHM} from "./common.js";
 import {getStorage} from "../storage-provider.js";
 
 export const convertToClientModel = (inputModel) => {
-  const type = inputModel[`type`];
-  const typeWithPreposition = `${ALL_POINT_ACTION[type]}`;
-  const startDate = new Date(inputModel[`date_from`]);
-  const endDate = new Date(inputModel[`date_to`]);
-  const durationInMs = getPointDurationInMs(startDate, endDate);
-  const offersFromServer = inputModel[`offers`];
 
-  const availableOffers = getStorage().getAllOffers().find((item) => item.type === type).offers;
 
-  const availableOffersWithCheck = availableOffers.map((offer) => Object.assign({}, offer, {
-    isChecked: false,
-  }));
-
-  availableOffersWithCheck.forEach((availableOffer) => {
-    offersFromServer.forEach((offer) => {
-      if (availableOffer.title === offer.title && availableOffer.price === offer.price) {
-        availableOffer.isChecked = true;
-      }
-    });
+  const serverProperties = [`base_price`, `date_from`, `date_to`, `destination`, `is_favorite`, `offers`, `type`];
+  const isAllProperties = serverProperties.map((property) => {
+    return inputModel.hasOwnProperty(property);
   });
 
-  return {
-    id: inputModel[`id`],
-    description: inputModel[`destination`].description,
-    destination: inputModel[`destination`].name,
-    duration: getPointDurationInDHM(durationInMs),
-    durationInMs,
-    endDate,
-    isFavorite: inputModel[`is_favorite`],
-    offers: availableOffersWithCheck,
-    photos: inputModel[`destination`].pictures,
-    price: inputModel[`base_price`],
-    startDate,
-    type,
-    typeWithPreposition,
-  };
+  if (isAllProperties.some((result) => !result)) {
+    return null;
+  } else {
+    const type = inputModel[`type`];
+    const typeWithPreposition = `${ALL_POINT_ACTION[type]}`;
+    const startDate = new Date(inputModel[`date_from`]);
+    const endDate = new Date(inputModel[`date_to`]);
+    const durationInMs = getPointDurationInMs(startDate, endDate);
+    const offersFromServer = inputModel[`offers`];
+
+    const availableOffers = getStorage().getAllOffers().find((item) => item.type === type).offers;
+
+    const availableOffersWithCheck = availableOffers.map((offer) => Object.assign({}, offer, {
+      isChecked: false,
+    }));
+
+    availableOffersWithCheck.forEach((availableOffer) => {
+      offersFromServer.forEach((offer) => {
+        if (availableOffer.title === offer.title && availableOffer.price === offer.price) {
+          availableOffer.isChecked = true;
+        }
+      });
+    });
+
+    return {
+      id: inputModel[`id`],
+      description: inputModel[`destination`].description,
+      destination: inputModel[`destination`].name,
+      duration: getPointDurationInDHM(durationInMs),
+      durationInMs,
+      endDate,
+      isFavorite: inputModel[`is_favorite`],
+      offers: availableOffersWithCheck,
+      photos: inputModel[`destination`].pictures,
+      price: inputModel[`base_price`],
+      startDate,
+      type,
+      typeWithPreposition,
+    };
+  }
 };
 
 export const convertToServerModel = (inputModel) => {

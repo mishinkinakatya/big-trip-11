@@ -4,8 +4,14 @@ export default class FilterModel {
 
     this._activeFilterTypeChangeObservers = [];
     this._availableFiltersChangeObservers = [];
+    this._availableFilters = [];
 
     this._callAvailableFiltersChangeObservers = this._callAvailableFiltersChangeObservers.bind(this);
+    this.setAvailableFilters = this.setAvailableFilters.bind(this);
+  }
+
+  setPointsModel(pointsModel) {
+    pointsModel.setFiltersWithPossiblePointsChangeObserver(this.setAvailableFilters);
   }
 
   getActiveFilterType() {
@@ -17,8 +23,13 @@ export default class FilterModel {
     this._activeFilterTypeChangeObservers.forEach((handler) => handler(this._activeFilterType, changePropertyType));
   }
 
-  setPointsModel(pointsModel) {
-    pointsModel.setFiltersWithPossiblePointsChangeObserver(this._callAvailableFiltersChangeObservers);
+  setAvailableFilters(availableFilters) {
+    this._availableFilters = availableFilters;
+    this._callAvailableFiltersChangeObservers(availableFilters);
+  }
+
+  getAvailableFilters() {
+    return this._availableFilters;
   }
 
   setAvailableFiltersChangeObserver(handler) {

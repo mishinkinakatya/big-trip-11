@@ -21,6 +21,14 @@ export default class FilterController extends AbstractController {
     render(this._container, this._filterComponent, RenderPosition.BEFOREEND);
   }
 
+  forceDisabled() {
+    this._filterComponent.setAvailableFilters([]);
+  }
+
+  restoreFilters() {
+    this._filterComponent.setAvailableFilters(this.getModel().getAvailableFilters());
+  }
+
   _getActiveFilterType() {
     return this.getModel().getActiveFilterType();
   }

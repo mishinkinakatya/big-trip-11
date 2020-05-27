@@ -31,15 +31,12 @@ export default class DataManager {
     if (isOnline()) {
       return this._api.getPoints()
         .then((points) => {
-          const items = createStoreStructure(points);
-
-          this._pointsStore.setItems(items);
+          this._pointsStore.setItems(createStoreStructure(points));
           return points;
         });
     }
 
-    const storePoints = Object.values(this._pointsStore.getItems());
-    return Promise.resolve(storePoints);
+    return Promise.resolve(Object.values(this._pointsStore.getItems()));
   }
 
   getDestinations() {
@@ -51,8 +48,7 @@ export default class DataManager {
         });
     }
 
-    const storeDestinations = this._commonStore.getItem(DESTINATIONS_KEY);
-    return Promise.resolve(storeDestinations);
+    return Promise.resolve(this._commonStore.getItem(DESTINATIONS_KEY));
   }
 
   getOffers() {
@@ -64,8 +60,7 @@ export default class DataManager {
         });
     }
 
-    const storeOffers = this._commonStore.getItem(OFFERS_KEY);
-    return Promise.resolve(storeOffers);
+    return Promise.resolve(this._commonStore.getItem(OFFERS_KEY));
   }
 
   createPoint(pointData) {

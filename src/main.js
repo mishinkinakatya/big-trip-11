@@ -70,10 +70,12 @@ Promise.all([
     storage.setAllDestination(results[0]);
 
     storage.setAllOffers(results[1]);
+    const truePoints = results[2].map((it) => {
+      return convertToClientModel(it);
+    }).filter((it) => it !== null);
 
-    const pointsControllers = results[2].map((it) => {
-      const model = convertToClientModel(it);
-      return new PointController(new PointModel(model, model, PointMode.DEFAULT));
+    const pointsControllers = truePoints.map((it) => {
+      return new PointController(new PointModel(it, it, PointMode.DEFAULT));
     });
 
     if (pointsControllers.length === 0) {
@@ -96,12 +98,14 @@ siteMenuComponent.setMenuItemChangeHandler((menuItem) => {
     case MenuItem.TABLE:
       statsController.remove();
       pointsController.show();
+      filterController.restoreFilters();
       addButton.disabled = false;
       break;
     case MenuItem.STATS:
       pointsModel.resetAllPoints(pointsModel.getActualPoints());
       pointsController.hide();
       statsController.activate();
+      filterController.forceDisabled();
       addButton.disabled = true;
       break;
   }
