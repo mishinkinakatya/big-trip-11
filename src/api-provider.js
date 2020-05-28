@@ -2,6 +2,6 @@ import API from "./api.js";
 
 const AUTHORIZATION = `Basic Zlrt59fjkco43dld4dkp`;
 
-let api = new API(AUTHORIZATION);
+const api = new API(AUTHORIZATION);
 
 export const getApi = () => api;

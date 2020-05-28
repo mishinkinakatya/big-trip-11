@@ -2,9 +2,7 @@ const CACHE_PREFIX = `big-trip-cache`;
 const CACHE_VER = `v1`;
 const CACHE_NAME = `${CACHE_PREFIX}-${CACHE_VER}`;
 
-const StatusCode = {
-  OK: 200,
-};
+const STATUS_CODE_OK = 200;
 
 self.addEventListener(`install`, (evt) => {
   evt.waitUntil(
@@ -64,7 +62,7 @@ self.addEventListener(`fetch`, (evt) => {
         }
         return fetch(request)
           .then((response) => {
-            if (!response || response.status !== StatusCode.OK || response.type !== `basic`) {
+            if (!response || response.status !== STATUS_CODE_OK || response.type !== `basic`) {
               return response;
             }
 
