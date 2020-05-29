@@ -51,6 +51,7 @@ export default class PointController extends AbstractController {
   _createPointEditComponent() {
     const pointEditComponent = new PointEditComponent(this.getModel().getMode(), this._getActualPointData, this._updateTempPoint, this._getTempPointData);
 
+
     const changeModel = () => {
       this.getModel().applyChanges();
       this.getModel().setMode(PointMode.DEFAULT, ChangePropertyType.FROM_VIEW);
@@ -70,7 +71,6 @@ export default class PointController extends AbstractController {
 
     pointEditComponent.setSubmitHandler((evt) => {
       const tempPoint = this.getModel().getTempPoint();
-
       if (tempPoint.destination === ``) {
         pointEditComponent.returnValidatedFields().destination.setCustomValidity(`Destinaton must be indicated`);
         return;
@@ -128,6 +128,25 @@ export default class PointController extends AbstractController {
 
     pointEditComponent.setRollupButtonClickHandler(() => {
       this._reset();
+    });
+
+    pointEditComponent.setFavoriteButtonClickHandler(() => {
+      const tempPoint = this.getModel().getTempPoint();
+      tempPoint.isFavorite = !tempPoint.isFavorite;
+
+      if (this.getModel().getMode() === PointMode.ADDING) {
+        this.getModel().updateTempPoint(tempPoint);
+      } else if (this.getModel().getMode() === PointMode.EDIT) {
+        this._dataManager.updatePoint(convertToServerModel(tempPoint), tempPoint.id)
+          .then(() => {
+            this.getModel().updateTempPoint(tempPoint);
+            this.getModel().applyChanges();
+            this.initView();
+          })
+          .catch(() => {
+            handleTheError(ButtonNames.SAVE_DEFAULT);
+          });
+      }
     });
 
     return pointEditComponent;

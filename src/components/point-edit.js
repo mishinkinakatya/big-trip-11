@@ -147,27 +147,27 @@ const createEventEditTemplate = (pointOfTrip, mode, isSending, buttonName) => {
       ${isPointDetailsShowing ?
       `<section class="event__details">
       ${isOfferShowing ?
-      `<section class="event__section  event__section--offers">
+        `<section class="event__section  event__section--offers">
           <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
           <div class="event__available-offers">
           ${offersMarkup}
           </div>
         </section>`
-      : ``}
+        : ``}
 
         <section class="event__section  event__section--destination">
         ${isDescriptionShowing ?
-      `<h3 class="event__section-title  event__section-title--destination">Destination</h3>
+        `<h3 class="event__section-title  event__section-title--destination">Destination</h3>
           <p class="event__destination-description">${descriptionMarkup}</p>`
-      : ``}
+        : ``}
       ${isPhotosShowing ?
-      `<div class="event__photos-container">
+        `<div class="event__photos-container">
             <div class="event__photos-tape">
             ${photosMarkup}
             </div>
           </div>`
-      : ``}
+        : ``}
         </section>
       </section>`
       : ``}
@@ -240,6 +240,10 @@ export default class PointEdit extends AbstractSmartComponent {
     this._rollupButtonClickHandler = handler;
   }
 
+  setFavoriteButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__favorite-checkbox`).addEventListener(`click`, handler);
+    this._favoriteButtonClickHandler = handler;
+  }
 
   returnValidatedFields() {
     return {
@@ -371,26 +375,23 @@ export default class PointEdit extends AbstractSmartComponent {
     element.querySelector(`.event__input--price`).addEventListener(`change`, (evt) => {
       let pointPrice = evt.target.value;
 
-      this._onChangeDataPoint((tempPoint) => {
-        if (tempPoint.price === pointPrice) {
+      const getNewTempPoint = () => {
+        if (this._tempPoint.price === pointPrice) {
           return null;
         }
         if (!Number.isInteger(Number(pointPrice))) {
-          pointPrice = tempPoint.price;
+          pointPrice = this._tempPoint.price;
         }
-        const newTempPoint = tempPoint;
+        const newTempPoint = this._tempPoint;
         newTempPoint.price = Number(pointPrice);
         return newTempPoint;
-      });
-    });
+      };
 
-    element.querySelector(`.event__favorite-checkbox`).addEventListener(`change`, () => {
-      this._onChangeDataPoint((tempPoint) => {
+      const newTempPoint = getNewTempPoint();
 
-        const newTempPoint = tempPoint;
-        newTempPoint.isFavorite = !tempPoint.isFavorite;
-        return newTempPoint;
-      });
+      if (newTempPoint) {
+        this._updateTempPoint(newTempPoint);
+      }
     });
 
     if (element.querySelector(`.event__available-offers`)) {
