@@ -1,8 +1,8 @@
 import AbstractComponent from "./abstract-component.js";
-import {MONTH} from "../const.js";
+import {MONTHS} from "../const.js";
 
 const createDescriptionDate = (item) => {
-  let monthName = MONTH[item.slice(6, 7)];
+  let monthName = MONTHS[item.slice(6, 7)];
   const dateNumber = item.slice(8, 10);
   return (
     `${monthName} ${dateNumber}`

@@ -156,7 +156,7 @@ export default class PointsModel {
     }
     const index = this._allPointsControllers.findIndex((it) => it.getModel() === pointModel);
 
-    const notDefault = [].concat(this._allPointsControllers.slice(0, index), this._allPointsControllers.slice(index + 1)).filter((point) => {
+    const notDefaults = [].concat(this._allPointsControllers.slice(0, index), this._allPointsControllers.slice(index + 1)).filter((point) => {
       return point.getModel().getMode() !== PointMode.DEFAULT;
     });
 
@@ -166,7 +166,7 @@ export default class PointsModel {
         break;
       case PointMode.EDIT:
       case PointMode.ADDING:
-        this.resetAllPoints(notDefault);
+        this.resetAllPoints(notDefaults);
         break;
     }
     this._callActualPointsControllersChangeObservers(this._actualPointsControllersChangeObservers);

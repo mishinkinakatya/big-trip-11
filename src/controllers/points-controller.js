@@ -19,7 +19,7 @@ export default class PointsController extends AbstractController {
   }
 
   _rerender() {
-    this._tripDaysComponent.clearTripDays();
+    this._tripDaysComponent.clear();
     this.render();
   }
 }

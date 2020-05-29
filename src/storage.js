@@ -1,4 +1,4 @@
-import {deepCopyFunction} from "./utils/common.js";
+import {deepCopy} from "./utils/common.js";
 
 export default class DataStorage {
   constructor() {
@@ -7,11 +7,11 @@ export default class DataStorage {
   }
 
   getAllDestinations() {
-    return this._allDestinations.map((it) => deepCopyFunction(it));
+    return this._allDestinations.map((it) => deepCopy(it));
   }
 
   getAllOffers() {
-    return this._allOffers.map((it) => deepCopyFunction(it));
+    return this._allOffers.map((it) => deepCopy(it));
   }
 
   setAllDestination(data) {

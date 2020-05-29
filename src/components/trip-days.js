@@ -38,7 +38,7 @@ export default class TripDays extends AbstractComponent {
     }
   }
 
-  clearTripDays() {
+  clear() {
     remove(this._tripWithoutDays);
     this._daysOfTrip.forEach((day) => remove(day));
   }

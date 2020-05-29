@@ -53,7 +53,7 @@ export const convertToClientModel = (inputModel) => {
 };
 
 export const convertToServerModel = (inputModel) => {
-  const checkedOffers = inputModel.offers.filter((offer) => offer.isChecked === true);
+  const checkedOffers = inputModel.offers.filter((offer) => offer.isChecked);
   const offers = checkedOffers.length !== 0 ? checkedOffers.map((offer) => {
     return Object.assign({}, {
       "title": offer.title,

@@ -24,16 +24,21 @@ const getPointDurationInDHM = (pointDurationInMs) => {
   const hourCount = castDateTimeFormat(moment.duration(pointDurationInMs, `milliseconds`).hours());
   const minutesCount = castDateTimeFormat(moment.duration(pointDurationInMs, `milliseconds`).minutes());
 
+
   if (dayCount > 0) {
+    if (hourCount === `00` && minutesCount === `00`) {
+      return `${dayCount}D`;
+    } else if (minutesCount === `00`) {
+      return `${dayCount}D ${hourCount}H`;
+    }
     return `${dayCount}D ${hourCount}H ${minutesCount}M`;
-  } else if (hourCount > 0) {
-    return `${hourCount}H ${minutesCount}M`;
-  } else {
-    return `${minutesCount}M`;
+  } else if (hourCount > `00`) {
+    return minutesCount === `00` ? `${hourCount}H` : `${hourCount}H ${minutesCount}M`;
   }
+  return `${minutesCount}M`;
 };
 
-const deepCopyFunction = (inObject) => {
+const deepCopy = (inObject) => {
   let outObject;
   let value;
   let key;
@@ -47,7 +52,7 @@ const deepCopyFunction = (inObject) => {
   for (key in inObject) {
     if ({}.hasOwnProperty.call(inObject, key)) {
       value = inObject[key];
-      outObject[key] = deepCopyFunction(value);
+      outObject[key] = deepCopy(value);
     }
   }
 
@@ -58,5 +63,5 @@ const isFutureDate = (nowDate, startDate) => startDate > nowDate;
 
 const isPastDate = (nowDate, endDate) => endDate < nowDate;
 
-export {deepCopyFunction, getPointDurationInDHM, getPointDurationInMs, castDateTimeFormat, formatDate, formatTime, isFutureDate, isPastDate};
+export {deepCopy, getPointDurationInDHM, getPointDurationInMs, castDateTimeFormat, formatDate, formatTime, isFutureDate, isPastDate};
 

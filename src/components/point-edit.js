@@ -1,18 +1,11 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {ALL_POINT_ACTION, POINT_ACTIVITY, POINT_TRANSPORT, PointMode} from "../const.js";
+import {ALL_POINT_ACTION, POINT_ACTIVITY, POINT_TRANSPORT, ButtonNames, PointMode} from "../const.js";
 import {getPointDurationInDHM, getPointDurationInMs} from "../utils/common.js";
 import {getStorage} from "../storage-provider.js";
 import flatpickr from "flatpickr";
 import moment from "moment";
 import "flatpickr/dist/flatpickr.min.css";
 
-const ButtonNames = {
-  SAVE_DEFAULT: `Save`,
-  DELETE_DEFAULT: `Delete`,
-  SAVE_SENDING: `Saving...`,
-  DELETE_SENDING: `Deleting...`,
-  CANCEL: `Cancel`,
-};
 
 const OFFER_NAME_PREFIX = `event-offer-`;
 
@@ -55,13 +48,16 @@ const createPhotosMarkup = (photos) => {
   }).join(`\n`) : ``;
 };
 
-const createEventEditTemplate = (pointOfTrip, mode, isSending) => {
+const createEventEditTemplate = (pointOfTrip, mode, isSending, buttonName) => {
   const {photos, isFavorite, price, type, typeWithPreposition, destination, description, offers, startDate, endDate} = pointOfTrip;
 
-  const submitButton = !isSending ? ButtonNames.SAVE_DEFAULT : ButtonNames.SAVE_SENDING;
-  let resetButton = ButtonNames.CANCEL;
-  if (mode === PointMode.EDIT) {
-    resetButton = !isSending ? ButtonNames.DELETE_DEFAULT : ButtonNames.DELETE_SENDING;
+  let submitButton = ButtonNames.SAVE_DEFAULT;
+  if (isSending && buttonName === ButtonNames.SAVE_DEFAULT) {
+    submitButton = ButtonNames.SAVE_SENDING;
+  }
+  let resetButton = mode === PointMode.EDIT ? ButtonNames.DELETE_DEFAULT : ButtonNames.CANCEL;
+  if (isSending && buttonName === ButtonNames.DELETE_DEFAULT) {
+    resetButton = ButtonNames.DELETE_SENDING;
   }
 
   const isDisabled = isSending ? `disabled` : ``;
@@ -199,8 +195,8 @@ export default class PointEdit extends AbstractSmartComponent {
     this._subscribeOnEvents();
   }
 
-  getTemplate(isSending) {
-    return createEventEditTemplate(this._tempPoint, this._mode, isSending);
+  getTemplate(isSending, buttonName) {
+    return createEventEditTemplate(this._tempPoint, this._mode, isSending, buttonName);
   }
 
   recoveryListeners() {
@@ -210,8 +206,8 @@ export default class PointEdit extends AbstractSmartComponent {
     this._subscribeOnEvents();
   }
 
-  rerender(isSending) {
-    super.rerender(isSending);
+  rerender(isSending, buttonName) {
+    super.rerender(isSending, buttonName);
     this._applyFlatpickr();
   }
 
@@ -242,6 +238,14 @@ export default class PointEdit extends AbstractSmartComponent {
   setRollupButtonClickHandler(handler) {
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
     this._rollupButtonClickHandler = handler;
+  }
+
+
+  returnValidatedFields() {
+    return {
+      destination: this.getElement().querySelector(`.event__input--destination`),
+      price: this.getElement().querySelector(`.event__input--price`),
+    };
   }
 
   _applyFlatpickr() {

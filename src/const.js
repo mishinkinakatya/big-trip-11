@@ -29,7 +29,15 @@ const ActionIcon = {
 
 const ALL_POINT_ACTION = Object.assign({}, POINT_TRANSPORT, POINT_ACTIVITY);
 
-const MONTH = [`JAN`, `FEB`, `MAR`, `APR`, `MAY`, `JUNE`, `JULY`, `AUG`, `SEPT`, `OCT`, `NOV`, `DEC`];
+const MONTHS = [`JAN`, `FEB`, `MAR`, `APR`, `MAY`, `JUNE`, `JULY`, `AUG`, `SEPT`, `OCT`, `NOV`, `DEC`];
+
+const ButtonNames = {
+  SAVE_DEFAULT: `Save`,
+  DELETE_DEFAULT: `Delete`,
+  SAVE_SENDING: `Saving...`,
+  DELETE_SENDING: `Deleting...`,
+  CANCEL: `Cancel`,
+};
 
 const FilterType = {
   EVERYTHING: `Everything`,
@@ -59,5 +67,5 @@ const MenuItem = {
   STATS: `stats`,
 };
 
-export {ActionIcon, ALL_POINT_ACTION, ChangePropertyType, FilterType, MenuItem, MONTH, PointMode, POINT_ACTIVITY, POINT_TRANSPORT, SortType};
+export {ActionIcon, ButtonNames, ALL_POINT_ACTION, ChangePropertyType, FilterType, MenuItem, MONTHS, PointMode, POINT_ACTIVITY, POINT_TRANSPORT, SortType};
 

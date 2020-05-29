@@ -1,7 +1,7 @@
 import AbstractController from "./abstract-controller.js";
 import PointEditComponent from "../components/point-edit.js";
 import PointOfDayComponent from "../components/point-of-day.js";
-import {ChangePropertyType, PointMode} from "../const.js";
+import {ChangePropertyType, ButtonNames, PointMode} from "../const.js";
 import {convertToClientModel, convertToServerModel} from "../utils/model-adapter.js";
 import {getDataManager} from "../data-manager-provider.js";
 
@@ -59,8 +59,8 @@ export default class PointController extends AbstractController {
       document.removeEventListener(`keydown`, this._escKeyDownHandler);
     };
 
-    const handleTheError = () => {
-      pointEditComponent.rerender(false);
+    const handleTheError = (buttonName) => {
+      pointEditComponent.rerender(false, buttonName);
       this._shake(pointEditComponent);
     };
 
@@ -72,22 +72,22 @@ export default class PointController extends AbstractController {
       const tempPoint = this.getModel().getTempPoint();
 
       if (tempPoint.destination === ``) {
-        pointEditComponent.getElement().querySelector(`.event__input--destination`).setCustomValidity(`Destinaton must be indicated`);
+        pointEditComponent.returnValidatedFields().destination.setCustomValidity(`Destinaton must be indicated`);
         return;
       }
 
       if (tempPoint.price === ``) {
-        pointEditComponent.getElement().querySelector(`.event__input--price`).setCustomValidity(`Price must be indicated`);
+        pointEditComponent.returnValidatedFields().price.setCustomValidity(`Price must be indicated`);
         return;
       }
 
       if (tempPoint.price < 0) {
-        pointEditComponent.getElement().querySelector(`.event__input--price`).setCustomValidity(`Price must be positive integer number`);
+        pointEditComponent.returnValidatedFields().price.setCustomValidity(`Price must be positive integer number`);
         return;
       }
       evt.preventDefault();
 
-      pointEditComponent.rerender(true);
+      pointEditComponent.rerender(true, ButtonNames.SAVE_DEFAULT);
 
       if (this.getModel().getMode() === PointMode.ADDING) {
         this._dataManager.createPoint(convertToServerModel(tempPoint))
@@ -96,7 +96,7 @@ export default class PointController extends AbstractController {
             changeModel();
           })
           .catch(() => {
-            handleTheError();
+            handleTheError(ButtonNames.SAVE_DEFAULT);
           });
       } else if (this.getModel().getMode() === PointMode.EDIT) {
         this._dataManager.updatePoint(convertToServerModel(tempPoint), tempPoint.id)
@@ -104,13 +104,13 @@ export default class PointController extends AbstractController {
             changeModel();
           })
           .catch(() => {
-            handleTheError();
+            handleTheError(ButtonNames.SAVE_DEFAULT);
           });
       }
     });
 
     pointEditComponent.setResetButtonClickHandler(() => {
-      pointEditComponent.rerender(true);
+      pointEditComponent.rerender(true, ButtonNames.DELETE_DEFAULT);
 
       if (this.getModel().getMode() === PointMode.ADDING) {
         this.getModel().removePoint();
@@ -121,7 +121,7 @@ export default class PointController extends AbstractController {
             pointEditComponent.removeElement();
           })
           .catch(() => {
-            handleTheError();
+            handleTheError(ButtonNames.DELETE_DEFAULT);
           });
       }
     });

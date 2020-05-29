@@ -15,9 +15,8 @@ const StatusCode = {
 const checkStatus = (response) => {
   if (response.status >= StatusCode.OK && response.status < StatusCode.REDIRECT) {
     return response;
-  } else {
-    throw new Error(`${response.status}: ${response.statusText}`);
   }
+  throw new Error(`${response.status}: ${response.statusText}`);
 };
 
 export default class API {
