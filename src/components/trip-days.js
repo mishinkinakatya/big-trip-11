@@ -4,6 +4,7 @@ import TripWithoutDaysComponent from "./trip-without-days.js";
 import {castDateTimeFormat} from "../utils/common.js";
 import {PointMode, SortType} from "../const.js";
 import {render, renderElementToElement, remove, replaceElement, RenderPosition} from "../utils/render.js";
+import moment from "moment";
 
 const createTripDaysTemplate = () => `<ul class="trip-days"></ul>`;
 
@@ -70,8 +71,8 @@ export default class TripDays extends AbstractComponent {
       const tripMonth = tripDay.slice(5, 7);
 
       existedPoints.filter((point) => {
-        const pointDate = castDateTimeFormat(point.getModel().getActualPoint().startDate.getDate());
-        const pointMonth = castDateTimeFormat(point.getModel().getActualPoint().startDate.getMonth());
+        const pointDate = castDateTimeFormat(moment(point.getModel().getActualPoint().startDate).date());
+        const pointMonth = castDateTimeFormat(moment(point.getModel().getActualPoint().startDate).month());
 
         return tripMonth === pointMonth && tripDate === pointDate;
       }).map((point) => {
@@ -86,7 +87,7 @@ export default class TripDays extends AbstractComponent {
 
   _getPointsDays(pointsControllers) {
     const points = pointsControllers.map((it) => it.getModel().getActualPoint());
-    return points.map((it) => [`${it.startDate.getFullYear()}-${castDateTimeFormat(it.startDate.getMonth())}-${castDateTimeFormat(it.startDate.getDate())}`].join(`, `));
+    return points.map((it) => [`${moment(it.startDate).year()}-${castDateTimeFormat(moment(it.startDate).month())}-${castDateTimeFormat(moment(it.startDate).date())}`].join(`, `));
   }
 
   _viewChangeObserverHandler(newElement, oldElement) {

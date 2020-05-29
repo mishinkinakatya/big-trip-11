@@ -1,4 +1,5 @@
 import {PointMode} from "../const.js";
+import {deepCopy} from "../utils/common.js";
 
 export default class PointModel {
   constructor(point, tempPoint, mode) {
@@ -16,7 +17,7 @@ export default class PointModel {
   }
 
   getTempPoint() {
-    return Object.assign({}, this._tempPoint);
+    return deepCopy(this._tempPoint);
   }
 
   getMode() {

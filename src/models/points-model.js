@@ -3,13 +3,14 @@ import PointModel from "./point-model.js";
 import {getPointsByFilter} from "../utils/filter.js";
 import {ChangePropertyType, FilterType, PointMode, SortType} from "../const.js";
 import {getStorage} from "../storage-provider.js";
+import moment from "moment";
 
 const getEmptyPoint = (offers) => {
   return {
     description: ``,
     destination: ``,
     duration: `00M`,
-    endDate: new Date(),
+    endDate: moment().format(),
     isFavorite: false,
     offers: offers.map((it) => {
       return {
@@ -20,7 +21,7 @@ const getEmptyPoint = (offers) => {
     }),
     photos: null,
     price: ``,
-    startDate: new Date(),
+    startDate: moment().format(),
     type: `bus`,
     typeWithPreposition: `Bus to`,
   };

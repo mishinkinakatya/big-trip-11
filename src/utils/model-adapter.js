@@ -1,6 +1,7 @@
 import {ALL_POINT_ACTION} from "../const.js";
 import {getPointDurationInMs, getPointDurationInDHM} from "./common.js";
 import {getStorage} from "../storage-provider.js";
+import moment from "moment";
 
 export const convertToClientModel = (inputModel) => {
 
@@ -15,8 +16,8 @@ export const convertToClientModel = (inputModel) => {
   } else {
     const type = inputModel[`type`];
     const typeWithPreposition = `${ALL_POINT_ACTION[type]}`;
-    const startDate = new Date(inputModel[`date_from`]);
-    const endDate = new Date(inputModel[`date_to`]);
+    const startDate = moment(inputModel[`date_from`]).format();
+    const endDate = moment(inputModel[`date_to`]).format();
     const durationInMs = getPointDurationInMs(startDate, endDate);
     const offersFromServer = inputModel[`offers`];
 
@@ -63,8 +64,8 @@ export const convertToServerModel = (inputModel) => {
 
   return {
     "base_price": inputModel.price,
-    "date_from": inputModel.startDate.toISOString(),
-    "date_to": inputModel.endDate.toISOString(),
+    "date_from": inputModel.startDate,
+    "date_to": inputModel.endDate,
     "destination": {
       "description": inputModel.description,
       "name": inputModel.destination,

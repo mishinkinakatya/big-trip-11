@@ -6,10 +6,6 @@ const castDateTimeFormat = (value) => {
 
 const formatTime = (date) => moment(date).format(`HH:mm`);
 
-const formatDate = (date) => {
-  return moment(date).format(`YYYY-MM-DD`);
-};
-
 const calculatePointDuration = (start, end) => {
   return moment.duration(moment(end).diff(moment(start)));
 };
@@ -63,5 +59,5 @@ const isFutureDate = (nowDate, startDate) => startDate > nowDate;
 
 const isPastDate = (nowDate, endDate) => endDate < nowDate;
 
-export {deepCopy, getPointDurationInDHM, getPointDurationInMs, castDateTimeFormat, formatDate, formatTime, isFutureDate, isPastDate};
+export {deepCopy, getPointDurationInDHM, getPointDurationInMs, castDateTimeFormat, formatTime, isFutureDate, isPastDate};
 

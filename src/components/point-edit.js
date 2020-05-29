@@ -3,7 +3,6 @@ import {ALL_POINT_ACTION, POINT_ACTIVITY, POINT_TRANSPORT, ButtonNames, PointMod
 import {getPointDurationInDHM, getPointDurationInMs} from "../utils/common.js";
 import {getStorage} from "../storage-provider.js";
 import flatpickr from "flatpickr";
-import moment from "moment";
 import "flatpickr/dist/flatpickr.min.css";
 
 
@@ -147,27 +146,27 @@ const createEventEditTemplate = (pointOfTrip, mode, isSending, buttonName) => {
       ${isPointDetailsShowing ?
       `<section class="event__details">
       ${isOfferShowing ?
-        `<section class="event__section  event__section--offers">
+      `<section class="event__section  event__section--offers">
           <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
           <div class="event__available-offers">
           ${offersMarkup}
           </div>
         </section>`
-        : ``}
+      : ``}
 
         <section class="event__section  event__section--destination">
         ${isDescriptionShowing ?
-        `<h3 class="event__section-title  event__section-title--destination">Destination</h3>
+      `<h3 class="event__section-title  event__section-title--destination">Destination</h3>
           <p class="event__destination-description">${descriptionMarkup}</p>`
-        : ``}
+      : ``}
       ${isPhotosShowing ?
-        `<div class="event__photos-container">
+      `<div class="event__photos-container">
             <div class="event__photos-tape">
             ${photosMarkup}
             </div>
           </div>`
-        : ``}
+      : ``}
         </section>
       </section>`
       : ``}
@@ -338,7 +337,7 @@ export default class PointEdit extends AbstractSmartComponent {
     });
 
     element.querySelector(`#event-start-time-1`).addEventListener(`change`, (evt) => {
-      const pointStartDate = moment(evt.target.value).toDate();
+      const pointStartDate = evt.target.value;
       this._onChangeDataPoint((tempPoint) => {
 
         if (tempPoint.startDate === pointStartDate) {
@@ -359,7 +358,7 @@ export default class PointEdit extends AbstractSmartComponent {
     });
 
     element.querySelector(`#event-end-time-1`).addEventListener(`change`, (evt) => {
-      const pointEndDate = moment(evt.target.value).toDate();
+      const pointEndDate = evt.target.value;
       this._onChangeDataPoint((tempPoint) => {
         if (tempPoint.endDate === pointEndDate) {
           return null;

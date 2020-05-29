@@ -1,5 +1,5 @@
 import AbstractComponent from "./abstract-component.js";
-import {formatDate, formatTime} from "../utils/common.js";
+import {formatTime} from "../utils/common.js";
 
 const createOfferMarkup = (offerType, offerPrice) => {
   return (
@@ -13,9 +13,6 @@ const createOfferMarkup = (offerType, offerPrice) => {
 
 const createPointOfDayTemplate = (pointOfDay) => {
   const {type, typeWithPreposition, destination, price, startDate, endDate, duration, offers} = pointOfDay;
-
-  const startDay = formatDate(startDate);
-  const endDay = formatDate(endDate);
 
   const startTime = formatTime(startDate);
   const endTime = formatTime(endDate);
@@ -39,9 +36,9 @@ const createPointOfDayTemplate = (pointOfDay) => {
 
         <div class="event__schedule">
             <p class="event__time">
-              <time class="event__start-time" datetime="${startDay}T${startTime}">${startTime}</time>
+              <time class="event__start-time" datetime="${startDate}">${startTime}</time>
               &mdash;
-              <time class="event__end-time" datetime="${endDay}T${endTime}">${endTime}</time>
+              <time class="event__end-time" datetime="${endDate}">${endTime}</time>
             </p>
             <p class="event__duration">${duration}</p>
         </div>
