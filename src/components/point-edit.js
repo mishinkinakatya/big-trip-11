@@ -259,10 +259,10 @@ export default class PointEdit extends AbstractSmartComponent {
       this._flatpickrEnd = null;
     }
 
-    const dateStartElements = this.getElement().querySelector(`#event-start-time-1`);
-    const dateEndElements = this.getElement().querySelector(`#event-end-time-1`);
+    const dateStartElement = this.getElement().querySelector(`#event-start-time-1`);
+    const dateEndElement = this.getElement().querySelector(`#event-end-time-1`);
 
-    this._flatpickrStart = flatpickr(dateStartElements, {
+    this._flatpickrStart = flatpickr(dateStartElement, {
       altInput: true,
       altFormat: `d/m/y H:i`,
       allowInput: true,
@@ -270,7 +270,7 @@ export default class PointEdit extends AbstractSmartComponent {
       enableTime: true,
     });
 
-    this._flatpickrEnd = flatpickr(dateEndElements, {
+    this._flatpickrEnd = flatpickr(dateEndElement, {
       altInput: true,
       altFormat: `d/m/y H:i`,
       allowInput: true,

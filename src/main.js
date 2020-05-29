@@ -132,7 +132,9 @@ addButton.addEventListener(`click`, () => {
 
 // sw
 window.addEventListener(`load`, () => {
-  navigator.serviceWorker.register(`/sw.js`);
+  navigator.serviceWorker.register(`/sw.js`)
+    .then(() => {})
+    .catch(() => {});
 });
 
 // sync

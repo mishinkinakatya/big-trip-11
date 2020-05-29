@@ -1,13 +1,9 @@
 import AbstractComponent from "./abstract-component.js";
 import {MONTHS} from "../const.js";
+import {parseDate} from "../utils/common.js";
 
-const createDescriptionDate = (item) => {
-  let monthName = MONTHS[item.slice(6, 7)];
-  const dateNumber = item.slice(8, 10);
-  return (
-    `${monthName} ${dateNumber}`
-  );
-};
+
+const createDescriptionDate = (item) => `${MONTHS[Number(parseDate(item).month)]} ${parseDate(item).date}`;
 
 const createDayInfoMarkup = (number, day) =>
   `<div class="day__info">

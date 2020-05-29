@@ -55,9 +55,16 @@ const deepCopy = (inObject) => {
   return outObject;
 };
 
+const parseDate = (inputDate) => {
+  return {
+    date: inputDate.slice(8, 10),
+    month: inputDate.slice(5, 7),
+  };
+};
+
 const isFutureDate = (nowDate, startDate) => startDate > nowDate;
 
 const isPastDate = (nowDate, endDate) => endDate < nowDate;
 
-export {deepCopy, getPointDurationInDHM, getPointDurationInMs, castDateTimeFormat, formatTime, isFutureDate, isPastDate};
+export {deepCopy, getPointDurationInDHM, getPointDurationInMs, castDateTimeFormat, formatTime, isFutureDate, isPastDate, parseDate};
 

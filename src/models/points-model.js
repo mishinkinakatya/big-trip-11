@@ -120,7 +120,7 @@ export default class PointsModel {
       case SortType.PRICE:
         return pointsControllers.sort((a, b) => b.getModel().getActualPoint().price - a.getModel().getActualPoint().price);
       case SortType.EVENT:
-        return pointsControllers.sort((a, b) => a.getModel().getActualPoint().startDate - b.getModel().getActualPoint().startDate);
+        return pointsControllers.sort((a, b) => moment(a.getModel().getActualPoint().startDate).toDate() - moment(b.getModel().getActualPoint().startDate).toDate());
       default:
         throw new Error(`Sort type is invalid`);
     }

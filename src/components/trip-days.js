@@ -1,7 +1,7 @@
 import AbstractComponent from "./abstract-component.js";
 import DayOfTripComponent from "./day-of-trip.js";
 import TripWithoutDaysComponent from "./trip-without-days.js";
-import {castDateTimeFormat} from "../utils/common.js";
+import {castDateTimeFormat, parseDate} from "../utils/common.js";
 import {PointMode, SortType} from "../const.js";
 import {render, renderElementToElement, remove, replaceElement, RenderPosition} from "../utils/render.js";
 import moment from "moment";
@@ -67,8 +67,8 @@ export default class TripDays extends AbstractComponent {
       render(this.getElement(), dayOfTrip, RenderPosition.BEFOREEND);
 
       const tripDay = dayOfTrip.getElement().querySelector(`.day__date`).getAttribute(`dateTime`);
-      const tripDate = tripDay.slice(8, 10);
-      const tripMonth = tripDay.slice(5, 7);
+      const tripDate = parseDate(tripDay).date;
+      const tripMonth = parseDate(tripDay).month;
 
       existedPoints.filter((point) => {
         const pointDate = castDateTimeFormat(moment(point.getModel().getActualPoint().startDate).date());
