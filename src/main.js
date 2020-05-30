@@ -130,13 +130,6 @@ addButton.addEventListener(`click`, () => {
   setDisabledForAddButton();
 });
 
-// sw
-window.addEventListener(`load`, () => {
-  navigator.serviceWorker.register(`/sw.js`)
-    .then(() => {})
-    .catch(() => {});
-});
-
 // sync
 window.addEventListener(`online`, () => {
   document.title = document.title.replace(` [offline]`, ``);
