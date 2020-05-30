@@ -1,7 +1,6 @@
 import AbstractComponent from "./abstract-component.js";
 import DayOfTripComponent from "./day-of-trip.js";
 import TripWithoutDaysComponent from "./trip-without-days.js";
-import {castDateTimeFormat, parseDate} from "../utils/common.js";
 import {PointMode, SortType} from "../const.js";
 import {render, renderElementToElement, remove, replaceElement, RenderPosition} from "../utils/render.js";
 import moment from "moment";
@@ -14,7 +13,6 @@ export default class TripDays extends AbstractComponent {
     this._daysOfTrip = [];
 
     this._tripWithoutDays = new TripWithoutDaysComponent();
-    this._dayOfTrip = new DayOfTripComponent();
 
     this._viewChangeObserverHandler = this._viewChangeObserverHandler.bind(this);
   }
@@ -67,12 +65,12 @@ export default class TripDays extends AbstractComponent {
       render(this.getElement(), dayOfTrip, RenderPosition.BEFOREEND);
 
       const tripDay = dayOfTrip.getElement().querySelector(`.day__date`).getAttribute(`dateTime`);
-      const tripDate = parseDate(tripDay).date;
-      const tripMonth = parseDate(tripDay).month;
+      const tripDate = moment(tripDay).date();
+      const tripMonth = moment(tripDay).month();
 
       existedPoints.filter((point) => {
-        const pointDate = castDateTimeFormat(moment(point.getModel().getActualPoint().startDate).date());
-        const pointMonth = castDateTimeFormat(moment(point.getModel().getActualPoint().startDate).month());
+        const pointDate = moment(point.getModel().getActualPoint().startDate).date();
+        const pointMonth = moment(point.getModel().getActualPoint().startDate).month();
 
         return tripMonth === pointMonth && tripDate === pointDate;
       }).map((point) => {
@@ -87,12 +85,10 @@ export default class TripDays extends AbstractComponent {
 
   _getPointsDays(pointsControllers) {
     const points = pointsControllers.map((it) => it.getModel().getActualPoint());
-    return points.map((it) => [`${moment(it.startDate).year()}-${castDateTimeFormat(moment(it.startDate).month())}-${castDateTimeFormat(moment(it.startDate).date())}`].join(`, `));
+    return points.map((it) => moment(it.startDate).format(`YYYY-MM-DD`));
   }
 
   _viewChangeObserverHandler(newElement, oldElement) {
     replaceElement(newElement, oldElement);
   }
-
 }
-

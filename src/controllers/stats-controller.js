@@ -20,6 +20,6 @@ export default class StatsController extends AbstractController {
   }
 
   remove() {
-    this._statsComponent.clearStats();
+    this._statsComponent.clear();
   }
 }

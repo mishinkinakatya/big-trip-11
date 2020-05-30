@@ -25,7 +25,7 @@ export default class SortController extends AbstractController {
   }
 
   _rerender() {
-    this._sortComponent.clearSort();
+    this._sortComponent.clear();
     this.render();
   }
 

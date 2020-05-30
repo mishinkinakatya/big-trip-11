@@ -4,8 +4,6 @@ const castDateTimeFormat = (value) => {
   return value < 10 ? `0${value}` : String(value);
 };
 
-const formatTime = (date) => moment(date).format(`HH:mm`);
-
 const calculatePointDuration = (start, end) => {
   return moment.duration(moment(end).diff(moment(start)));
 };
@@ -55,16 +53,9 @@ const deepCopy = (inObject) => {
   return outObject;
 };
 
-const parseDate = (inputDate) => {
-  return {
-    date: inputDate.slice(8, 10),
-    month: inputDate.slice(5, 7),
-  };
-};
-
 const isFutureDate = (nowDate, startDate) => startDate > nowDate;
 
 const isPastDate = (nowDate, endDate) => endDate < nowDate;
 
-export {deepCopy, getPointDurationInDHM, getPointDurationInMs, castDateTimeFormat, formatTime, isFutureDate, isPastDate, parseDate};
+export {deepCopy, getPointDurationInDHM, getPointDurationInMs, isFutureDate, isPastDate};
 

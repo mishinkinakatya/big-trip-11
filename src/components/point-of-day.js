@@ -1,5 +1,5 @@
 import AbstractComponent from "./abstract-component.js";
-import {formatTime} from "../utils/common.js";
+import moment from "moment";
 
 const createOfferMarkup = (offerType, offerPrice) => {
   return (
@@ -14,8 +14,8 @@ const createOfferMarkup = (offerType, offerPrice) => {
 const createPointOfDayTemplate = (pointOfDay) => {
   const {type, typeWithPreposition, destination, price, startDate, endDate, duration, offers} = pointOfDay;
 
-  const startTime = formatTime(startDate);
-  const endTime = formatTime(endDate);
+  const startTime = moment(startDate).format(`HH:mm`);
+  const endTime = moment(endDate).format(`HH:mm`);
 
   const OFFERS_MAX_COUNT = 3;
 

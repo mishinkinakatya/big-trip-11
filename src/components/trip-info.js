@@ -26,7 +26,7 @@ export default class TripInfo extends AbstractComponent {
     return createTripInfoTemplate(this._title, this._dates, this._cost);
   }
 
-  clearTripInfo() {
+  clear() {
     remove(this);
   }
 }

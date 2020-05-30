@@ -5,7 +5,6 @@ import moment from "moment";
 
 export const convertToClientModel = (inputModel) => {
 
-
   const serverProperties = [`base_price`, `date_from`, `date_to`, `destination`, `is_favorite`, `offers`, `type`];
   const isAllProperties = serverProperties.map((property) => {
     return inputModel.hasOwnProperty(property);

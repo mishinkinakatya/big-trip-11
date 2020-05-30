@@ -272,7 +272,7 @@ export default class Stats extends AbstractComponent {
     return createTimeSpendChart(this._timeSpendStats);
   }
 
-  clearStats() {
+  clear() {
     remove(this);
   }
 }

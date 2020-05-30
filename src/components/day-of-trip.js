@@ -1,15 +1,11 @@
 import AbstractComponent from "./abstract-component.js";
-import {MONTHS} from "../const.js";
-import {parseDate} from "../utils/common.js";
-
-
-const createDescriptionDate = (item) => `${MONTHS[Number(parseDate(item).month)]} ${parseDate(item).date}`;
+import moment from "moment";
 
 const createDayInfoMarkup = (number, day) =>
   `<div class="day__info">
     ${number && day ?
     `<span class="day__counter">${number}</span>
-      <time class="day__date" datetime="${day}">${createDescriptionDate(day)}</time>`
+      <time class="day__date" datetime="${day}">${moment(day).format(`MMM DD`)}</time>`
     : ``}
   </div>`;
 

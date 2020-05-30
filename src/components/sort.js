@@ -48,7 +48,7 @@ export default class Sort extends AbstractComponent {
     return createSortTemplate(activeSortType);
   }
 
-  clearSort() {
+  clear() {
     remove(this);
   }
 

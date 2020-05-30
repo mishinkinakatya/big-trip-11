@@ -5,7 +5,6 @@ import {getStorage} from "../storage-provider.js";
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 
-
 const OFFER_NAME_PREFIX = `event-offer-`;
 
 const getOfferByName = (name) => {
