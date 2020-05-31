@@ -64,13 +64,13 @@ Promise.all([
   dataManager.getOffers(),
   dataManager.getPoints()
 ])
-  .then((results) => {
+  .then(([destinations, offers, points]) => {
     remove(loadingComponent);
     addButton.disabled = false;
-    storage.setAllDestination(results[0]);
+    storage.setAllDestination(destinations);
 
-    storage.setAllOffers(results[1]);
-    const truePoints = results[2].map((it) => {
+    storage.setAllOffers(offers);
+    const truePoints = points.map((it) => {
       return convertToClientModel(it);
     }).filter((it) => it !== null);
 
